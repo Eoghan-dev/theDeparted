@@ -4,17 +4,18 @@
 </head>
 <body>
 <h1>5 first scrape results</h1>
-{% if CurrentWeatherList %}
-    {% for weather in CurrentWeatherList %}
+{% if currentWeatherList %}
+    {% for weatherEntry in currentWeatherList %}
         <ul>
-            <li>Entry id: {{ weather.entry_id }}</li>
-            <li>Datetime: {{ weather.dt }}</li>
-            <li>Weather description: {{ weather.weather_description }}</li>
+            <li><a href="{% url 'detail' weatherEntry.entry_id %}">Entry id: {{ weatherEntry.entry_id }}</a></li>
+            <li>Datetime: {{ weatherEntry.dt }}</li>
+            <li>Weather description: {{ weatherEntry.weather_description }}</li>
         </ul>
     {% endfor %}
 
 {% else %}
-    <p>No current weather data is available.</p>
+    <p>No current weather data is available in the database.</p>
 {% endif %}
+
 </body>
 </html>

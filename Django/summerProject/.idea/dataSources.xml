@@ -22,5 +22,12 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="sql server 2" uuid="c71fe7f2-3605-4e29-be2f-fb2a8983e366">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://thedeparted.database.windows.net:1433;database=thedeparted_v2</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -78,17 +78,17 @@ WSGI_APPLICATION = 'summerProject.wsgi.application'
 
 DATABASES = {
     'default': {
-    #     "ENGINE": logins.db_info['ENGINE'],
-    #     "NAME": logins.db_info['NAME'],
-    #     "USER": logins.db_info['USER'],
-    #     "PASSWORD": logins.db_info['PASSWORD'],
-    #     "HOST": logins.db_info['HOST'],
-    #     "PORT": logins.db_info['PORT'],
-    #     "OPTIONS": {
-    #         "driver": logins.db_info['driver'],
-    #                 },
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
+        "ENGINE": logins.db_info['ENGINE'],
+        "NAME": logins.db_info['NAME'],
+        "USER": logins.db_info['USER'],
+        "PASSWORD": logins.db_info['PASSWORD'],
+        "HOST": logins.db_info['HOST'],
+        "PORT": logins.db_info['PORT'],
+        "OPTIONS": {
+            "driver": logins.db_info['driver'],
+                    },
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'mydatabase',
     }
 }
 

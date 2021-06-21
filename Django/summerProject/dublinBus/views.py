@@ -6,7 +6,7 @@ from .models import CurrentWeather
 
 
 def index(request):
-    CurrentWeatherList = CurrentWeather.objects.order_by('entry_id')[:5]
+    CurrentWeatherList = CurrentWeather.objects.order_by('entry_id')
     template = loader.get_template('dublinBus/index.html')
     context = {
         'CurrentWeatherList': CurrentWeatherList,

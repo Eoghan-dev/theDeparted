@@ -8,7 +8,8 @@ class CurrentWeather(models.Model):
     data for this model will be harvested from the openweather api
     """
     entry_id = models.AutoField(primary_key=True) # Auto increment primary key
-    dt = models.CharField(max_length=256) # Timestamp of when the API call was made
+    timestamp = models.BigIntegerField() # Timestamp of when the API call was made
+    dt = models.DateTimeField()
     weather_id = models.IntegerField()
     weather_main = models.CharField(max_length=256)
     coord_lon = models.FloatField()
@@ -42,7 +43,7 @@ class CurrentWeather(models.Model):
         str_output = f"\n*****\n" \
                      f"Entry id:{self.entry_id}\n" \
                      f"Weather description:{self.weather_description}\n" \
-                     f"Datetime:{datetime.fromtimestamp(int(self.dt))}\n" \
+                     f"Datetime:{self.dt}\n" \
                      f"*****\n"
         return str_output
 
@@ -61,7 +62,8 @@ class CurrentWeather(models.Model):
 
         # Make an object for the current update that is being scraped
         latestUpdate = CurrentWeather(
-            dt=weather_json['dt'],
+            timestamp=int(weather_json['dt']),
+            dt=datetime.fromtimestamp(int(weather_json['dt'])),
             coord_lon=longitude,
             coord_lat=latitude,
 

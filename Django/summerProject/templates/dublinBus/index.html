@@ -8,6 +8,7 @@
     {% for weather in CurrentWeatherList %}
         <ul>
             <li>Entry id: {{ weather.entry_id }}</li>
+            <li>Datetime: {{ weather.dt }}</li>
             <li>Weather description: {{ weather.weather_description }}</li>
         </ul>
     {% endfor %}

@@ -1,0 +1,19 @@
+<html>
+<head>
+    <title>Test home page</title>
+</head>
+<body>
+<h1>5 first scrape results</h1>
+{% if CurrentWeatherList %}
+    {% for weather in CurrentWeatherList %}
+        <ul>
+            <li>Entry id: {{ weather.entry_id }}</li>
+            <li>Weather description: {{ weather.weather_description }}</li>
+        </ul>
+    {% endfor %}
+
+{% else %}
+    <p>No current weather data is available.</p>
+{% endif %}
+</body>
+</html>

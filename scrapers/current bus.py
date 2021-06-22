@@ -21,14 +21,13 @@ def get_current_bus():
 
     params = urllib.parse.urlencode({
     })
-
+    info_bus = ()
     try:
 
         gtfs = 'https://gtfsr.transportforireland.ie/v1/?format=json'
         r = requests.get(gtfs, params=params, headers=headers)
         data = json.loads(r.content)
         #print(data)
-        info_bus = ()
         for i in data["entity"]:
             id = i["id"]
             trip = i["trip_update"]["trip"]
@@ -48,11 +47,11 @@ def get_current_bus():
                             delay = test["delay"]
                         except:
                             delay = 0
+                    info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
+                                            delay),)
             except:
                 stop_id = None
                 delay = None
-
-
                 info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
                                             delay),)
         print(len(info_bus))

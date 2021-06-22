@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     # ex: /dublinBus/scrapeCW
     path('scrapeCW', views.scrapeCW, name='scrapeCW'),
+    # ex: /dublinBus/scrapeCB
+    path('scrapeCB', views.scrapeCB, name='scrapeCB'),
     #ex: /dublinBus/2/
     path('<int:entry_id>/', views.detail, name='detail'),
 ]

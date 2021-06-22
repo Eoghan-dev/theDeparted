@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
-from .models import CurrentWeather
+from .models import CurrentWeather, CurrentBus
 
 
 def index(request):
@@ -23,6 +23,11 @@ def detail(request, entry_id):
     return render(request, 'dublinBus/detail.html', context)
 
 def scrapeCW(request):
-    """View to call our scrape method in the CurrentWeather class."""
+    """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()
-    return HttpResponse("Finished scraping, results saved to database!")
+    return HttpResponse("Finished scraping CurrentWeather, results saved to database!")
+
+def scrapeCB(request):
+    """View to call our scrape method in the CurrentBus class"""
+    CurrentBus.scrape()
+    return HttpResponse("Finished scraping CurrentBus, results saved to database!")

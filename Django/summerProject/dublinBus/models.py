@@ -56,6 +56,7 @@ class CurrentWeather(models.Model):
         weather_json = scrapers.get_current_weather()
         # Create a CurrentWeather object with this json file and write it to the db
         scrapers.write_current_weather(weather_json)
+        print("Finished scraping CurrentWeather!")
 
 
 class CurrentBus(models.Model):
@@ -87,3 +88,4 @@ class CurrentBus(models.Model):
         transport_data = scrapers.get_current_bus()
         # Pass this json data through to our functiont that creates a CurrentBus object and writes it to the db
         scrapers.write_current_bus(transport_data)
+        print("Finished scraping CurrentBus!")

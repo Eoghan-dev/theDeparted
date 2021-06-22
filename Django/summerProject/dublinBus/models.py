@@ -71,8 +71,8 @@ class CurrentBus(models.Model):
     schedule = models.CharField(max_length=256)
     start_t = models.CharField(max_length=256)
     start_d = models.CharField(max_length=256)
-    stop_id = models.CharField(max_length=256)
-    delay = models.IntegerField()
+    stop_id = models.CharField(max_length=256, null=True)
+    delay = models.IntegerField(null=True)
 
     def __str__(self):
         """String representation of the model, can be changed to anything"""

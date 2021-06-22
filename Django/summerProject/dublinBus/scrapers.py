@@ -86,6 +86,9 @@ def write_current_bus(transport_data):
     # Truncate table
     models.CurrentBus.objects.all().delete()
 
+    # Create list where we will store all our instances of CurrentBus that are generated in the for loop
+    entries = []
+
     # Timestamp is the same for all items in the json object so we can create this and dt outside the loop
     timestamp = transport_data['header']['timestamp']
     dt = datetime.fromtimestamp(int(transport_data['header']['timestamp']))
@@ -99,19 +102,23 @@ def write_current_bus(transport_data):
         temp_start_t = trip["start_time"],
         temp_start_d = trip["start_date"],
         # Now loop through all trip updates within the current trip
-        for j in i["trip_update"]["stop_time_update"]:
-            temp_stop_id = j["stop_id"]
-            try:
-                test = j["departure"]
-                temp_delay = test["delay"]
-            except:
+        try:
+            for j in i["trip_update"]["stop_time_update"]:
+                temp_stop_id = j["stop_id"]
                 try:
-                    test = j['arrival']
+                    test = j["departure"]
                     temp_delay = test["delay"]
                 except:
-                    delay = 0
-            temp_delay = test["delay"]
+                    try:
+                        test = j['arrival']
+                        temp_delay = test["delay"]
+                    except:
+                        temp_delay = 0
+        except:
+            temp_stop_id = None
+            temp_delay = None
             # Create one instance CurrentBus for each nested for loop
+        finally:
             latestUpdate = models.CurrentBus(
                 timestamp=timestamp,
                 dt=dt,
@@ -123,5 +130,9 @@ def write_current_bus(transport_data):
                 stop_id=temp_stop_id,
                 delay=temp_delay,
             )
-            # Now save this instance with the current trip update to the database
-            latestUpdate.save()
+            # Now append this instance to our list of entries
+            entries.append(latestUpdate)
+    # Save all our entries to the database
+    print(len(entries))
+    print("TESTTTT")
+    models.CurrentBus.objects.bulk_create(entries)

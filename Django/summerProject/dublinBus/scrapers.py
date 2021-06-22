@@ -78,10 +78,18 @@ def get_current_bus():
     return data
 
 def write_current_bus(transport_data):
+    """
+    Function to write the results from an API call to gtfs transport for Ireland to our db
+    Each trip update for each respective trip will be made into a CurrentBus object and then saved into a respective row
+    in the database table. The table gets cleared everytime the function is run before saving new info.
+    """
+    # Truncate table
+    models.CurrentBus.objects.all().delete()
 
     # Timestamp is the same for all items in the json object so we can create this and dt outside the loop
     timestamp = transport_data['header']['timestamp']
     dt = datetime.fromtimestamp(int(transport_data['header']['timestamp']))
+
     # loop through all the entries in 'entity' and create a CurrentBus object for each one before saving to db
     for i in transport_data['entity']:
         trip = i["trip_update"]["trip"]
@@ -90,12 +98,18 @@ def write_current_bus(transport_data):
         temp_schedule = trip["schedule_relationship"],
         temp_start_t = trip["start_time"],
         temp_start_d = trip["start_date"],
+        # Now loop through all trip updates within the current trip
         for j in i["trip_update"]["stop_time_update"]:
             temp_stop_id = j["stop_id"]
             try:
                 test = j["departure"]
+                temp_delay = test["delay"]
             except:
-                test = j['arrival']
+                try:
+                    test = j['arrival']
+                    temp_delay = test["delay"]
+                except:
+                    delay = 0
             temp_delay = test["delay"]
             # Create one instance CurrentBus for each nested for loop
             latestUpdate = models.CurrentBus(
@@ -109,22 +123,5 @@ def write_current_bus(transport_data):
                 stop_id=temp_stop_id,
                 delay=temp_delay,
             )
-            # Now save this instance to the database
+            # Now save this instance with the current trip update to the database
             latestUpdate.save()
-
-    # for i in transport_data["entity"]:
-    #     id = i["id"]
-    #     trip = i["trip_update"]["trip"]
-    #     route_id = trip["route_id"]
-    #     schedule = trip["schedule_relationship"]
-    #     start_t = trip["start_time"]
-    #     start_d = trip["start_date"]
-    #     for j in i["trip_update"]["stop_time_update"]:
-    #         stop_id = j["stop_id"]
-    #         try:
-    #             test = j["departure"]
-    #         except:
-    #             test = j['arrival']
-    #         delay = test["delay"]
-    #         info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
-    #                                 delay),)

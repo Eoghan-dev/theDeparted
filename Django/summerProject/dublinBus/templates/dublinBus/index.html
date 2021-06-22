@@ -1,8 +1,12 @@
 <html>
 <head>
     <title>Test home page</title>
+    {% load static %}
+    <script type="text/javascript" src="{% static 'dublinBus/javascript.js' %}"></script>
 </head>
+
 <body>
+<button id="scrapeCW" onclick="scrapeCW()">Scrape Current Weather</button>
 <h1>5 first scrape results</h1>
 {% if currentWeatherList %}
     {% for weatherEntry in currentWeatherList %}

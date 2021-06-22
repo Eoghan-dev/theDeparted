@@ -118,6 +118,7 @@ def write_current_bus(transport_data):
             temp_stop_id = None
             temp_delay = None
             # Create one instance CurrentBus for each nested for loop
+        # Regardless of what happened in above try/except blocks we want to insert the row by creating the instance regardlesss
         finally:
             latestUpdate = models.CurrentBus(
                 timestamp=timestamp,

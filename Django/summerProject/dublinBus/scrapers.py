@@ -3,13 +3,14 @@ from . import models
 import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
+from ..summerProject import logins
 def get_current_weather():
     """
     Method to make an api call to openweather for current weather results, returns it as json
     """
     latitude = '53.349805'
     longitude = '-6.26031'
-    weather_key = "7ac118753938be7d1540e9f996c5aab4"
+    weather_key = logins.apis['OpenWeather']
     weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/weather'
     r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
     weather_json = r.json()
@@ -66,7 +67,7 @@ def get_current_bus():
     headers = {
         # Request headers
         'Cache-Control': 'no-cache',
-        'x-api-key': '100d436970cb4ed5b1e954c64f541cb0',
+        'x-api-key': logins.apis['gtfsTFI'],
     }
 
     params = urllib.parse.urlencode({

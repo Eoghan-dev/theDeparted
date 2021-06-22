@@ -1,16 +1,16 @@
 import requests
 import pyodbc
 import  urllib.request, urllib.parse, urllib.error, json
-#import myPrivates
+import myPrivates
 
-# server = myPrivates.server
-# database = myPrivates.dbName
-# username = myPrivates.user
-# password = myPrivates.password
-# #open connection with sql server
-# cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
+server = myPrivates.server
+database = myPrivates.dbName
+username = myPrivates.user
+password = myPrivates.password
+#open connection with sql server
+cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
 # #making cursor easier to access
-# cursor = cnxn.cursor()
+cursor = cnxn.cursor()
 
 def get_current_bus():
     headers = {
@@ -21,38 +21,48 @@ def get_current_bus():
 
     params = urllib.parse.urlencode({
     })
-    """
+
     try:
-        """
-    gtfs = 'https://gtfsr.transportforireland.ie/v1/?format=json'
-    r = requests.get(gtfs, params=params, headers=headers)
-    data = json.loads(r.content)
-    #print(data)
-    info_bus = ()
-    for i in data["entity"]:
-        id = i["id"]
-        trip = i["trip_update"]["trip"]
-        route_id = trip["route_id"]
-        schedule = trip["schedule_relationship"]
-        start_t = trip["start_time"]
-        start_d = trip["start_date"]
-        for j in i["trip_update"]["stop_time_update"]:
-            stop_id = j["stop_id"]
+
+        gtfs = 'https://gtfsr.transportforireland.ie/v1/?format=json'
+        r = requests.get(gtfs, params=params, headers=headers)
+        data = json.loads(r.content)
+        #print(data)
+        info_bus = ()
+        for i in data["entity"]:
+            id = i["id"]
+            trip = i["trip_update"]["trip"]
+            route_id = trip["route_id"]
+            schedule = trip["schedule_relationship"]
+            start_t = trip["start_time"]
+            start_d = trip["start_date"]
             try:
-                test = j["departure"]
+                for j in i["trip_update"]["stop_time_update"]:
+                    stop_id = j["stop_id"]
+                    try:
+                        test = j["departure"]
+                        delay = test["delay"]
+                    except:
+                        try:
+                            test = j["arrival"]
+                            delay = test["delay"]
+                        except:
+                            delay = 0
             except:
-                test = j['arrival']
-            delay = test["delay"]
-            info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
-                                        delay),)
-    print(len(info_bus))
-    write_current_bus(info_bus)
+                stop_id = None
+                delay = None
 
 
-    """
+                info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
+                                            delay),)
+        print(len(info_bus))
+        write_current_bus(info_bus)
+        print("finished")
+
+
     except Exception as e:
-        print("oh no")
-        """
+        print(e)
+
 def write_current_bus(x):
     current_bus = "INSERT INTO dublin_bus_current_info (id, route_id, " \
                     "schedule , start_t, start_d, stop_id, delay) " \
@@ -66,7 +76,7 @@ def write_current_bus(x):
                          "route_id VARCHAR(40), schedule VARCHAR(40), "
                          "start_t VARCHAR(20), start_d VARCHAR(20), stop_id VARCHAR(20), "
                          "delay INT) ")
-    print(x)
+    cursor.execute("truncate table dublin_bus_current_info;")
     cursor.executemany(current_bus, x)
     cnxn.commit()
 get_current_bus()

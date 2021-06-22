@@ -1,6 +1,6 @@
 from django.db import models
-import requests
-from datetime import datetime
+# Import our functions used in our scrape methods for certain models
+from . import scrapers
 
 class CurrentWeather(models.Model):
     """
@@ -52,51 +52,38 @@ class CurrentWeather(models.Model):
         """
         Method to make a call to the open weather for a hard coded set of co-ordinates and save the info in our db
         """
-        # Make the api request and parse it as json
-        latitude = '53.349805'
-        longitude = '-6.26031'
-        weather_key = "7ac118753938be7d1540e9f996c5aab4"
-        weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/weather'
-        r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
-        weather_json = r.json()
+        # Make api call to get the results in a json file
+        weather_json = scrapers.get_current_weather()
+        # Create a CurrentWeather object with this json file and write it to the db
+        scrapers.write_current_weather(weather_json)
 
-        # Make an object for the current update that is being scraped
-        latestUpdate = CurrentWeather(
-            timestamp=int(weather_json['dt']),
-            dt=datetime.fromtimestamp(int(weather_json['dt'])),
-            coord_lon=longitude,
-            coord_lat=latitude,
 
-            weather_id=weather_json['weather'][0]['id'],
-            weather_main=weather_json['weather'][0]['main'],
-            weather_description = weather_json['weather'][0]['description'],
-            weather_icon = weather_json['weather'][0]['icon'],
-            weather_icon_url = 'http://openweathermap.org/img/wn/{}@2x.png'.format(weather_json['weather'][0]['icon']),
+class CurrentBus(models.Model):
+    """
+    Stores current bus information,
+    data for this model will be harvested from gtfs transport for ireland
+    """
+    timestamp = models.BigIntegerField() # timestamp of when the api call was made
+    dt = models.DateTimeField() # datetime representation of the above timestamp
+    trip_id = models.CharField(max_length=256)
+    route_id = models.CharField(max_length=256)
+    schedule = models.CharField(max_length=256)
+    start_t = models.CharField(max_length=256)
+    start_d = models.CharField(max_length=256)
+    stop_id = models.CharField(max_length=256)
+    delay = models.IntegerField()
 
-            base = weather_json['base'],
-            main_temp = weather_json['main']['temp'],
-            main_feels_like = weather_json['main']['feels_like'],
-            main_temp_min = weather_json['main']['temp_min'],
-            main_temp_max = weather_json['main']['temp_max'],
-            main_pressure = weather_json['main']['pressure'],
-            main_humidity = weather_json['main']['humidity'],
-            visibility = weather_json['visibility'],
+    def __str__(self):
+        """String representation of the model, can be changed to anything"""
+        str_output = f"*****" \
+                     f"id: {self.id}" \
+                     f"datetime: {self.dt}" \
+                     f"delay: {self.delay}"
+        return str_output
 
-            wind_speed = weather_json['wind']['speed'],
-            wind_deg = weather_json['wind']['deg'],
-
-            clouds_all = weather_json['clouds']['all'],
-
-            sys_type = weather_json['sys']['type'],
-            sys_id = weather_json['sys']['id'],
-            sys_country = weather_json['sys']['country'],
-            sys_sunrise = weather_json['sys']['sunrise'],
-            sys_sunset = weather_json['sys']['sunset'],
-
-            timezone = weather_json['timezone'],
-            id = weather_json['id'],
-            name = weather_json['name'],
-            cod = weather_json['cod'],
-        )
-        # Store the object which represents a row in our table into the database table
-        latestUpdate.save()
+    @classmethod
+    def scrape(cls):
+        # Make api call to gtfs transport for Ireland api and store the result as json in a variable
+        transport_data = scrapers.get_current_bus()
+        # Pass this json data through to our functiont that creates a CurrentBus object and writes it to the db
+        scrapers.write_current_bus(transport_data)

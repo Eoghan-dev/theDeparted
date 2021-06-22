@@ -1,16 +1,16 @@
 import requests
 import pyodbc
 import  urllib.request, urllib.parse, urllib.error, json
-import myPrivates
+#import myPrivates
 
-server = myPrivates.server
-database = myPrivates.dbName
-username = myPrivates.user
-password = myPrivates.password
-#open connection with sql server
-cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
-#making cursor easier to access
-cursor = cnxn.cursor()
+# server = myPrivates.server
+# database = myPrivates.dbName
+# username = myPrivates.user
+# password = myPrivates.password
+# #open connection with sql server
+# cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+password)
+# #making cursor easier to access
+# cursor = cnxn.cursor()
 
 def get_current_bus():
     headers = {
@@ -26,8 +26,8 @@ def get_current_bus():
         """
     gtfs = 'https://gtfsr.transportforireland.ie/v1/?format=json'
     r = requests.get(gtfs, params=params, headers=headers)
-    print(r)
     data = json.loads(r.content)
+    #print(data)
     info_bus = ()
     for i in data["entity"]:
         id = i["id"]
@@ -45,6 +45,7 @@ def get_current_bus():
             delay = test["delay"]
             info_bus = info_bus + ((id, route_id, schedule, start_t, start_d, stop_id,
                                         delay),)
+    print(len(info_bus))
     write_current_bus(info_bus)
 
 

@@ -3,9 +3,10 @@ from . import models
 import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
+
 def get_current_weather():
     """
-    Method to make an api call to openweather for current weather results, returns it as json
+    Function to make an api call to openweather for current weather results at hard-coded location, returns it as json
     """
     latitude = '53.349805'
     longitude = '-6.26031'
@@ -62,7 +63,9 @@ def write_current_weather(weather_json):
     latestUpdate.save()
 
 def get_current_bus():
-    """Function to get current data from the gtfs transport for ireland api and return it in json format"""
+    """
+    Function to get current data from the gtfs transport for ireland api and return it in json format
+    """
     headers = {
         # Request headers
         'Cache-Control': 'no-cache',
@@ -117,9 +120,10 @@ def write_current_bus(transport_data):
         except:
             temp_stop_id = None
             temp_delay = None
-            # Create one instance CurrentBus for each nested for loop
+
         # Regardless of what happened in above try/except blocks we want to insert the row by creating the instance regardlesss
         finally:
+            # Create one instance CurrentBus for each nested for loop
             latestUpdate = models.CurrentBus(
                 timestamp=timestamp,
                 dt=dt,
@@ -134,6 +138,4 @@ def write_current_bus(transport_data):
             # Now append this instance to our list of entries
             entries.append(latestUpdate)
     # Save all our entries to the database
-    print(len(entries))
-    print("TESTTTT")
     models.CurrentBus.objects.bulk_create(entries)

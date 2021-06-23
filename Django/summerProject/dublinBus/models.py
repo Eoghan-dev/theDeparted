@@ -79,7 +79,8 @@ class CurrentBus(models.Model):
         str_output = f"*****" \
                      f"id: {self.id}" \
                      f"datetime: {self.dt}" \
-                     f"delay: {self.delay}"
+                     f"delay: {self.delay}" \
+                     f"*****"
         return str_output
 
     @classmethod

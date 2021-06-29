@@ -139,3 +139,34 @@ def write_current_bus(transport_data):
             entries.append(latestUpdate)
     # Save all our entries to the database
     models.CurrentBus.objects.bulk_create(entries)
+
+def get_bus_stop():
+    f = open("stops.txt", "r")
+    count = 0
+    entries = []
+    while (True):
+        try:
+            # read next line
+            line = f.readline()
+            # if line is empty, you are done with all lines in the file
+            if not line:
+                break
+
+            x = line.split('","')
+            y = x[1].split(", stop ")
+            latestUpdate = models.bus_stops(
+                stop_id=x[0],
+                stop_name=y[0],
+                stop_number=y[1],
+                stop_lat=x[2],
+                stop_lon=x[3]
+            )
+            entries.append(latestUpdate)
+        except Exception as e:
+            count +=1
+            print(e)
+    # close file
+    f.close
+    models.bus_stops.objects.bulk_create(entries)
+    print("Number of stations failing:",count)
+get_bus_stop()

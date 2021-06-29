@@ -90,3 +90,31 @@ class CurrentBus(models.Model):
         # Pass this json data through to our functiont that creates a CurrentBus object and writes it to the db
         scrapers.write_current_bus(transport_data)
         print("Finished scraping CurrentBus!")
+
+class bus_stops(models.Model):
+    """
+    Stores current bus stop information,
+    data for this model will be harvested from gtfs transport for ireland
+    """
+
+    stop_id = models.CharField(max_length=256)
+    stop_name = models.CharField(max_length=256)
+    stop_number = models.CharField(max_length=256)
+    stop_lat = models.CharField(max_length=256)
+    stop_lon = models.CharField(max_length=256)
+
+    def __str__(self):
+        """String representation of the model, can be changed to anything"""
+        str_output = f"*****" \
+                     f"id: {self.stop_id}" \
+                     f"name: {self.stop_name}" \
+                     f"stop_number: {self.stop_number}" \
+                     f"stop_lat: {self.stop_lat}"\
+                     f"stop_lon: {self.stop_lon}" \
+                     f"*****"
+        return str_output
+
+    @classmethod
+    def scrape(cls):
+        scrapers.get_bus_stop()
+        print("Finished scraping Bus stops!")

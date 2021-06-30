@@ -143,9 +143,13 @@ def write_current_bus(transport_data):
     models.CurrentBus.objects.bulk_create(entries)
 
 def get_bus_stop():
+    # Read file with all stops
     base = settings.BASE_DIR
     file_location = os.path.join(base, "dublinBus", "stops.txt")
     f = open(file_location, "r")
+    # Truncate table
+    models.bus_stops.objects.all().delete()
+
     count = 0
     entries = []
     while (True):

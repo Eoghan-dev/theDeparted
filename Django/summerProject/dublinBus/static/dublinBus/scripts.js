@@ -25,5 +25,9 @@ function scrapeCB() {
 
 function getBusJson() {
     // Funtion to get all bus stops from
-    fetch('/dublinBus/getBus/get_bus_stops')
+    fetch('/dublinBus/getBus/get_bus_stops').then(res => {
+        return res.json({
+            
+        })
+    })
 }

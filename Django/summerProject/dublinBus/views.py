@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
 from .models import CurrentWeather, CurrentBus, bus_stops
@@ -32,7 +32,13 @@ def scrapeCB(request):
     CurrentBus.scrape()
     return HttpResponse("Finished scraping CurrentBus, results saved to database!")
 
-def get_bus_stops(request):
-    """View to call our scrape method in the bus_stops class, works by reading from txt file and saving to db"""
+def scrape_bus_stops(request):
+    """View to call our scrape method in the bus_stops class"""
     bus_stops.scrape()
     return HttpResponse("Finished scraping bus_stops, results saved to database!")
+
+def get_bus_stops(request):
+    """View to get all bus stops from our db and return it as json"""
+    # Get all bus stops as json data
+    bus_stops_json = bus_stops.objects.values()
+    return JsonResponse(bus_stops_json)

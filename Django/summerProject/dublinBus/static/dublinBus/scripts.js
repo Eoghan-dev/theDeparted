@@ -22,3 +22,8 @@ function scrapeCB() {
         }
     })
 }
+
+function getBusJson() {
+    // Funtion to get all bus stops from
+    fetch('/dublinBus/getBus/get_bus_stops')
+}

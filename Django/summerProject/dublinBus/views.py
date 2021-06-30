@@ -34,3 +34,5 @@ def scrapeCB(request):
 
 def get_bus_stops(request):
     """View to call our scrape method in the bus_stops class, works by reading from txt file and saving to db"""
+    bus_stops.scrape()
+    return HttpResponse("Finished scraping bus_stops, results saved to database!")

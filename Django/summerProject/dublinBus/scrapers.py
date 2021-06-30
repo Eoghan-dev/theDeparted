@@ -169,4 +169,3 @@ def get_bus_stop():
     f.close
     models.bus_stops.objects.bulk_create(entries)
     print("Number of stations failing:",count)
-get_bus_stop()

@@ -13,11 +13,11 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="thedeparted_v2" uuid="99ac4e5d-94b4-4ef4-acaa-5381c206e242">
+    <data-source source="LOCAL" name="the_departed" uuid="99ac4e5d-94b4-4ef4-acaa-5381c206e242">
       <driver-ref>sqlserver.ms</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
-      <jdbc-url>jdbc:sqlserver://thedeparted.database.windows.net:1433;database=thedeparted_v2</jdbc-url>
+      <jdbc-url>jdbc:sqlserver://thedeparted.database.windows.net:1433;database=the_departed</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -11,4 +11,6 @@ urlpatterns = [
     path('scrapeCB', views.scrapeCB, name='scrapeCB'),
     #ex: /dublinBus/2/
     path('<int:entry_id>/', views.detail, name='detail'),
+    #ex: /dublinBus/get_bus_stops/
+    path('get_bus_stops', views.get_bus_stops, name='get_bus_stops')
 ]

@@ -3,6 +3,8 @@ from . import models
 import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
+from django.conf import settings # This allows us to import base directory which we can use for read/write operations
+import os
 
 def get_current_weather():
     """
@@ -141,7 +143,9 @@ def write_current_bus(transport_data):
     models.CurrentBus.objects.bulk_create(entries)
 
 def get_bus_stop():
-    f = open("stops.txt", "r")
+    base = settings.BASE_DIR
+    file_location = os.path.join(base, "dublinBus", "stops.txt")
+    f = open(file_location, "r")
     count = 0
     entries = []
     while (True):

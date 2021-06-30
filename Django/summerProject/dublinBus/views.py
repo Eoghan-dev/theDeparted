@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
-from .models import CurrentWeather, CurrentBus
+from .models import CurrentWeather, CurrentBus, bus_stops
 
 
 def index(request):
@@ -31,3 +31,6 @@ def scrapeCB(request):
     """View to call our scrape method in the CurrentBus class"""
     CurrentBus.scrape()
     return HttpResponse("Finished scraping CurrentBus, results saved to database!")
+
+def get_bus_stops(request):
+    """View to call our scrape method in the bus_stops class, works by reading from txt file and saving to db"""

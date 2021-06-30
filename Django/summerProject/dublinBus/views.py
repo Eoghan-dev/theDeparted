@@ -39,6 +39,6 @@ def scrape_bus_stops(request):
 
 def get_bus_stops(request):
     """View to get all bus stops from our db and return it as json"""
-    # Get all bus stops as json data
-    bus_stops_json = bus_stops.objects.values()
-    return JsonResponse(bus_stops_json)
+    # Get all bus stops as an array of json objects
+    bus_stops_json = list(bus_stops.objects.values())
+    return JsonResponse(bus_stops_json, safe=False)

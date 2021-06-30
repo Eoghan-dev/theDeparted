@@ -1,5 +1,5 @@
 from django.contrib import admin
-from dublinBus.models import CurrentWeather, CurrenBus, bus_stops
+from dublinBus.models import CurrentWeather, CurrentBus, bus_stops
 
 admin.site.register(CurrentWeather)
 admin.site.register(CurrentBus)

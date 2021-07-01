@@ -100,8 +100,8 @@ class bus_stops(models.Model):
     stop_id = models.CharField(max_length=256)
     stop_name = models.CharField(max_length=256)
     stop_number = models.CharField(max_length=256)
-    stop_lat = models.CharField(max_length=256)
-    stop_lon = models.CharField(max_length=256)
+    stop_lat = models.FloatField()
+    stop_lon = models.FloatField()
 
     def __str__(self):
         """String representation of the model, can be changed to anything"""

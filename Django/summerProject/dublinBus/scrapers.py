@@ -149,6 +149,8 @@ def get_bus_stop():
     f = open(file_location, "r")
     # Truncate table
     models.bus_stops.objects.all().delete()
+    # Make a string with all numeric characters and '-', so we can remove all characters apart from these before insertion
+    allowed = '.-0123456789'
 
     count = 0
     entries = []
@@ -162,6 +164,31 @@ def get_bus_stop():
 
             x = line.split('","')
             y = x[1].split(", stop ")
+            # Check that the string for longitude and latitude are valid before casting to float
+            temp_stop_lat = stop_lat=x[2]
+            temp_stop_lon = stop_lon=x[3]
+            # Loop through each character in the string and remove it if not in our allowed string
+            lat_to_remove = []
+            for i in range(len(temp_stop_lat)):
+                current_character = temp_stop_lat[i]
+                if current_character not in allowed:
+                    lat_to_remove.append(current_character)
+            #Remove unwanted characters
+            for unwanted_char in lat_to_remove:
+                temp_stop_lat = temp_stop_lat.replace(unwanted_char, '')
+            # Cast to float
+            temp_stop_lat = float(temp_stop_lat)
+            long_to_remove = []
+            # Loop through each character in the string and remove it if not in our allowed string
+            for i in range(len(temp_stop_lon)):
+                current_character = temp_stop_lon[i]
+                if current_character not in allowed:
+                    long_to_remove.append(current_character)
+            #Remove unwanted characters
+            for unwanted_char in long_to_remove:
+                temp_stop_long = temp_stop_long.replace(unwanted_char, '')
+            # Cast to float
+            temp_stop_lon = float(temp_stop_lon)
             latestUpdate = models.bus_stops(
                 stop_id=x[0],
                 stop_name=y[0],

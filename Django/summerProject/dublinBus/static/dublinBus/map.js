@@ -29,7 +29,11 @@ async function initMap() {
   // Apply this arrow function to each bus station in our response
   bus_stop_data.forEach(station=> {
     let station_long = parseFloat(station.stop_lon);
+    console.log("data type of long below_")
+    console.log(typeof station_long)
     let station_lat = parseFloat(station.stop_lat);
+    console.log("data type of lat below:")
+    console.log(typeof station_lat)
     const marker = new google.maps.Marker({
       position: {lat: station_lat, long: station_long},
       map: map,

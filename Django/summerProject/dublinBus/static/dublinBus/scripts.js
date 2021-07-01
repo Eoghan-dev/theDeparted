@@ -23,10 +23,9 @@ function scrapeCB() {
     })
 }
 
-function getBusJson() {
-    // Function to get all bus stops from the current_bus table and return it as json
-    fetch('/dublinBus/get_bus_stops').then(res => {
-        console.log(res.json())
-        return res.json()
-    })
-}
+//  async function getBusJson() {
+//     console.log("about to fetch data")
+//    let bus_stop_data = await fetch('/dublinBus/get_bus_stops');
+//    let bus_stop_json = bus_stop_data.json();
+//     return bus_stop_json
+// }

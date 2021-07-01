@@ -15,13 +15,6 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-def detail(request, entry_id):
-    """View that returns more detailed info for a row in the CurrentWeather table based on the entry_id"""
-    # Get the appropriate object (row in table) according to the given entry id
-    weatherEntry = get_object_or_404(CurrentWeather, pk=entry_id)
-    context = {'weatherEntry': weatherEntry}
-    return render(request, 'dublinBus/detail.html', context)
-
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()

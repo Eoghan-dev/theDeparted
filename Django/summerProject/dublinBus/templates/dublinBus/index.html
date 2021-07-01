@@ -3,24 +3,18 @@
     <title>Test home page</title>
     {% load static %}
     <script type="text/javascript" src="{% static 'dublinBus/scripts.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dublinBus/map.js' %}"></script>
 </head>
 
 <body>
 <button id="scrapeCW" onclick="scrapeCW()">Scrape Current Weather</button>
 <button id="scrapeCB" onclick="scrapeCB()">Scrape Current Bus</button>
-<h1>Test home page to show different rows in the current weather table</h1>
-{% if currentWeatherList %}
-    {% for weatherEntry in currentWeatherList %}
-        <ul>
-            <li><a href="{% url 'detail' weatherEntry.entry_id %}">Entry id: {{ weatherEntry.entry_id }}</a></li>
-            <li>Datetime: {{ weatherEntry.dt }}</li>
-            <li>Weather description: {{ weatherEntry.weather_description }}</li>
-        </ul>
-    {% endfor %}
 
-{% else %}
-    <p>No current weather data is available in the database.</p>
-{% endif %}
+
+<div id="map">
+
+</div>
+
 
 </body>
 </html>

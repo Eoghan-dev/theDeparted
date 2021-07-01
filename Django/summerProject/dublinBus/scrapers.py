@@ -165,8 +165,8 @@ def get_bus_stop():
             x = line.split('","')
             y = x[1].split(", stop ")
             # Check that the string for longitude and latitude are valid before casting to float
-            temp_stop_lat = stop_lat=x[2]
-            temp_stop_lon = stop_lon=x[3]
+            temp_stop_lat = x[2]
+            temp_stop_lon = x[3]
             # Loop through each character in the string and remove it if not in our allowed string
             lat_to_remove = []
             for i in range(len(temp_stop_lat)):

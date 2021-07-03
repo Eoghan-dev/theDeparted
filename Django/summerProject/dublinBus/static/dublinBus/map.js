@@ -42,6 +42,7 @@ async function initMap() {
       name: station.stop_name,
       number: parseInt(station.stop_number),
       infowindow: current_info_window,
+      icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png",
     });
     // Add an on-click event for each marker to open the associated info window
     current_marker.addListener("click", () => {

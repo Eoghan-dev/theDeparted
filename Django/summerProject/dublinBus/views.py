@@ -34,7 +34,5 @@ def get_bus_stops(request):
     """View to get all bus stops from our db and return it as json"""
     # Get all bus stops as an array of json objects
     bus_stops_json = list(bus_stops.objects.values())
-    print(type(bus_stops_json))
-    print(bus_stops_json)
     # return JsonResponse({"stops_data": bus_stops_json})
     return JsonResponse(bus_stops_json, safe=False)

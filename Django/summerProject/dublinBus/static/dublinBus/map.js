@@ -8,7 +8,7 @@ async function initMap() {
 
   // load map
   const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 4,
+    zoom: 8,
     center: {lat: 53.349804, lng: -6.260310},
   });
   // Make request to get json object of all dublin bus stops

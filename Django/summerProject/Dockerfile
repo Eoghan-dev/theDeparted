@@ -25,7 +25,7 @@ RUN ACCEPT_EULA=Y apt-get -y install msodbcsql17
 # Install other dependencies
 RUN apt-get install unixodbc-dev
 
-# Install dependencies from requirements file
+# Install python dependencies from requirements file
 RUN pip install -r requirements.txt
 # Copy the django project into the working directory
 COPY . /code/

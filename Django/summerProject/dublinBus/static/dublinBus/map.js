@@ -1,5 +1,4 @@
 
-
 async function initMap() {
   // initMap function is ran as soon as our home page is opened
   // Function is async in order to allow use of the await keyword
@@ -20,12 +19,10 @@ async function initMap() {
     console.log(data)
     return data
   })
-  console.log("look here")
-  console.log(typeof bus_stop_data)
-  console.log(bus_stop_data)
 
   // Declare an empty array where we will keep all of our markers for each stop
   let markers_array = [];
+
   // Apply this arrow function to each bus station in our response
   bus_stop_data.forEach(station=> {
     let marker_location = new google.maps.LatLng(station.stop_lat, station.stop_lon)
@@ -36,12 +33,16 @@ async function initMap() {
       number: parseInt(station.number),
     });
 
-    if (station.stop_id === 1) {
-      console.log(station.name)
-    }
     //Now add each created marker to our array of markers to keep track of them
     markers_array.push(marker);
     // Also add each marker to our map
     marker.setMap(map)
   });
+
+  // Add a marker clusterer to group all the markers together.
+  new MarkerClusterer(map, markers_array, {
+    imagePath:
+      "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+  });
+
 }

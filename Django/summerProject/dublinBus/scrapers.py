@@ -5,7 +5,6 @@ from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
-import re
 
 def get_current_weather():
     """

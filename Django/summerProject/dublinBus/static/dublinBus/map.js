@@ -21,22 +21,44 @@ async function initMap() {
   })
 
   // Declare an empty array where we will keep all of our markers for each stop
-  let markers_array = [];
+  const markers_array = [];
 
   // Apply this arrow function to each bus station in our response
   bus_stop_data.forEach(station=> {
-    let marker_location = new google.maps.LatLng(station.stop_lat, station.stop_lon)
-    const marker = new google.maps.Marker({
-      position: marker_location,
-      map: map,
-      name: station.name,
-      number: parseInt(station.number),
+    // Create info window for each station before creating a marker
+    // Create content of window
+    let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
+        `<ul><li>Station Number: ${station.stop_number} </li></ul>`;
+    // Create info window object
+    let current_info_window = new google.maps.InfoWindow({
+      content: window_content,
     });
 
+    // Create marker for each station
+    const current_marker_location = new google.maps.LatLng(station.stop_lat, station.stop_lon);
+    const current_marker = new google.maps.Marker({
+      position: current_marker_location,
+      map: map,
+      name: station.stop_name,
+      number: parseInt(station.stop_number),
+      infowindow: current_info_window,
+    });
+    // Add an on-click event for each marker to open the associated info window
+    current_marker.addListener("click", () => {
+      // before opening the window for this marker close any other open markers
+      markers_array.forEach(current_marker => {
+        current_marker.infowindow.close(map, current_marker)
+      });
+      current_info_window.open({
+        anchor: current_marker,
+        map: map,
+        shouldFocus: false,
+      });
+    });
     //Now add each created marker to our array of markers to keep track of them
-    markers_array.push(marker);
+    markers_array.push(current_marker);
     // Also add each marker to our map
-    marker.setMap(map)
+    current_marker.setMap(map);
   });
 
   // Add a marker clusterer to group all the markers together.

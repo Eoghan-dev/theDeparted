@@ -5,6 +5,7 @@ from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
+import re
 
 def get_current_weather():
     """
@@ -167,34 +168,25 @@ def get_bus_stop():
             # Check that the string for longitude and latitude are valid before casting to float
             temp_stop_lat = x[2]
             temp_stop_lon = x[3]
-            # Loop through each character in the string and remove it if not in our allowed string
-            lat_to_remove = []
-            for i in range(len(temp_stop_lat)):
-                current_character = temp_stop_lat[i]
-                if current_character not in allowed:
-                    lat_to_remove.append(current_character)
-            #Remove unwanted characters
-            for unwanted_char in lat_to_remove:
-                temp_stop_lat = temp_stop_lat.replace(unwanted_char, '')
+
+            # Remove inverted commas and new line characters from string so it can be converted to float
+            temp_stop_lat = temp_stop_lat.replace('"', '')
+            temp_stop_lat = temp_stop_lat.strip()
             # Cast to float
             temp_stop_lat = float(temp_stop_lat)
-            long_to_remove = []
-            # Loop through each character in the string and remove it if not in our allowed string
-            for i in range(len(temp_stop_lon)):
-                current_character = temp_stop_lon[i]
-                if current_character not in allowed:
-                    long_to_remove.append(current_character)
-            #Remove unwanted characters
-            for unwanted_char in long_to_remove:
-                temp_stop_long = temp_stop_long.replace(unwanted_char, '')
+
+            # Remove inverted commas and new line characters from string so it can be converted to float
+            temp_stop_lon = temp_stop_lon.replace('"', '')
+            temp_stop_lon = temp_stop_lon.strip()
             # Cast to float
             temp_stop_lon = float(temp_stop_lon)
+
             latestUpdate = models.bus_stops(
                 stop_id=x[0],
                 stop_name=y[0],
                 stop_number=y[1],
-                stop_lat=x[2],
-                stop_lon=x[3]
+                stop_lat=temp_stop_lat,
+                stop_lon=temp_stop_lon
             )
             entries.append(latestUpdate)
         except Exception as e:

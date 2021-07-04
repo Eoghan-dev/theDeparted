@@ -42,6 +42,7 @@ async function initMap() {
       name: station.stop_name,
       number: parseInt(station.stop_number),
       infowindow: current_info_window,
+      // Icon taken from http://kml4earth.appspot.com/icons.html
       icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png",
     });
     // Add an on-click event for each marker to open the associated info window
@@ -62,7 +63,7 @@ async function initMap() {
     current_marker.setMap(map);
   });
 
-  // Add a marker clusterer to group all the markers together.
+  // Add a marker clusterer to group all the markers together using the Marker Clusterer Plus library https://github.com/googlemaps/js-markerclustererplus
   new MarkerClusterer(map, markers_array, {
     imagePath:
       "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",

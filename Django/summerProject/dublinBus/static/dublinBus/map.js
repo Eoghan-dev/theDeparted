@@ -1,4 +1,4 @@
-
+alert("test")
 async function initMap() {
   // initMap function is ran as soon as our home page is opened
   // Function is async in order to allow use of the await keyword

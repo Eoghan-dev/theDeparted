@@ -57,7 +57,7 @@ ROOT_URLCONF = 'summerProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'dublinBus/templates']
+        'DIRS': [BASE_DIR / 'dublinBus/templates/dublinBus']
         ,
         'APP_DIRS': True,
         'OPTIONS': {

@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     # ex: /dublinBus
     path('', views.index, name='index'),
+    # ex: /dublinBus/login
+    path('login', views.login, name="login"),
     # ex: /dublinBus/scrapeCW
     path('scrapeCW', views.scrapeCW, name='scrapeCW'),
     # ex: /dublinBus/scrapeCB

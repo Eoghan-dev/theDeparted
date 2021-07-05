@@ -31,9 +31,13 @@
     <button id="scrapeCB" onclick="scrapeCB()">Scrape Current Bus</button>
 </div>
 <div id="main_content">
-    {% block content %}{% endblock %}
+    {% block content %}
+{# This is where the main content of our page layout should go (map/login form etc. depends on the page) #}
+{# We can add more blocks for things such as header/footer/navbar etc. depending on our UX choices #}
+    {% endblock %}
 </div>
 {% block scripts %}
+#     This is where the google maps JS will be loaded when inherited in index.html
 {% endblock %}
 </body>
 </html>

@@ -3,8 +3,9 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-{#   Bootstrap styling can go here #}
+{#   Bootstrap styling can go here, I added some really basic bootstrap just following the guide I was using #}
     <form method="post" class="form-group">
+        {% csrf_token %}
         {{ form }}
     <button type="submit" class="btn btn-success">Register</button>
     </form>

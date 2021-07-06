@@ -149,8 +149,6 @@ def get_bus_stop():
     f = open(file_location, "r")
     # Truncate table
     models.bus_stops.objects.all().delete()
-    # Make a string with all numeric characters and '-', so we can remove all characters apart from these before insertion
-    allowed = '.-0123456789'
 
     count = 0
     entries = []

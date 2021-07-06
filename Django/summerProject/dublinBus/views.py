@@ -7,12 +7,8 @@ from .models import CurrentWeather, CurrentBus, bus_stops
 
 
 def index(request):
-    """View for the homepage of our application"""
+    """View to load the homepage of our application"""
     return render(request, 'dublinBus/index.html')
-
-def login(request):
-    """View to load the login page of our application"""
-    return render(request, 'dublinBus/login.html')
 
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""

@@ -1,6 +1,6 @@
 function scrapeCW() {
     //Function to call the current weather scraper
-    fetch('/dublinBus/scrapeCW').then(res => {
+    fetch('/scrapeCW').then(res => {
         console.log("CurrentWeather scraper request sent")
         if (res.status===200) {
             console.log("Scraper ran successfully")
@@ -12,7 +12,7 @@ function scrapeCW() {
 }
 function scrapeCB() {
     //Function to call the current bus scraper
-    fetch('/dublinBus/scrapeCB').then(res => {
+    fetch('/scrapeCB').then(res => {
         console.log("CurrentBus scraper request sent")
         if (res.status===200) {
             console.log("Scraper ran successfully")

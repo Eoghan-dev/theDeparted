@@ -12,7 +12,7 @@ async function initMap() {
   });
   // Make request to get json object of all dublin bus stops
   // We use await to ensure that we wait until the data is fetched before continuing
-  let bus_stop_data = await fetch('/dublinBus/get_bus_stops').then(res=> {
+  let bus_stop_data = await fetch('/get_bus_stops').then(res=> {
     return res.json()
   }).then(data => {
     console.log(data)

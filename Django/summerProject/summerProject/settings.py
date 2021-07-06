@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['137.43.49.56', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'dublinBus.apps.DublinbusConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'summerProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'dublinBus/templates/dublinBus']
+        'DIRS': [BASE_DIR / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {

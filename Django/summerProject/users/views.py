@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
@@ -10,6 +10,9 @@ def register(request):
         # save the new user in the database if the form is valid
         if form.is_valid():
             form.save()
+            print("user saved")
+            # Redirect back to homepage after user is created
+            return redirect("/")
     # If form was not posted then nothing was submitted by user so just load an empty form
     else:
         form = UserCreationForm()

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['137.43.49.56', 'localhost', '127.0.0.1']
 INSTALLED_APPS = [
     'dublinBus.apps.DublinbusConfig',
     'users.apps.UsersConfig',
+    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -132,6 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+# This tells the crispy forms package what version of bootstrap we're using. Can change this at anytime
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]

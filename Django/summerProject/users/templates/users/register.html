@@ -9,5 +9,10 @@
         {% csrf_token %}
         {{ form|crispy }}
     <button type="submit" class="btn btn-success">Register</button>
+    {% if request.path == "/register/" %}
+        <p>Already have an account? <a href="/login">Login</p>
+    {% elif request.path == "/login/" %}
+        <p>Don't have an account? <a href="/register">Register</a></p>
+    {% endif %}
     </form>
 {% endblock %}

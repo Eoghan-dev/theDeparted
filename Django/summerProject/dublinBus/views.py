@@ -10,6 +10,10 @@ def index(request):
     """View to load the homepage of our application"""
     return render(request, 'dublinBus/index.html')
 
+def journey(request):
+    """View to load the journey page of our application"""
+    return render(request, 'dublinBus/journey.html')
+
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()

@@ -1,0 +1,39 @@
+{% extends "dublinBus/base.html" %}
+{% block title %}journey{% endblock %}
+
+{% block content %}
+<div class="container">
+        <div class="row">
+            <div class="col-md-4" style="width: 33.33%;border-bottom-color: var(--bs-green);"><button class="btn btn-primary" type="button" style="width: 100%;background: var(--bs-green);padding-left: 12px;">Route</button></div>
+            <div class="col-md-4" style="width: 33.333%;border-bottom-color: var(--bs-green);"><button class="btn btn-primary" type="button" style="width: 100%;background: var(--bs-green);border-bottom-color: var(--bs-green);">Stops</button></div>
+            <div class="col-md-4" style="width: 33.33%;border-bottom-color: var(--bs-green);"><button class="btn btn-primary" type="button" style="width: 100%;background: var(--bs-green);">Directions</button></div>
+        </div>
+    </div><input type="search" style="width: 80%;margin-right: 10%;margin-left: 10%;">
+    <div class="table-responsive" style="width: 80%;margin-right: 10%;margin-left: 10%;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Stop Number</th>
+                    <th style="border-style: solid;border-color: var(--bs-dark);">Bus Numbers</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-style: solid;border-color: var(--bs-dark);">
+                    <td style="border-style: solid;border-color: var(--bs-dark);">Cell 1</td>
+                    <td style="border-style: solid;border-color: var(--bs-dark);">Cell 2</td>
+                </tr>
+                <tr>
+                    <td style="border-style: solid;border-color: var(--bs-dark);">Cell 3</td>
+                    <td style="border-style: solid;border-color: rgb(33, 37, 41);border-top-color: rgb(33,;border-right-color: 37,;border-bottom-color: 41);border-left-color: 37,;">Cell 4</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIcs79d43mNxy4DHlrmVXPVT13Twe6PT4&callback=initMap&libraries=&v=weekly"
+        async
+    ></script>
+{% endblock %}

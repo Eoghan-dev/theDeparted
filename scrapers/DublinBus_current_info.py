@@ -27,7 +27,7 @@ def download():
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
-    with open('Dublin_bus_info/'+filename) as fh:
+    with open('Dublin_bus_info/'+filename, encoding="utf8") as fh:
         # count variable for id
         l = 1
 
@@ -58,5 +58,6 @@ def json_convertor(filename):
     out_file = open("Dublin_bus_info/json_files/"+filename+".json", "w")
     json.dump(dict1, out_file, indent=4)
     out_file.close()
+    print("Finished saving", filename + ".json")
 
 main()

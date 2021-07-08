@@ -148,7 +148,7 @@ def get_bus_stop():
     file_location = os.path.join(base, "dublinBus", "stops.txt")
     f = open(file_location, "r")
     # Truncate table
-    models.bus_stops.objects.all().delete()
+    models.BusStops.objects.all().delete()
 
     count = 0
     entries = []
@@ -178,7 +178,7 @@ def get_bus_stop():
             # Cast to float
             temp_stop_lon = float(temp_stop_lon)
 
-            latestUpdate = models.bus_stops(
+            latestUpdate = models.BusStops(
                 stop_id=x[0],
                 stop_name=y[0],
                 stop_number=y[1],
@@ -191,5 +191,5 @@ def get_bus_stop():
             print(e)
     # close file
     f.close
-    models.bus_stops.objects.bulk_create(entries)
+    models.BusStops.objects.bulk_create(entries)
     print("Number of stations failing:",count)

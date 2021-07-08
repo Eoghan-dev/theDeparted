@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
-from .models import CurrentWeather, CurrentBus, bus_stops
+from .models import CurrentWeather, CurrentBus, BusStops
 
 
 def index(request):
@@ -26,12 +26,12 @@ def scrapeCB(request):
 
 def scrape_bus_stops(request):
     """View to call our scrape method in the bus_stops class"""
-    bus_stops.scrape()
+    BusStops.scrape()
     return HttpResponse("Finished scraping bus_stops, results saved to database!")
 
 def get_bus_stops(request):
     """View to get all bus stops from our db and return it as json"""
     # Get all bus stops as an array of json objects
-    bus_stops_json = list(bus_stops.objects.values())
+    bus_stops_json = list(BusStops.objects.values())
     # return JsonResponse({"stops_data": bus_stops_json})
     return JsonResponse(bus_stops_json, safe=False)

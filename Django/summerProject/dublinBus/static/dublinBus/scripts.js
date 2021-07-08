@@ -22,3 +22,19 @@ function scrapeCB() {
         }
     })
 }
+
+function showCertainMarkers(allMarkers, visibleMarkers) {
+    // Function that takes an array of all the markers on the map, an array of the markers we want to make visible and
+    // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
+
+    // First make all markers invisible
+    allMarkers.forEach(current_marker => {
+         current_marker.setVisible(false);
+       // current_marker.setMap(null);
+    })
+
+    // Now loop over the markers we want to make visible and make only them visible
+    visibleMarkers.forEach(current_marker => {
+         current_marker.setVisible(true);
+    })
+}

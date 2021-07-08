@@ -91,12 +91,11 @@ class CurrentBus(models.Model):
         scrapers.write_current_bus(transport_data)
         print("Finished scraping CurrentBus!")
 
-class bus_stops(models.Model):
+class BusStops(models.Model):
     """
     Stores current bus stop information,
     data for this model will be harvested from gtfs transport for ireland
     """
-
     stop_id = models.CharField(max_length=256)
     stop_name = models.CharField(max_length=256)
     stop_number = models.CharField(max_length=256)
@@ -118,3 +117,4 @@ class bus_stops(models.Model):
     def scrape(cls):
         scrapers.get_bus_stop()
         print("Finished scraping Bus stops!")
+

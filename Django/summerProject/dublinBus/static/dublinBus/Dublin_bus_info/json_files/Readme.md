@@ -1,0 +1,1 @@
+Folder to seperate created json files. Taken from transport for Ireland website

@@ -23,7 +23,7 @@ function scrapeCB() {
     })
 }
 
-function showCertainMarkers(allMarkers, visibleMarkers, map) {
+function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes an array of all the markers on the map, an array of the markers we want to make visible and
     // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
 

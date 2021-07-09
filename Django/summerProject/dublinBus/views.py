@@ -38,9 +38,20 @@ def get_bus_stops(request):
     # return JsonResponse({"stops_data": bus_stops_json})
     return JsonResponse(bus_stops_json, safe=False)
 
+def get_routes(request):
+    """View to get all entries from routes.json and return it"""
+    base = settings.BASE_DIR
+    # Save the path of shapes.json as a variable
+    file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
+    # Open the file and load it as a dictionary
+    f = open(file_path)
+    routes_dict = json.load(f)
+    # Now we can just return this dictionary version of the json file
+    return JsonResponse(routes_dict)
+
 def get_shapes_by_route(request, route_id):
     """
-    View that returns an array of json objects from the shapes.json file where it matches our given route_id
+    View that returns an json object containing all objects from the shapes.json file where it matches our given route_id
     """
     base = settings.BASE_DIR
     # Save the path of shapes.json as a variable
@@ -48,10 +59,11 @@ def get_shapes_by_route(request, route_id):
     # Open the file and load it as a dictionary
     f = open(file_path)
     shapes_dict = json.load(f)
-    # Create an array which will hold dictionaries from shapes.json where it matches our rout_id
-    returnable_data = []
-    for shape in shapes_dict:
-        # Check if the route id matches the shape id and if so add it to an array
-        if shapes_dict[shape]["\ufeffshape_id"].split(".")[0] == route_id:
-            returnable_data.append(shapes_dict[shape])
-    return JsonResponse(returnable_data, safe=False)
+
+    # Create an a dictionary which will hold only the entries from shapes_dict that match our given route_id
+    returnable_data = {}
+    for id, data in shapes_dict.items():
+        # Check if the route id matches the shape id and if so add it to our new dictionary as a key, value pair
+        if data["\ufeffshape_id"].split(".")[0] == route_id:
+            returnable_data[id] = data
+    return JsonResponse(returnable_data)

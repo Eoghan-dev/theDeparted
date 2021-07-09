@@ -16,5 +16,7 @@ urlpatterns = [
     #ex: /get_bus_stops/
     path('get_bus_stops', views.get_bus_stops, name='get_bus_stops'),
     #ex: /get_shapes_by_route/60-1-b12-1/
-    path('get_shapes_by_route/<str:route_id>', views.get_shapes_by_route, name='get_shapes_by_route')
+    path('get_shapes_by_route/<str:route_id>', views.get_shapes_by_route, name='get_shapes_by_route'),
+    #ex: /get_routes/
+    path('get_routes', views.get_routes, name='get_routes'),
 ]

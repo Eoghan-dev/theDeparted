@@ -30,7 +30,7 @@ def download():
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
-    with open('../../summerProject/dublinBus/static//dublinBus/Dublin_bus_info/'+filename, encoding="utf8") as fh:
+    with open('../../summerProject/dublinBus/static//dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1
 
@@ -39,7 +39,7 @@ def json_convertor(filename):
                 fields = list(line.strip().split(','))
             if (l!=1):
                 # reading line by line from the text file
-                description = list(line.strip('"').split(','))
+                description = list(line.strip('"').strip('\n').split(','))
                 count = 0
                 for i in description:
                     description[count] = i.replace('"','')

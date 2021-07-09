@@ -17,16 +17,3 @@ def register(request):
     else:
         form = RegistrationForm()
         return render(request, 'users/register.html', {"form": form})
-
-# def login(request):
-#     """View to handle user login"""
-#     # Check if the request was posted the same way we do in our register view
-#     if request.method == "POST":
-#         form = AuthenticationForm(data=request.POST)
-#         # Check if form is valid and re-direct if so
-#         if form.is_valid():
-#             return redirect("/")
-#     # If form was not posted then just load an empty form as we did in the register view
-#     else:
-#         form = AuthenticationForm()
-#         return render(request, 'users/registration/login.html', {"form": form})

@@ -4,7 +4,9 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.shortcuts import render, get_object_or_404
 from .models import CurrentWeather, CurrentBus, BusStops
-
+from django.conf import settings # This allows us to import base directory which we can use for read/write operations
+import os
+import json
 
 def index(request):
     """View to load the homepage of our application"""
@@ -35,3 +37,21 @@ def get_bus_stops(request):
     bus_stops_json = list(BusStops.objects.values())
     # return JsonResponse({"stops_data": bus_stops_json})
     return JsonResponse(bus_stops_json, safe=False)
+
+def get_shapes_by_route(request, route_id):
+    """
+    View that returns an array of json objects from the shapes.json file where it matches our given route_id
+    """
+    base = settings.BASE_DIR
+    # Save the path of shapes.json as a variable
+    file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "shapes.json")
+    # Open the file and load it as a dictionary
+    f = open(file_path)
+    shapes_dict = json.load(f)
+    # Create an array which will hold dictionaries from shapes.json where it matches our rout_id
+    returnable_data = []
+    for shape in shapes_dict:
+        # Check if the route id matches the shape id and if so add it to an array
+        if shapes_dict[shape]["\ufeffshape_id"].split(".")[0] == route_id:
+            returnable_data.append(shapes_dict[shape])
+    return JsonResponse(returnable_data, safe=False)

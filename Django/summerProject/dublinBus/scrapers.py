@@ -98,47 +98,57 @@ def write_current_bus(transport_data):
     timestamp = transport_data['header']['timestamp']
     dt = datetime.fromtimestamp(int(transport_data['header']['timestamp']))
 
+    with open("static/dublinBus/Dublin_bus_info/json_files/routes.json") as routes:
+        route_obj = json.load(routes)
+        routes.close()
+        route_list = []
+    for i in route_obj:
+        route_list.append(route_obj[i]['route_id'])
+
     # loop through all the entries in 'entity' and create a CurrentBus object for each one before saving to db
     for i in transport_data['entity']:
-        trip = i["trip_update"]["trip"]
-        temp_id = i["id"],
-        temp_route_id = trip["route_id"],
-        temp_schedule = trip["schedule_relationship"],
-        temp_start_t = trip["start_time"],
-        temp_start_d = trip["start_date"],
-        # Now loop through all trip updates within the current trip
-        try:
-            for j in i["trip_update"]["stop_time_update"]:
-                temp_stop_id = j["stop_id"]
-                try:
-                    test = j["departure"]
-                    temp_delay = test["delay"]
-                except:
+        if trip["route_id"] in route_list:
+            trip = i["trip_update"]["trip"]
+            temp_id = i["id"],
+            temp_route_id = trip["route_id"],
+            temp_schedule = trip["schedule_relationship"],
+            temp_start_t = trip["start_time"],
+            temp_start_d = trip["start_date"],
+            # Now loop through all trip updates within the current trip
+            try:
+                for j in i["trip_update"]["stop_time_update"]:
+                    temp_stop_id = j["stop_id"]
                     try:
-                        test = j['arrival']
+                        test = j["departure"]
                         temp_delay = test["delay"]
                     except:
-                        temp_delay = 0
-        except:
-            temp_stop_id = None
-            temp_delay = None
+                        try:
+                            test = j['arrival']
+                            temp_delay = test["delay"]
+                        except:
+                            temp_delay = 0
+            except:
+                temp_stop_id = None
+                temp_delay = None
 
-        # Regardless of what happened in above try/except blocks we want to insert the row by creating the instance regardlesss
-        finally:
-            # Create one instance CurrentBus for each nested for loop
-            latestUpdate = models.CurrentBus(
-                timestamp=timestamp,
-                dt=dt,
-                trip_id=temp_id,
-                route_id=temp_route_id,
-                schedule=temp_schedule,
-                start_t=temp_start_t,
-                start_d=temp_start_d,
-                stop_id=temp_stop_id,
-                delay=temp_delay,
-            )
-            # Now append this instance to our list of entries
-            entries.append(latestUpdate)
+            # Regardless of what happened in above try/except blocks we want to insert the row by creating the instance regardlesss
+            finally:
+                # Create one instance CurrentBus for each nested for loop
+                latestUpdate = models.CurrentBus(
+                    timestamp=timestamp,
+                    dt=dt,
+                    trip_id=temp_id,
+                    route_id=temp_route_id,
+                    schedule=temp_schedule,
+                    start_t=temp_start_t,
+                    start_d=temp_start_d,
+                    stop_id=temp_stop_id,
+                    delay=temp_delay,
+                )
+                # Now append this instance to our list of entries
+                entries.append(latestUpdate)
+        else:
+            pass
     # Save all our entries to the database
     models.CurrentBus.objects.bulk_create(entries)
 

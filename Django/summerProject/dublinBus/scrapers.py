@@ -98,7 +98,9 @@ def write_current_bus(transport_data):
     timestamp = transport_data['header']['timestamp']
     dt = datetime.fromtimestamp(int(transport_data['header']['timestamp']))
 
-    with open("static/dublinBus/Dublin_bus_info/json_files/routes.json") as routes:
+    base = settings.BASE_DIR
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
+    with open(file_location) as routes:
         route_obj = json.load(routes)
         routes.close()
         route_list = []

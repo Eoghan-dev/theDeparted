@@ -70,4 +70,5 @@ async function initMap() {
     imagePath:
       "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
   });
+  displayRoute(directionsService, directionsRenderer)
 }

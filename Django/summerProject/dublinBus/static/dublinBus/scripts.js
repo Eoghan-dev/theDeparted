@@ -66,22 +66,27 @@ function displayRoute(directionsService, directionsRenderer) {
         // Loop through all of the possible route directions given back by the api
         for (let i=0; i<response.routes.length; i++) {
             let current_route = response.routes[i];
-            console.log("looping through routes. Current route:", current_route)
+           console.log("looping through routes. Current route:", current_route)
             // Loop through all the legs of the current route
             for (let j=0; j<current_route.legs.length; j++) {
                 let current_leg = current_route.legs[j];
                 console.log("in legs", current_leg);
                 // Loop through each step in this leg of the route
-                for (let k=0; k<current_leg.steps; k++) {
-                    let current_step = current_leg.steps[i]
+                for (let k=0; k<current_leg.steps.length; k++) {
+                    let current_step = current_leg.steps[k];
+                    console.log("current step:", current_leg.steps[0]);
                     // Check if this step is using public transport and if so check if it's using the correct route
-                    if (current_step.hasOwnProperty("transit_details")) {
+                    if (current_step.travel_mode === "TRANSIT") {
                         // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
                         // so we can select the route to be used as the current one in the for loop
-                        if (current_step.transit_details.line.short_name == "56A") {
-                            directionsRenderer.setDirections(response);
+                        console.log("current route number is", current_step.transit.line.short_name);
+                        if (current_step.transit.line.short_name === "56A") {
+
+                            // directionsRenderer.setDirections(response);
                             directionsRenderer.setRouteIndex(i);
                         }
+                    } else {
+                        console.log("step is not transit")
                     }
                 }
 
@@ -90,7 +95,6 @@ function displayRoute(directionsService, directionsRenderer) {
         }
         if (status == 'OK') {
             directionsRenderer.setDirections(response);
-            console.log(directionsRenderer)
         }
     });
 }

@@ -36,7 +36,12 @@ def json_convertor(filename):
 
         for line in fh:
             if (l==1):
-                fields = list(line.strip().split(','))
+                #Comma present in stops.txt for stop name that seperates name with number
+                if filename == "stops.txt":
+                    ext_line = "stop_id, stop_name, stop_num, stop_lat, stop_lon"
+                    fields = list(ext_line.strip().split(','))
+                else:
+                    fields = list(line.strip().split(','))
             if (l!=1):
                 # reading line by line from the text file
                 description = list(line.strip('"').strip('\n').split(','))
@@ -51,7 +56,16 @@ def json_convertor(filename):
                 dict2 = {}
                 while i < len(fields):
                     #dictionary for each id
-                    dict2[fields[i]] = description[i]
+                    #Error in stops.txt file were inconsistent naming convention, catches when missing stop number
+                    if filename == "stops.txt" and len(description)==4 :
+                        if i==2:
+                            dict2[fields[i]] = "null"
+                        elif i>2:
+                            dict2[fields[i]] = description[i-1]
+                        else:
+                            dict2[fields[i]] = description[i]
+                    else:
+                        dict2[fields[i]] = description[i]
                     i = i + 1
                 # appending the record of each id
                 dict1[id] = dict2

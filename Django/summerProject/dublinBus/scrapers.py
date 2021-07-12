@@ -1,10 +1,12 @@
 # Import our models so we can reference them when creating instances of the model and write to db
+from django.conf import settings
+import os
+from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 from . import models
 import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
-from django.conf import settings # This allows us to import base directory which we can use for read/write operations
-import os
+from django.utils import timezone
 
 def get_current_weather():
     """
@@ -96,7 +98,7 @@ def write_current_bus(transport_data):
 
     # Timestamp is the same for all items in the json object so we can create this and dt outside the loop
     timestamp = transport_data['header']['timestamp']
-    dt = datetime.fromtimestamp(int(transport_data['header']['timestamp']))
+    dt = datetime.now(tz=timezone.utc)
 
     base = settings.BASE_DIR
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
@@ -109,8 +111,8 @@ def write_current_bus(transport_data):
 
     # loop through all the entries in 'entity' and create a CurrentBus object for each one before saving to db
     for i in transport_data['entity']:
+        trip = i["trip_update"]["trip"]
         if trip["route_id"] in route_list:
-            trip = i["trip_update"]["trip"]
             temp_id = i["id"],
             temp_route_id = trip["route_id"],
             temp_schedule = trip["schedule_relationship"],

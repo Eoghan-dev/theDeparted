@@ -44,7 +44,7 @@ def get_routes(request):
     # Save the path of shapes.json as a variable
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
     # Open the file and load it as a dictionary
-    f = open(file_path)
+    f = open(file_path, encoding="utf-8-sig")
     routes_dict = json.load(f)
     # Now we can just return this dictionary version of the json file
     return JsonResponse(routes_dict)
@@ -57,13 +57,13 @@ def get_shapes_by_route(request, route_id):
     # Save the path of shapes.json as a variable
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "shapes.json")
     # Open the file and load it as a dictionary
-    f = open(file_path)
+    f = open(file_path, encoding="utf-8-sig")
     shapes_dict = json.load(f)
 
     # Create an a dictionary which will hold only the entries from shapes_dict that match our given route_id
     returnable_data = {}
     for id, data in shapes_dict.items():
         # Check if the route id matches the shape id and if so add it to our new dictionary as a key, value pair
-        if data["\ufeffshape_id"].split(".")[0] == route_id:
+        if data["shape_id"].split(".")[0] == route_id:
             returnable_data[id] = data
     return JsonResponse(returnable_data)

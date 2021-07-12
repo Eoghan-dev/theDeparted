@@ -38,3 +38,25 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
          current_marker.setVisible(true);
     })
 }
+
+function displayRoute(directionsService, directionsRenderer) {
+    // Function that takes a route number, the map being used and our array of markers as a parameter and
+    // Displays directions for that route and only the markers on that route on the map
+
+    // Some logic will be needed here to determine the start and end point co-ordinates of the passed route
+    // but for the purposes of the presentation I'm going to hardcode the co-ordinates for route 56A
+      console.log("In displayRoute function")
+      let origin_location = new google.maps.LatLng(53.3419400535678, -6.23527645441628)
+      let destination_location = new google.maps.LatLng(53.286105644023, -6.37306211391221)
+
+  var request = {
+      origin: {lat :53.3419400535678, lng: -6.23527645441628},
+      destination: {lat :53.286105644023, lng: -6.37306211391221},
+      travelMode: "TRANSIT"
+  };
+  directionsService.route(request, function(response, status) {
+    if (status == 'OK') {
+      directionsRenderer.setDirections(response);
+    }
+  });
+}

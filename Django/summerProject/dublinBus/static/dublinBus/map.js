@@ -6,10 +6,13 @@ async function initMap() {
   // these co-ordinates before trying to fill the map with markers based around them.
 
   // load map
+  var directionsService = new google.maps.DirectionsService();
+  var directionsRenderer = new google.maps.DirectionsRenderer();
   const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 8,
     center: {lat: 53.349804, lng: -6.260310},
   });
+  directionsRenderer.setMap(map);
   // Make request to get json object of all dublin bus stops
   // We use await to ensure that we wait until the data is fetched before continuing
   let bus_stop_data = await fetch('/get_bus_stops').then(res=> {
@@ -67,5 +70,4 @@ async function initMap() {
     imagePath:
       "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
   });
-
 }

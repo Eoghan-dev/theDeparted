@@ -30,7 +30,7 @@ def download():
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
-    with open('../../summerProject/dublinBus/static//dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
+    with open('../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1
 
@@ -38,7 +38,7 @@ def json_convertor(filename):
             if (l==1):
                 #Comma present in stops.txt for stop name that seperates name with number
                 if filename == "stops.txt":
-                    ext_line = "stop_id, stop_name, stop_num, stop_lat, stop_lon"
+                    ext_line = "stop_id, stop_name, stop_num, stop_lat, stop_lon, routes"
                     fields = list(ext_line.strip().split(','))
                 else:
                     fields = list(line.strip().split(','))
@@ -60,10 +60,17 @@ def json_convertor(filename):
                     if filename == "stops.txt" and len(description)==4 :
                         if i==2:
                             dict2[fields[i]] = "null"
+                        elif i==5:
+                            bus_list = route_to_stop(description[0])
+                            dict2[fields[i]] = bus_list
                         elif i>2:
                             dict2[fields[i]] = description[i-1]
                         else:
                             dict2[fields[i]] = description[i]
+
+                    elif filename == "stops.txt" and i==5:
+                        bus_list = route_to_stop(description[0])
+                        dict2[fields[i]] = bus_list
                     else:
                         dict2[fields[i]] = description[i]
                     i = i + 1
@@ -77,4 +84,18 @@ def json_convertor(filename):
     out_file.close()
     print("Finished saving", filename + ".json")
 
+def route_to_stop(stop_id):
+    with open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/stop_times.json") as out_file:
+        stop_times = json.loads(out_file.read())
+    out_file.close()
+    bus_list = []
+    for id in stop_times:
+        if stop_times[id]["stop_id"]==stop_id:
+            bus_num = list(stop_times[id]["trip_id"].split("."))
+            bus_num = list(bus_num[2].split("-"))
+            if bus_num[1] in bus_list:
+                pass
+            else:
+                bus_list.append(bus_num[1])
+    return bus_list
 main()

@@ -65,7 +65,7 @@ function displayRoute(directionsService, directionsRenderer, markers_cluster, ma
         }
     }
     // Hide all markers except those in our new array which are on our route
-    showCertainMarkers(cluster, markersOnRoute);
+    showCertainMarkers(markers_cluster, markersOnRoute);
 
     // Make the request for directions and display it
     var request = {

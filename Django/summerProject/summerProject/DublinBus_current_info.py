@@ -43,7 +43,7 @@ def json_convertor(filename):
             if (l==1):
                 #Comma present in stops.txt for stop name that seperates name with number
                 if filename == "stops.txt":
-                    ext_line = "stop_id, stop_name, stop_num, stop_lat, stop_lon, routes"
+                    ext_line = "stop_id,stop_name,stop_num,stop_lat,stop_lon,routes"
                     fields = list(ext_line.strip().split(','))
                 else:
                     fields = list(line.strip().split(','))

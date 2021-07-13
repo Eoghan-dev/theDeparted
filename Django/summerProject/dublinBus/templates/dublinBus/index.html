@@ -3,49 +3,10 @@
 
 {% block content %}
 
-<style>
-
-      .display{
-        color: white;
-        margin-bottom: 20px;
-        background-color: white;
-        }
-      .dropD {
-        vertical-align: bottom;
-        background-color: #0d6efd;
-        margin: auto;
-        width: 50%;
-        height: 50%;
-        border: 3px solid white;
-        padding: 50px;
-      }
-
-      label {
-        font-family: "Raleway Regular";
-        color: white;
-        background-color: #0d6efd;
-        padding: 5px 5px;
-        font-size: 20px;
-      }
-      select {
-        font-family: "Raleway Regular";
-        text-align: center;
-        background-color: #0d6efd;
-        color: white;
-        padding: 3px 5px;
-        font-size: 20px;
-      }
-
-      input {
-        font-family: "Raleway Regular";
-        background-color: #0d6efd;
-        color: white;
-        padding: 3px 5px;
-        font-size: 20px;
-      }
-    </style>
-
- <form method="POST">
+<div class="container" style="width: 100%;margin-right: 0px;margin-left: 0px;height: 100%;margin-top: 20px;">
+        <div class="row" style="width: 100%;margin-left: 0px;margin-right: 0px;height: 100%;">
+                    <form method="POST">
+     {% csrf_token %}
       <div class="display">
 
         <br>
@@ -91,14 +52,16 @@
         <br>
         <br>
 
-        <p id="demo"></p>
-        <p id="demo2"></p>
+        <a>{{route}}</a>
         </div>
         <br>
         <br>
       </div>
     </form>
-    <a>here {{route}} here</a>
+
+            <div class="col-md-9"><button id="get_directions">Give route</button><div id="map"></div></div>
+        </div>
+    </div>
 
 {#    {% if user.is_authenticated %}#}
 {#        Welcome, {{ user.username }}!#}
@@ -107,12 +70,6 @@
 {#        <p>You are not logged in</p>#}
 {#        <a href="{% url 'login' %}">Login</a>#}
 {#    {% endif %}#}
-    <button id="get_directions">Give route</button>
-    <div id="container">
-        <div id="map"></div>
-{#   Sidebar layout for directions panel taken from https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html     #}
-        <div id="sidebar"></div>
-    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -120,14 +77,4 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=&v=weekly"
         async
     ></script>
-
-<script>
-function disp() {
-  var x = document.getElementById("route").value;
-  document.getElementById("demo").innerHTML = x;
-  var y = document.getElementById("time").value;
-  document.getElementById("demo2").innerHTML = y;
-
-}
-</script>
 {% endblock %}

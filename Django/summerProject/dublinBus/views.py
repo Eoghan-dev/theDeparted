@@ -16,7 +16,8 @@ def index(request):
     if request.method == 'POST':
         route = request.POST.get("route")
         time = request.POST.get("time")
-        print(route)
+        route = predict_linear("56A",DIRECTION=1,PLANNEDTIME_ARR=30113.0,PLANNEDTIME_DEP=26400.0,ACTUALTIME_DEP=26365.0,temp=2.32,MONTH=2,weather_main='Clouds')
+        route = (route/60)/60
     else:
         route = 0
     return render(request, 'dublinBus/index.html', {'route':route})
@@ -83,7 +84,7 @@ def predict_linear(ROUTEID,DIRECTION,PLANNEDTIME_ARR,PLANNEDTIME_DEP,ACTUALTIME_
         """
     base = settings.BASE_DIR
     # Save the path of shapes.json as a variable
-    file_path = os.path.join(base, "dublinBus", "static", "predictive_model")
+    file_path = os.path.join(base, "dublinBus", "static","dublinBus", "predictive_model")
     weather = {'Clear': 0, 'Clouds': 1, 'Rain': 2, 'Mist': 3, 'Drizzle': 4, 'Snow': 5, 'Fog': 6}
     # features
     data = {
@@ -97,7 +98,7 @@ def predict_linear(ROUTEID,DIRECTION,PLANNEDTIME_ARR,PLANNEDTIME_DEP,ACTUALTIME_
     # create dataframe
     X = pd.DataFrame.from_dict(data)
     # load model from file
-    with open('models/r' + str(ROUTEID) + '_' + str(DIRECTION) + '.pkl', 'rb') as file:
+    with open(file_path+"\\" + str(ROUTEID) + '_' + str(DIRECTION) + '.pkl', 'rb') as file:
         model = pickle.load(file)
         # get prediction from model
     y = model.predict(X)

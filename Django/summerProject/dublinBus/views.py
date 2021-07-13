@@ -7,11 +7,19 @@ from .models import CurrentWeather, CurrentBus, BusStops
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
 import json
+import pandas as pd
+import pickle
 base = settings.BASE_DIR
 
 def index(request):
     """View to load the homepage of our application"""
-    return render(request, 'dublinBus/index.html')
+    if request.method == 'POST':
+        route = request.POST.get("route")
+        time = request.POST.get("time")
+        print(route)
+    else:
+        route = 0
+    return render(request, 'dublinBus/index.html', {'route':route})
 
 def journey(request):
     """View to load the journey page of our application"""
@@ -68,3 +76,30 @@ def get_shapes_by_route(request, route_id):
         if data["shape_id"].split(".")[0] == route_id:
             returnable_data[id] = data
     return JsonResponse(returnable_data)
+
+def predict_linear(ROUTEID,DIRECTION,PLANNEDTIME_ARR,PLANNEDTIME_DEP,ACTUALTIME_DEP,temp=10,MONTH=1,weather_main='Rain'):
+    """
+        View that returns an json object containing all objects from the shapes.json file where it matches our given route_id
+        """
+    base = settings.BASE_DIR
+    # Save the path of shapes.json as a variable
+    file_path = os.path.join(base, "dublinBus", "static", "predictive_model")
+    weather = {'Clear': 0, 'Clouds': 1, 'Rain': 2, 'Mist': 3, 'Drizzle': 4, 'Snow': 5, 'Fog': 6}
+    # features
+    data = {
+        'PLANNEDTIME_ARR': [PLANNEDTIME_ARR],
+        'PLANNEDTIME_DEP': [PLANNEDTIME_DEP],
+        'ACTUALTIME_DEP': [ACTUALTIME_DEP],
+        'temp': [temp],
+        'MONTH': [MONTH],
+        'weather_main': [weather[weather_main]]
+    }
+    # create dataframe
+    X = pd.DataFrame.from_dict(data)
+    # load model from file
+    with open('models/r' + str(ROUTEID) + '_' + str(DIRECTION) + '.pkl', 'rb') as file:
+        model = pickle.load(file)
+        # get prediction from model
+    y = model.predict(X)
+    # return the prediction
+    return round(y[0][0])

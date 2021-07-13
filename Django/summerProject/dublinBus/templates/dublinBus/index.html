@@ -45,8 +45,7 @@
       }
     </style>
 
- <form action="/form/submit" method="post">
-
+ <form method="POST">
       <div class="display">
 
         <br>
@@ -88,7 +87,7 @@
           <option value="22:00">10.00 PM</option>
           <option value="23:00">11.00 PM</option>
         </select>
-        <input type="button" onclick="disp()" value="Prediction">
+            <button type="submit">Submit</button>
         <br>
         <br>
 
@@ -99,7 +98,7 @@
         <br>
       </div>
     </form>
-
+    <a>here {{route}} here</a>
 
 {#    {% if user.is_authenticated %}#}
 {#        Welcome, {{ user.username }}!#}

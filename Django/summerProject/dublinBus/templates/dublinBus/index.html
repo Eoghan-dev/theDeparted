@@ -2,6 +2,105 @@
 {% block title %}Test home page{% endblock %}
 
 {% block content %}
+
+<style>
+
+      .display{
+        color: white;
+        margin-bottom: 20px;
+        background-color: white;
+        }
+      .dropD {
+        vertical-align: bottom;
+        background-color: #0d6efd;
+        margin: auto;
+        width: 50%;
+        height: 50%;
+        border: 3px solid white;
+        padding: 50px;
+      }
+
+      label {
+        font-family: "Raleway Regular";
+        color: white;
+        background-color: #0d6efd;
+        padding: 5px 5px;
+        font-size: 20px;
+      }
+      select {
+        font-family: "Raleway Regular";
+        text-align: center;
+        background-color: #0d6efd;
+        color: white;
+        padding: 3px 5px;
+        font-size: 20px;
+      }
+
+      input {
+        font-family: "Raleway Regular";
+        background-color: #0d6efd;
+        color: white;
+        padding: 3px 5px;
+        font-size: 20px;
+      }
+    </style>
+
+ <form action="/form/submit" method="post">
+
+      <div class="display">
+
+        <br>
+        <div class="dropD" >
+        <label for="hours">Choose a route and time:</label>
+        <select id="route">
+          <option value="56A">56A</option>
+          <option value="77A">77A</option>
+          <option value="114">114</option>
+          <option value="63">63</option>
+          <option value="46A">46A</option>
+          <option value="84">84</option>
+          <option value="7B">7B</option>
+        </select>
+
+        <select id="time">
+          <option value="00:00">00.00 AM</option>
+          <option value="01:00">01.00 AM</option>
+          <option value="02:00">02.00 AM</option>
+          <option value="03:00">03.00 AM</option>
+          <option value="04:00">04.00 AM</option>
+          <option value="05:00">05.00 AM</option>
+          <option value="06:00">06.00 AM</option>
+          <option value="07:00">07.00 AM</option>
+          <option value="08:00">08.00 AM</option>
+          <option value="09:00">09.00 AM</option>
+          <option value="10:00">10.00 AM</option>
+          <option value="11:00">11.00 AM</option>
+          <option value="12:00">12.00 PM</option>
+          <option value="13:00">01.00 PM</option>
+          <option value="14:00">02.00 PM</option>
+          <option value="15:00">03.00 PM</option>
+          <option value="16:00">04.00 PM</option>
+          <option value="17:00">05.00 PM</option>
+          <option value="18:00">06.00 PM</option>
+          <option value="19:00">07.00 PM</option>
+          <option value="20:00">08.00 PM</option>
+          <option value="21:00">09.00 PM</option>
+          <option value="22:00">10.00 PM</option>
+          <option value="23:00">11.00 PM</option>
+        </select>
+        <input type="button" onclick="disp()" value="Prediction">
+        <br>
+        <br>
+
+        <p id="demo"></p>
+        <p id="demo2"></p>
+        </div>
+        <br>
+        <br>
+      </div>
+    </form>
+
+
 {#    {% if user.is_authenticated %}#}
 {#        Welcome, {{ user.username }}!#}
 {#        <a href="{% url 'logout' %}">Logout</a>#}
@@ -21,4 +120,14 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=&v=weekly"
         async
     ></script>
+
+<script>
+function disp() {
+  var x = document.getElementById("route").value;
+  document.getElementById("demo").innerHTML = x;
+  var y = document.getElementById("time").value;
+  document.getElementById("demo2").innerHTML = y;
+
+}
+</script>
 {% endblock %}

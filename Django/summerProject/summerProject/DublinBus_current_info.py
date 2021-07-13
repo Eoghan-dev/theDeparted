@@ -2,7 +2,8 @@ import requests
 from zipfile import ZipFile
 import json
 import os
-
+from django.conf import settings
+base = settings.BASE_DIR
 def main():
     download()
     files = ['routes.txt','shapes.txt','stop_times.txt','stops.txt']
@@ -23,14 +24,17 @@ def download():
     # Create a ZipFile Object and load sample.zip in it
     with ZipFile(filename, 'r') as zipObj:
        # Extract all the contents of zip file in current directory
-       zipObj.extractall(path='../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info')
+
+       file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", )
+       zipObj.extractall(path=file_location)
     print('Download Completed!!!')
     os.remove(filename)
 
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
-    with open('../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", filename)
+    with open(file_location, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1
         if filename == "stops.txt":
@@ -78,13 +82,16 @@ def json_convertor(filename):
             l = l + 1
     # creating json file
     filename = filename.strip('.txt')
-    out_file = open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/"+filename+".json", "w")
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", filename)
+    # out_file = open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/"+filename+".json", "w")
+    out_file = open(file_location+".json", "w")
     json.dump(dict1, out_file, indent=4)
     out_file.close()
     print("Finished saving", filename + ".json")
 
 def route_to_stop():
-    with open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/stop_times.json") as out_file:
+    file_location =  os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
+    with open(file_location) as out_file:
         stop_times = json.loads(out_file.read())
     out_file.close()
     bus_dict = {}

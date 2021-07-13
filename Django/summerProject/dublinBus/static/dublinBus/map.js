@@ -32,7 +32,8 @@ async function initMap() {
   const markers_array = [];
   // This is what we can call from our html to load our directions
     const onChangeHandler = function () {
-    displayRoute(directionsService, directionsRenderer, markers_cluster, map);
+    // displayRoute(directionsService, directionsRenderer, markers_cluster, map); commented out for prototype demo
+          displayRoute(directionsService, directionsRenderer, markers_array);
   };
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", onChangeHandler);
@@ -61,7 +62,7 @@ async function initMap() {
       number: parseInt(station.stop_num),
       infowindow: current_info_window,
       // Icon taken from http://kml4earth.appspot.com/icons.html
-      icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png",
+      // icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png", this is the hideous icon
       routes: station.routes,
     });
     // Add an on-click event for each marker to open the associated info window
@@ -83,9 +84,9 @@ async function initMap() {
   }
 
   // Add a marker clusterer to group all the markers together using the Marker Clusterer Plus library https://github.com/googlemaps/js-markerclustererplus
-  let markers_cluster = new MarkerClusterer(map, markers_array, {ignoreHidden: true}, {
-    imagePath:
-      "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-  });
+  // let markers_cluster = new MarkerClusterer(map, markers_array, {ignoreHidden: true}, {
+  //   imagePath:
+  //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+  // });
   console.log("Markers array:", markers_array)
 }

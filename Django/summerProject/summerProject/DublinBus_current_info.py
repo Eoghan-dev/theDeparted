@@ -66,14 +66,14 @@ def json_convertor(filename):
                         if i==2:
                             dict2[fields[i]] = "null"
                         elif i==5:
-                            dict2[fields[i]] = [bus_dict[description[0]]]
+                            dict2[fields[i]] = bus_dict[description[0]]
                         elif i>2:
                             dict2[fields[i]] = description[i-1]
                         else:
                             dict2[fields[i]] = description[i]
 
                     elif filename == "stops.txt" and i==5:
-                        dict2[fields[i]] = [bus_dict[description[0]]]
+                        dict2[fields[i]] = bus_dict[description[0]]
                     else:
                         dict2[fields[i]] = description[i]
                     i = i + 1

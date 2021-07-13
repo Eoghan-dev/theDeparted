@@ -6,14 +6,19 @@ async function initMap() {
   // these co-ordinates before trying to fill the map with markers based around them.
 
   // load map
-  var directionsService = new google.maps.DirectionsService();
-  var directionsRenderer = new google.maps.DirectionsRenderer();
+
+
   const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 8,
     center: {lat: 53.349804, lng: -6.260310},
   });
+  var directionsService = new google.maps.DirectionsService();
+  var directionsRenderer = new google.maps.DirectionsRenderer();
+
   // directionsRenderer.setPanel(document.getElementById("sidebar")); makes and sets the sidebard
   directionsRenderer.setMap(map);
+
+
   // Make request to get json object of all dublin bus stops
   // We use await to ensure that we wait until the data is fetched before continuing
   let bus_stop_data = await fetch('/get_bus_stops').then(res=> {
@@ -25,7 +30,12 @@ async function initMap() {
 
   // Declare an empty array where we will keep all of our markers for each stop
   const markers_array = [];
-
+  // This is what we can call from our html to load our directions
+    const onChangeHandler = function () {
+    displayRoute(directionsService, directionsRenderer, markers_cluster, map);
+  };
+    // Add an event listener to a button so we can call the above function which will then load our directions
+    document.getElementById("get_directions").addEventListener("click", onChangeHandler);
   for (let key in bus_stop_data) {
     let current_stop = bus_stop_data[key];
     loadMarkers(current_stop);
@@ -73,10 +83,9 @@ async function initMap() {
   }
 
   // Add a marker clusterer to group all the markers together using the Marker Clusterer Plus library https://github.com/googlemaps/js-markerclustererplus
-  new MarkerClusterer(map, markers_array, {
+  let markers_cluster = new MarkerClusterer(map, markers_array, {ignoreHidden: true}, {
     imagePath:
       "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
   });
-  //(directionsService, directionsRenderer)
   console.log("Markers array:", markers_array)
 }

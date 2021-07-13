@@ -22,10 +22,12 @@ function scrapeCB() {
     })
 }
 
-function showCertainMarkers(allMarkers, visibleMarkers) {
-    // Function that takes an array of all the markers on the map, an array of the markers we want to make visible and
+function showCertainMarkers(markers_cluster, visibleMarkers, map) {
+    // Function that takes a cluster object with all the markers on the map, an array of the markers we want to make visible and
     // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
 
+    // get array of all the markers in markers_cluster (all the markers on the map)
+    allMarkers = markers_cluster.getMarkers();
     // First make all markers invisible
     allMarkers.forEach(current_marker => {
         current_marker.setVisible(false);
@@ -36,18 +38,36 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
     visibleMarkers.forEach(current_marker => {
         current_marker.setVisible(true);
     })
+    markers_cluster.repaint()
+  //    new MarkerClusterer(
+  //        map,
+  //        visibleMarkers,
+  //        { ignoreHidden: true },
+  //   {
+  //       imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+  // });
 }
-function displayRoute(directionsService, directionsRenderer) {
+function displayRoute(directionsService, directionsRenderer, markers_cluster, map) {
     // Function that takes a route number, the map being used and our array of markers as a parameter and
     // Displays directions for that route and only the markers on that route on the map
 
     // Some logic will be needed here to determine the start and end point co-ordinates of the passed route
     // but for the purposes of the presentation I'm going to hardcode the co-ordinates for route 56A
     console.log("In displayRoute function")
+    // Get array of all the markers in the cluster (all the markers on the map)
+    markersArray = markers_cluster.getMarkers();
+    // Create empty array to hold the markers on our route so we can only show them
+    markersOnRoute = [];
+    // Loop through all the markers and find those that match our route and add them to our new array
+    for (let currentMarker of markersArray) {
+        if (currentMarker.routes.includes("56A")) {
+            markersOnRoute.push(currentMarker);
+        }
+    }
+    // Hide all markers except those in our new array which are on our route
+    showCertainMarkers(cluster, markersOnRoute);
 
-    let origin_location = new google.maps.LatLng(53.3419400535678, -6.23527645441628)
-    let destination_location = new google.maps.LatLng(53.286105644023, -6.37306211391221)
-
+    // Make the request for directions and display it
     var request = {
         // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
         origin: {lat: 53.3419400535678, lng: -6.23527645441628},

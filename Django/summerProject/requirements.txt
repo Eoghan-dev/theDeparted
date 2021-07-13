@@ -3,3 +3,4 @@ requests
 pyodbc
 mssql-django
 django-crispy-forms
+pandas

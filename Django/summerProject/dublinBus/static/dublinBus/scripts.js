@@ -37,7 +37,6 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
         current_marker.setVisible(true);
     })
 }
-
 function displayRoute(directionsService, directionsRenderer) {
     // Function that takes a route number, the map being used and our array of markers as a parameter and
     // Displays directions for that route and only the markers on that route on the map
@@ -52,7 +51,7 @@ function displayRoute(directionsService, directionsRenderer) {
     var request = {
         // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
         origin: {lat: 53.3419400535678, lng: -6.23527645441628},
-        destination: {lat: 53.2857103566658, lng: -6.37241720059962},
+        destination: {lat: 53.2860074546224, lng: -6.37377077680564},
         travelMode: "TRANSIT",
         transitOptions: {
             modes: ["BUS"],

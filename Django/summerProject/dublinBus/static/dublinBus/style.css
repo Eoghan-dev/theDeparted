@@ -1,4 +1,33 @@
 /* Set the size of the div element that contains the map */
+/*Css for map adapted from google maps tutorial  https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html*/
 #map {
+  flex-basis: 0;
+  flex-grow: 4;
   height: 100%;
+}
+#container {
+  height: 100%;
+  display: flex;
+}
+#map {
+  flex: auto;
+}
+
+/*Sidebar layout for directions panel taken from https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html*/
+#sidebar {
+  flex-basis: 15rem;
+  flex-grow: 1;
+  padding: 1rem;
+  max-width: 30rem;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+#sidebar {
+  flex: 0 1 auto;
+  padding: 0;
+}
+#sidebar > div {
+  padding: 0.5rem;
 }

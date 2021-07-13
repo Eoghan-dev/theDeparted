@@ -2,7 +2,8 @@ import requests
 from zipfile import ZipFile
 import json
 import os
-
+from django.conf import settings
+base = settings.BASE_DIR
 def main():
     download()
     files = ['routes.txt','shapes.txt','stop_times.txt','stops.txt']
@@ -23,14 +24,17 @@ def download():
     # Create a ZipFile Object and load sample.zip in it
     with ZipFile(filename, 'r') as zipObj:
        # Extract all the contents of zip file in current directory
-       zipObj.extractall(path='../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info')
+
+       file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", )
+       zipObj.extractall(path=file_location)
     print('Download Completed!!!')
     os.remove(filename)
 
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
-    with open('../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", filename)
+    with open(file_location, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1
         if filename == "stops.txt":
@@ -39,7 +43,7 @@ def json_convertor(filename):
             if (l==1):
                 #Comma present in stops.txt for stop name that seperates name with number
                 if filename == "stops.txt":
-                    ext_line = "stop_id, stop_name, stop_num, stop_lat, stop_lon, routes"
+                    ext_line = "stop_id,stop_name,stop_num,stop_lat,stop_lon,routes"
                     fields = list(ext_line.strip().split(','))
                 else:
                     fields = list(line.strip().split(','))
@@ -62,14 +66,14 @@ def json_convertor(filename):
                         if i==2:
                             dict2[fields[i]] = "null"
                         elif i==5:
-                            dict2[fields[i]] = [bus_dict[description[0]]]
+                            dict2[fields[i]] = bus_dict[description[0]]
                         elif i>2:
                             dict2[fields[i]] = description[i-1]
                         else:
                             dict2[fields[i]] = description[i]
 
                     elif filename == "stops.txt" and i==5:
-                        dict2[fields[i]] = [bus_dict[description[0]]]
+                        dict2[fields[i]] = bus_dict[description[0]]
                     else:
                         dict2[fields[i]] = description[i]
                     i = i + 1
@@ -78,13 +82,16 @@ def json_convertor(filename):
             l = l + 1
     # creating json file
     filename = filename.strip('.txt')
-    out_file = open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/"+filename+".json", "w")
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", filename)
+    # out_file = open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/"+filename+".json", "w")
+    out_file = open(file_location+".json", "w")
     json.dump(dict1, out_file, indent=4)
     out_file.close()
     print("Finished saving", filename + ".json")
 
 def route_to_stop():
-    with open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/stop_times.json") as out_file:
+    file_location =  os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
+    with open(file_location) as out_file:
         stop_times = json.loads(out_file.read())
     out_file.close()
     bus_dict = {}

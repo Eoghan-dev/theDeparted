@@ -1,5 +1,4 @@
 # Import our models so we can reference them when creating instances of the model and write to db
-from django.conf import settings
 import os
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 from . import models

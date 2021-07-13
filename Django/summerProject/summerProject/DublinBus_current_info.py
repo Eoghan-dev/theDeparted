@@ -33,7 +33,8 @@ def json_convertor(filename):
     with open('../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/'+filename, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1
-
+        if filename == "stops.txt":
+            bus_dict = route_to_stop()
         for line in fh:
             if (l==1):
                 #Comma present in stops.txt for stop name that seperates name with number
@@ -61,16 +62,14 @@ def json_convertor(filename):
                         if i==2:
                             dict2[fields[i]] = "null"
                         elif i==5:
-                            bus_list = route_to_stop(description[0])
-                            dict2[fields[i]] = bus_list
+                            dict2[fields[i]] = [bus_dict[description[0]]]
                         elif i>2:
                             dict2[fields[i]] = description[i-1]
                         else:
                             dict2[fields[i]] = description[i]
 
                     elif filename == "stops.txt" and i==5:
-                        bus_list = route_to_stop(description[0])
-                        dict2[fields[i]] = bus_list
+                        dict2[fields[i]] = [bus_dict[description[0]]]
                     else:
                         dict2[fields[i]] = description[i]
                     i = i + 1
@@ -84,18 +83,25 @@ def json_convertor(filename):
     out_file.close()
     print("Finished saving", filename + ".json")
 
-def route_to_stop(stop_id):
+def route_to_stop():
     with open("../../summerProject/dublinBus/static/dublinBus/Dublin_bus_info/json_files/stop_times.json") as out_file:
         stop_times = json.loads(out_file.read())
     out_file.close()
+    bus_dict = {}
     bus_list = []
     for id in stop_times:
-        if stop_times[id]["stop_id"]==stop_id:
+        if stop_times[id]["stop_id"] in bus_dict.keys():
             bus_num = list(stop_times[id]["trip_id"].split("."))
             bus_num = list(bus_num[2].split("-"))
-            if bus_num[1] in bus_list:
+            if bus_num[1] in bus_dict[stop_times[id]["stop_id"]]:
                 pass
             else:
-                bus_list.append(bus_num[1])
-    return bus_list
+                list_1 = bus_dict[stop_times[id]["stop_id"]]
+                list_1.append(bus_num[1])
+                bus_dict[stop_times[id]["stop_id"]] = list_1
+        else:
+            bus_num = list(stop_times[id]["trip_id"].split("."))
+            bus_num = list(bus_num[2].split("-"))
+            bus_dict[stop_times[id]["stop_id"]] = [bus_num[1]]
+    return bus_dict
 main()

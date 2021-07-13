@@ -12,23 +12,28 @@ async function initMap() {
     zoom: 8,
     center: {lat: 53.349804, lng: -6.260310},
   });
-  // directionsRenderer.setPanel(document.getElementById("sidebar")); makes and sets the sidebar
+  // directionsRenderer.setPanel(document.getElementById("sidebar")); makes and sets the sidebard
   directionsRenderer.setMap(map);
   // Make request to get json object of all dublin bus stops
   // We use await to ensure that we wait until the data is fetched before continuing
   let bus_stop_data = await fetch('/get_bus_stops').then(res=> {
     return res.json()
   }).then(data => {
-    console.log(data)
+    console.log("bus stop data:", data)
     return data
   })
 
   // Declare an empty array where we will keep all of our markers for each stop
   const markers_array = [];
 
-  // Apply this arrow function to each bus station in our response
-  bus_stop_data.forEach(station=> {
-    // Create info window for each station before creating a marker
+  for (let key in bus_stop_data) {
+    let current_stop = bus_stop_data[key];
+    loadMarkers(current_stop);
+  }
+
+  function loadMarkers(station) {
+    // Function to load a marker on the map
+        // Create info window for each station before creating a marker
     // Create content of window
     let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
         `<ul><li>Station Number: ${station.stop_number} </li></ul>`;
@@ -64,7 +69,7 @@ async function initMap() {
     markers_array.push(current_marker);
     // Also add each marker to our map
     current_marker.setMap(map);
-  });
+  }
 
   // Add a marker clusterer to group all the markers together using the Marker Clusterer Plus library https://github.com/googlemaps/js-markerclustererplus
   new MarkerClusterer(map, markers_array, {

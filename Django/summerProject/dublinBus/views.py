@@ -9,6 +9,7 @@ import os
 import json
 import pandas as pd
 import pickle
+from datetime import timedelta
 base = settings.BASE_DIR
 
 def index(request):
@@ -17,7 +18,7 @@ def index(request):
         route = request.POST.get("route")
         time = request.POST.get("time")
         route = predict_linear("56A",DIRECTION=1,PLANNEDTIME_ARR=30113.0,PLANNEDTIME_DEP=26400.0,ACTUALTIME_DEP=26365.0,temp=2.32,MONTH=2,weather_main='Clouds')
-        route = (route/60)/60
+        route = timedelta(seconds=route)
     else:
         route = 0
     return render(request, 'dublinBus/index.html', {'route':route})

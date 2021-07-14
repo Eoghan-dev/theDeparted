@@ -11,7 +11,7 @@ import pandas as pd
 import pickle
 from datetime import timedelta
 base = settings.BASE_DIR
-from ..summerProject import DublinBus_current_info
+from summerProject import DublinBus_current_info
 
 def index(request):
     """View to load the homepage of our application"""

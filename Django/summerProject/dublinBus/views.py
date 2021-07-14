@@ -11,6 +11,7 @@ import pandas as pd
 import pickle
 from datetime import timedelta
 base = settings.BASE_DIR
+from ..summerProject import DublinBus_current_info
 
 def index(request):
     """View to load the homepage of our application"""
@@ -105,3 +106,8 @@ def predict_linear(ROUTEID,DIRECTION,PLANNEDTIME_ARR,PLANNEDTIME_DEP,ACTUALTIME_
     y = model.predict(X)
     # return the prediction
     return round(y[0][0])
+
+def get_bus_json(request):
+    """View to run the DublinBus_current_info scraper which gets json versions of our txt files for static bus"""
+    DublinBus_current_info.main()
+    return HttpResponse("Finished scraping bus_stops, results saved to database!")

@@ -19,4 +19,6 @@ urlpatterns = [
     path('get_shapes_by_route/<str:route_id>', views.get_shapes_by_route, name='get_shapes_by_route'),
     #ex: /get_routes/
     path('get_routes', views.get_routes, name='get_routes'),
+    #ex: /get_bus_json/
+    path('get_bus_json', views.get_bus_json, name='get_bus_json'),
 ]

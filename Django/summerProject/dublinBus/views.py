@@ -15,14 +15,14 @@ from summerProject import DublinBus_current_info
 
 def index(request):
     """View to load the homepage of our application"""
-    # if request.method == 'POST':
-    #     route = request.POST.get("route")
-    #     time = request.POST.get("time")
-    #     route = predict_linear("56A",DIRECTION=1,PLANNEDTIME_ARR=30113.0,PLANNEDTIME_DEP=26400.0,ACTUALTIME_DEP=26365.0,temp=2.32,MONTH=2,weather_main='Clouds')
-    #     route = timedelta(seconds=route)
-    # else:
-    #     route = 0
-    return render(request, 'dublinBus/index.html')
+    if request.method == 'POST':
+        route = request.POST.get("route")
+        time = request.POST.get("time")
+        route = predict_linear("56A",DIRECTION=1,PLANNEDTIME_ARR=30113.0,PLANNEDTIME_DEP=26400.0,ACTUALTIME_DEP=26365.0,temp=2.32,MONTH=2,weather_main='Clouds')
+        route = timedelta(seconds=route)
+    else:
+        route = 0
+    return render(request, 'dublinBus/index.html', {'route':route})
 
 def journey(request):
     """View to load the journey page of our application"""

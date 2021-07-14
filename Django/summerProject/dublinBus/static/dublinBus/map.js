@@ -39,7 +39,10 @@ async function initMap() {
         // Create info window for each station before creating a marker
         // Create content of window
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
-            `<ul><li>Station Number: ${station.stop_num} </li></ul>`;
+            `<ul>` +
+                `<li>Station Number: ${station.stop_num} </li>` +
+                `<li>Routes served by station: ${station.routes.toString()}` +
+            `</ul>`;
         // Create info window object
         let current_info_window = new google.maps.InfoWindow({
             content: window_content,

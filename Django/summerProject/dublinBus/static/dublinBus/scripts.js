@@ -85,21 +85,26 @@ function displayRoute(directionsService, directionsRenderer, markersArray) {
              // Loop through all of the possible route directions given back by the api
              for (let i = 0; i < response.routes.length; i++) {
                  let current_route = response.routes[i];
-                 console.log("looping through routes. Current route:", current_route)
+                 console.count("looping through routes. Current route:", current_route)
                  // Loop through all the legs of the current route
                  for (let j = 0; j < current_route.legs.length; j++) {
                      let current_leg = current_route.legs[j];
+                     console.group("current_leg is:", current_leg)
                      // Loop through each step in this leg of the route
                      for (let k = 0; k < current_leg.steps.length; k++) {
                          let current_step = current_leg.steps[k];
+                         console.group("current_step is:", current_step)
                          // Check if this step is using public transport and if so check if it's using the correct route
                          if (current_step.travel_mode === "TRANSIT") {
+                             console.log("step is in transit")
                              // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
                              // so we can select the route to be used as the current one in the for loop
                              if (current_step.transit.line.short_name === "56A") {
                                  console.log("56A found")
                                  directionsRenderer.setDirections(response);
                                  directionsRenderer.setRouteIndex(i);
+                                 // We want to exit the function now as we've found a match and set the directions,
+                                 // so we return to exit all the outer loops
                                  return
                              }
                          } else {

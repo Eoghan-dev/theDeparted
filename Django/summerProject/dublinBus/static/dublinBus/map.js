@@ -5,6 +5,25 @@ async function initMap() {
     // This is useful for things such as querying our db to get bus stop co-ordinates so that we can ensure that we have
     // these co-ordinates before trying to fill the map with markers based around them.
 
+    // Fill the drop down selector of routes before continuing
+    let routes = await fetch('/get_routes').then(res => {
+        return res.json()
+    }).then(data => {
+        console.log("all routes:", data)
+        return data
+    });
+    let routes_selector = document.getElementById("routes");
+    for (let route_key in routes) {
+        let current_route = routes[route_key]
+        let route_option = document.createElement("option");
+        route_option.value = current_route.route_id;
+        route_option.text= current_route.route_short_name.toUpperCase();
+        if (current_route.route_short_name === "56a") {
+            console.log("56a found")
+            route_option.selected = true;
+        }
+        routes_selector.appendChild(route_option);
+    }
     // load map
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
@@ -22,7 +41,7 @@ async function initMap() {
     }).then(data => {
         console.log("bus stop data:", data)
         return data
-    })
+    });
     // Declare an empty array where we will keep all of our markers for each stop
     const markers_array = [];
     // This is what we can call from our html to load our directions

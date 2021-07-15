@@ -7,7 +7,7 @@ async function initMap() {
 
     // load map
     const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 8,
+        zoom: 13,
         center: {lat: 53.349804, lng: -6.260310},
     });
     var directionsService = new google.maps.DirectionsService();
@@ -28,7 +28,7 @@ async function initMap() {
     // This is what we can call from our html to load our directions
     const onChangeHandler = function () {
         // displayRoute(directionsService, directionsRenderer, markers_cluster, map); commented out for prototype demo
-        displayRoute(directionsService, directionsRenderer, markers_array);
+        displayRoute(directionsService, directionsRenderer, markers_array, "56A");
     };
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", onChangeHandler);
@@ -37,11 +37,16 @@ async function initMap() {
     for (let key in bus_stop_data) {
         let station = bus_stop_data[key];
         // Create info window for each station before creating a marker
-        // Create content of window
+        // Save the routes serving this station in a new array by taking the first index from each entry in station.routes
+        let station_routes = []
+         station.routes.forEach(route => {
+            station_routes.push(route[0]);
+        })
+            // Create content of window
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
             `<ul>` +
                 `<li>Station Number: ${station.stop_num} </li>` +
-                `<li>Routes served by station: ${station.routes.toString()}` +
+                `<li>Routes served by station: ${station_routes.toString()}` +
             `</ul>`;
         // Create info window object
         let current_info_window = new google.maps.InfoWindow({

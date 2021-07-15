@@ -47,7 +47,7 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
   //       imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
   // });
 }
-function displayRoute(directionsService, directionsRenderer, markersArray) {
+function displayRoute(directionsService, directionsRenderer, markersArray, routeNumber) {
     // Function that takes a route number, the map being used and our array of markers as a parameter and
     // Displays directions for that route and only the markers on that route on the map
 
@@ -60,7 +60,11 @@ function displayRoute(directionsService, directionsRenderer, markersArray) {
     markersOnRoute = [];
     // Loop through all the markers and find those that match our route and add them to our new array
     for (let currentMarker of markersArray) {
-        if (currentMarker.routes.includes("56A")) {
+        let markerRoutes = []
+         currentMarker.routes.forEach(route => {
+            markerRoutes.push(route[0].split("-")[0]);
+        })
+        if (markerRoutes.includes(routeNumber)) {
             markersOnRoute.push(currentMarker);
         }
     }
@@ -99,7 +103,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray) {
                              console.log("step is in transit")
                              // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
                              // so we can select the route to be used as the current one in the for loop
-                             if (current_step.transit.line.short_name === "56A") {
+                             if (current_step.transit.line.short_name === routeNumber) {
                                  console.log("56A found")
                                  directionsRenderer.setDirections(response);
                                  directionsRenderer.setRouteIndex(i);

@@ -90,25 +90,46 @@ def json_convertor(filename):
     print("Finished saving", filename + ".json")
 
 def route_to_stop():
-    file_location =  os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
     with open(file_location) as out_file:
         stop_times = json.loads(out_file.read())
     out_file.close()
     bus_dict = {}
-    bus_list = []
+    bus_dir = {}
     for id in stop_times:
         if stop_times[id]["stop_id"] in bus_dict.keys():
             bus_num = list(stop_times[id]["trip_id"].split("."))
             bus_num = list(bus_num[2].split("-"))
-            if bus_num[1] in bus_dict[stop_times[id]["stop_id"]]:
+            route_id = bus_num[1]
+            if [bus_num[1] + "-1", stop_times[id]["stop_headsign"]] in bus_dict[stop_times[id]["stop_id"]]:
+                pass
+            elif [bus_num[1] + "-2", stop_times[id]["stop_headsign"]] in bus_dict[stop_times[id]["stop_id"]]:
                 pass
             else:
                 list_1 = bus_dict[stop_times[id]["stop_id"]]
-                list_1.append(bus_num[1])
-                bus_dict[stop_times[id]["stop_id"]] = list_1
+                if bus_num[1] in bus_dir.keys():
+                    if bus_dir[route_id] == stop_times[id]["stop_headsign"]:
+                        bus_list = [bus_num[1] + "-1", stop_times[id]["stop_headsign"]]
+                        list_1.append(bus_list)
+                        bus_dict[stop_times[id]["stop_id"]] = list_1
+                    else:
+                        list_1.append([bus_num[1] + "-2", stop_times[id]["stop_headsign"]])
+                        bus_dict[stop_times[id]["stop_id"]] = list_1
+                else:
+                    list_1.append([bus_num[1] + "-1", stop_times[id]["stop_headsign"]])
+                    bus_dict[stop_times[id]["stop_id"]] = [str(list_1) + "-1", stop_times[id]["stop_headsign"]]
+                    bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
+
         else:
             bus_num = list(stop_times[id]["trip_id"].split("."))
             bus_num = list(bus_num[2].split("-"))
-            bus_dict[stop_times[id]["stop_id"]] = [bus_num[1]]
+            if bus_num[1] in bus_dir:
+                if bus_dir[bus_num[1]] == stop_times[id]["stop_headsign"]:
+                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1] + "-1", stop_times[id]["stop_headsign"]]]
+                else:
+                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1] + "-2", stop_times[id]["stop_headsign"]]]
+            else:
+                bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
+                bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1] + "-1", stop_times[id]["stop_headsign"]]]
     return bus_dict
 # main()

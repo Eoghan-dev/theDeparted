@@ -4,7 +4,7 @@ import json
 
 def main():
     download()
-    files = ['routes.txt','shapes.txt','stop_times.txt','stops.txt']
+    files = ['routes.txt','shapes.json','stop_times.txt','stops.txt']
     for i in files:
         json_convertor(i)
 

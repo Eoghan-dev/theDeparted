@@ -22,6 +22,25 @@ function scrapeCB() {
     })
 }
 
+    function showPolyline(map) {
+    // Function that takes the map being used and plots a polyline using hard-coded lat & lng
+
+        const flightPlanCoordinates = [
+            { lat: 53.3296309426544, lng: -6.24901208670741 },
+            { lat: 53.3274927904883, lng: -6.24419027793743 },
+            { lat: 53.2813436184493, lng: -6.27720205461647 },
+            { lat: 53.2778180682183, lng: -6.28953551909299 },
+        ];
+        const flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+        });
+        flightPath.setMap(map);
+    }
+
 function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes a cluster object with all the markers on the map, an array of the markers we want to make visible and
     // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
@@ -120,4 +139,5 @@ function displayRoute(directionsService, directionsRenderer, markersArray) {
              alert("Error with response from google directions API")
          }
     });
+
 }

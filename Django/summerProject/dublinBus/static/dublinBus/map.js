@@ -38,6 +38,7 @@ async function initMap() {
         let station = bus_stop_data[key];
         // Create info window for each station before creating a marker
         // Create content of window
+        console.log(station.stop_name)
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
             `<ul>` +
                 `<li>Station Number: ${station.stop_num} </li>` +
@@ -84,4 +85,6 @@ async function initMap() {
     //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
     // });
     console.log("Markers array:", markers_array)
+    //Call function to plot polyline
+    showPolyline(map);
 }

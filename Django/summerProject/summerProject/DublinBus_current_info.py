@@ -8,6 +8,7 @@ def main():
     download()
     files = ['routes.txt','shapes.txt','stop_times.txt','stops.txt']
     for i in files:
+        print(i)
         json_convertor(i)
 
 
@@ -33,7 +34,10 @@ def download():
 def json_convertor(filename):
     # resultant dictionary
     dict1 = {}
+    print(filename)
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", filename)
+    print(file_location)
+
     with open(file_location, encoding="utf-8-sig") as fh:
         # count variable for id
         l = 1

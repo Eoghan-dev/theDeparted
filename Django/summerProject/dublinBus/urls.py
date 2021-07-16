@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('home', views.index, name='index'),
     path('journey', views.journey, name='journey'),
+    path('dropdown', views.dropdown, name='dropdown'),
     # ex: /scrapeCW
     path('scrapeCW', views.scrapeCW, name='scrapeCW'),
     # ex: /scrapeCB

@@ -49,6 +49,7 @@ def get_index():
 def get_timetable(index):
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
     bus_times = {}
+    count = 0
     if os.path.exists(file_location)==False:
         return False
     else:
@@ -85,11 +86,12 @@ def get_timetable(index):
                                     elif date[0] not in bus_times[route][i][direction][j] and j == (len(bus_times[route][i][direction]) - 1) and success_dt == 0:
                                         date_dict[date[0]] = [time]
                                         bus_times[route][i][direction].append(date_dict)
-                            elif (direction not in bus_times[route][i]) and i == len(bus_times[route]) -1 and success_dir == 1:
+                            elif (direction not in bus_times[route][i]) and i == len(bus_times[route]) -1 and success_dir == 0:
                                 date_dict[date[0]] = [time]
                                 dir_dict[direction] = [date_dict]
                                 bus_times[route].append(dir_dict)
                     else:
+                        count = count + 1
                         date_dict[date[0]] = [time]
                         dir_dict[direction] = [date_dict]
                         bus_times[route] = [dir_dict]
@@ -97,4 +99,5 @@ def get_timetable(index):
     out_file = open(file_location+".json", "w")
     json.dump(bus_times, out_file, indent=4)
     out_file.close()
+    print(count)
 

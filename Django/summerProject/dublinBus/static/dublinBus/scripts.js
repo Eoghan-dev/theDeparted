@@ -60,9 +60,14 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     }
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < markersOnRoute.length; i++) {
+    bounds.extend(markersOnRoute[i].getPosition());
+    }
+    map.fitBounds(bounds)
     // Pan the map to the co-ordinates of the first marker in markersOnRoute
-    let panCoords = markersOnRoute[0].getPosition();
-    map.panTo(panCoords);
+    // let panCoords = markersOnRoute[0].getPosition();
+    // map.panTo(panCoords);
 
 // I've commented out the code for the directions from google maps api for now until we decide how best to use it
     // Make the request for directions and display it

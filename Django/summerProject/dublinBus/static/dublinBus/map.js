@@ -46,11 +46,13 @@ async function initMap() {
     const markers_array = [];
     // This is what we can call from our html to load our directions
     const onChangeHandler = function () {
-        // displayRoute(directionsService, directionsRenderer, markers_cluster, map); commented out for prototype demo
-        displayRoute(directionsService, directionsRenderer, markers_array, "56A");
+        // get the text (route number) from the currently selected route and then call displayRoute with all args
+        let routeNumber = routes_selector.options[routes_selector.selectedIndex].text;
+        displayRoute(directionsService, directionsRenderer, markers_array, routeNumber, map);
     };
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", onChangeHandler);
+    // Add an event listener to the route
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {

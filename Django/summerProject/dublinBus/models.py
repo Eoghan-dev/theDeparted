@@ -118,3 +118,30 @@ class BusStops(models.Model):
         scrapers.get_bus_stop()
         print("Finished scraping Bus stops!")
 
+class Current_timetable(models.Model):
+    """
+    Stores current bus timetable,
+    data for this model will be harvested from gtfs transport for ireland
+    """
+    timestamp = models.BigIntegerField() # timestamp of when the api call was made
+    dt = models.DateTimeField() # datetime representation of the above timestamp
+    route = models.CharField(max_length=8)
+    direction = models.CharField(max_length=32)
+    day = models.CharField(max_length=8)
+    leave_t = models.CharField(max_length=32)
+
+    def __str__(self):
+        """String representation of the model, can be changed to anything"""
+        str_output = f"*****" \
+                     f"Route: {self.route}" \
+                     f"Direction: {self.direction}" \
+                     f"Day: {self.day}" \
+                     f"Leave_time: {self.leave_t}" \
+                     f"*****"
+        return str_output
+
+    @classmethod
+    def scrape(cls):
+        # Make api call to gtfs transport for Ireland api and store the result as json in a variable
+        scrapers.get_bus_timetable()
+        print("Finished scraping Dublin_bus_timetable!")

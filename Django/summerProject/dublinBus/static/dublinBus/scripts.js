@@ -125,3 +125,19 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
          }
     });
 }
+function input_stops() {
+    //Function to read in bus stops into a datalist
+    var options = '';
+    //Reads in Json data from stops.json
+    //See view at get_bus_stops
+    fetch('/get_bus_stops').then(res => res.json()).then((data) => {
+        for (id in data) {
+        //Adds option to options
+            options += '<option value="' + data[id]['stop_num'] + '" />';
+        }
+        //Add options to datalist
+        document.getElementById('stops').innerHTML = options;
+        })
+
+}
+input_stops()

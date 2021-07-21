@@ -11,7 +11,7 @@
 
         <br>
         <div class="dropD" >
-        <label for="hours">Choose a route and time:</label>
+        <label>Choose a route and time:</label>
         <select id="route">
           <option value="56A">56A</option>
           <option value="77A">77A</option>
@@ -58,7 +58,10 @@
         <br>
       </div>
     </form>
-
+    <label for="stops_num">Please enter Stop number</label>
+    <input id="stops_num" onselect="input_stops()" list="stops">
+        <datalist id="stops">
+        </datalist>
             <div class="col-md-9"><button id="get_directions">Give route</button><div id="map"></div></div>
         </div>
     </div>

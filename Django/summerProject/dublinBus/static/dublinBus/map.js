@@ -40,16 +40,11 @@ async function initMap() {
         let routeNumber = selectedRoute.value;
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumber)
     };
-    // This is what we can call from our html to pass our already loaded stop/route data to our function that makes
-    // the autocomplete search bar for each
-    const auto_search_routes = function () {
-        loadRoutesSearch(routes);
-    }
 
+    // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
+    loadRoutesSearch(routes);
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
-    // Add an event listener to the route
-    document.getElementById("routes_num").addEventListener("select", auto_search_routes);
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {

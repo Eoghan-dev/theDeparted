@@ -6,7 +6,7 @@ from django.conf import settings
 base = settings.BASE_DIR
 def main():
     download()
-    files = ['routes.txt','shapes.txt','stop_times.txt','stops.txt']
+    files = ['stop_times.txt','routes.txt','shapes.txt','stops.txt']
     for i in files:
         json_convertor(i)
 
@@ -39,12 +39,17 @@ def json_convertor(filename):
         l = 1
         if filename == "stops.txt":
             bus_dict = route_to_stop()
+        elif filename == "routes.txt":
+            bus_dict = route_destinations()
         for line in fh:
             if (l==1):
                 #Comma present in stops.txt for stop name that seperates name with number
                 if filename == "stops.txt":
                     ext_line = "stop_id,stop_name,stop_num,stop_lat,stop_lon,routes"
                     fields = list(ext_line.strip().split(','))
+                elif filename == "routes.txt":
+                    fields = list(line.strip().split(','))
+                    fields.append("direction")
                 else:
                     fields = list(line.strip().split(','))
             if (l!=1):
@@ -74,6 +79,11 @@ def json_convertor(filename):
 
                     elif filename == "stops.txt" and i==5:
                         dict2[fields[i]] = bus_dict[description[0]]
+                    elif filename == "routes.txt" and i==5:
+                        if description[2] in bus_dict:
+                            dict2[fields[i]] = bus_dict[description[2]]
+                        elif description[2].upper() in bus_dict:
+                            dict2[fields[i]] = bus_dict[description[2].upper()]
                     else:
                         dict2[fields[i]] = description[i]
                     i = i + 1
@@ -91,11 +101,13 @@ def json_convertor(filename):
 
 def route_to_stop():
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
-    with open(file_location) as out_file:
+    #Open stop_times json file
+    with open(file_location, encoding="utf-8-sig") as out_file:
         stop_times = json.loads(out_file.read())
     out_file.close()
     bus_dict = {}
     bus_dir = {}
+    #Iterates through all id's in stop times
     for id in stop_times:
         if stop_times[id]["stop_id"] in bus_dict.keys():
             bus_num = list(stop_times[id]["trip_id"].split("."))
@@ -131,5 +143,31 @@ def route_to_stop():
             else:
                 bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
                 bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1] + "-1", stop_times[id]["stop_headsign"]]]
+    return bus_dict
+
+def route_destinations():
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
+                                 "stop_times.json")
+    # Open stop_times json file
+    with open(file_location) as out_file:
+        stop_times = json.loads(out_file.read())
+    out_file.close()
+    bus_dict = {}
+    for id in stop_times:
+        bus_num = list(stop_times[id]["trip_id"].split("."))
+        bus_num = list(bus_num[2].split("-"))
+        route_id = bus_num[1]
+        route_id = route_id.strip("'")
+        check = 0
+        if route_id in bus_dict:
+            for i in bus_dict[route_id]:
+                if i == stop_times[id]["stop_headsign"]:
+                    check = 1
+            if check == 1:
+                pass
+            else:
+                bus_dict[route_id].append(stop_times[id]["stop_headsign"])
+        else:
+            bus_dict[route_id]=[stop_times[id]["stop_headsign"]]
     return bus_dict
 # main()

@@ -206,3 +206,28 @@ def get_bus_stop():
     f.close
     models.BusStops.objects.bulk_create(entries)
     print("Number of stations failing:",count)
+
+def get_bus_timetable():
+    """Uses information obtained through the GTFS to build a current timetable
+    Note please run timetable_creator_json to access the data"""
+
+    base = settings.BASE_DIR
+    file_location = os.path.join(base, "dublinBus", "json_files", "bus_times.json")
+    with open(file_location, encoding="utf-8-sig") as out_file:
+        timetable = json.loads(out_file.read())
+
+    # Truncate table
+    models.Current_timetable.objects.all().delete()
+    entries = []
+    for routes in timetable:
+        for directions in timetable[route]:
+            for day in timetable[route][directions]:
+                for time in timetable[route][directions][day]:
+                    latestUpdate = models.Current_timetable(
+                        route=routes,
+                        direction=directions,
+                        day=day,
+                        leave_t=time
+                    )
+                    entries.append(latestUpdate)
+    models.Current_timetable.objects.bulk_create(entries)

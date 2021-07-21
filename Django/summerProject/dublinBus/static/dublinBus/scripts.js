@@ -124,12 +124,13 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 }
 
 function routesStops(routesJson) {
-    console.log("In Routes stops!")
-    let options = '';
+    let routes_selector = document.getElementById("routes");
     for (id in routesJson) {
         //Adds option to options
-        options += '<option value="' + routesJson[id]['route_short_name'] + '" />';
+        let current_route = routesJson[id];
+        let route_option = document.createElement("option");
+        route_option.value = current_route.route_short_name;
+        route_option.text= current_route.route_id;
+        routes_selector.appendChild(route_option);
     }
-    //Add options to datalist
-    document.getElementById('routes').innerHTML = options;
 }

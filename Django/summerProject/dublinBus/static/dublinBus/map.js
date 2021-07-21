@@ -12,18 +12,6 @@ async function initMap() {
         console.log("all routes:", data)
         return data
     });
-    // let routes_selector = document.getElementById("routes");
-    // for (let route_key in routes) {
-    //     let current_route = routes[route_key]
-    //     let route_option = document.createElement("option");
-    //     route_option.value = current_route.route_id;
-    //     route_option.text= current_route.route_short_name.toUpperCase();
-    //     if (current_route.route_short_name === "56a") {
-    //         console.log("56a found")
-    //         route_option.selected = true;
-    //     }
-    //     routes_selector.appendChild(route_option);
-    // }
 
     // load map
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -47,14 +35,15 @@ async function initMap() {
     const markers_array = [];
     // This is what we can call from our html to load our directions
     const onChangeHandler = function () {
+     //   let routes_selector =
         // get the text (route number) from the currently selected route and then call displayRoute with all args
-        let routeNumber = routes_selector.options[routes_selector.selectedIndex].text;
+       // let routeNumber = routes_selector.options[routes_selector.selectedIndex].value;
+        let routeNumber = document.getElementById('routes').value;
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumber, map);
     };
     // This is what we can call from our html to pass our already loaded stop/route data to our function that makes
     // the autocomplete search bar for each
     const auto_search_routes = function () {
-        console.log("In auto_search routes")
         routesStops(routes);
     }
     // We can call the function here so it will load when the map loads
@@ -114,11 +103,5 @@ async function initMap() {
         // Also add each marker to our map
         current_marker.setMap(map);
     }
-
-    // Add a marker clusterer to group all the markers together using the Marker Clusterer Plus library https://github.com/googlemaps/js-markerclustererplus
-    // let markers_cluster = new MarkerClusterer(map, markers_array, {ignoreHidden: true}, {
-    //   imagePath:
-    //     "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-    // });
     console.log("Markers array:", markers_array)
 }

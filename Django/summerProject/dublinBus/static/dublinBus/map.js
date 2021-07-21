@@ -20,7 +20,6 @@ async function initMap() {
     });
     var directionsService = new google.maps.DirectionsService();
     var directionsRenderer = new google.maps.DirectionsRenderer();
-    // directionsRenderer.setPanel(document.getElementById("sidebar")); makes and sets the sidebard
     directionsRenderer.setMap(map);
 
     // Make request to get json object of all dublin bus stops
@@ -33,24 +32,22 @@ async function initMap() {
     });
     // Declare an empty array where we will keep all of our markers for each stop
     const markers_array = [];
+
     // This is what we can call from our html to load our directions
-    const onChangeHandler = function () {
-     //   let routes_selector =
-        // get the text (route number) from the currently selected route and then call displayRoute with all args
-       // let routeNumber = routes_selector.options[routes_selector.selectedIndex].value;
-        let routeNumber = document.getElementById('routes').value;
-        displayRoute(directionsService, directionsRenderer, markers_array, routeNumber, map);
+    const displaySelectedRoute = function () {
+        // The first index of the array returned by getElementsByName for our datalist with always be the selected route by the user
+        let selectedRoute = document.getElementsByName('routes_num')[0];
+        let routeNumber = selectedRoute.value;
+        displayRoute(directionsService, directionsRenderer, markers_array, routeNumber)
     };
     // This is what we can call from our html to pass our already loaded stop/route data to our function that makes
     // the autocomplete search bar for each
     const auto_search_routes = function () {
         routesStops(routes);
     }
-    // We can call the function here so it will load when the map loads
-    auto_search_routes()
 
     // Add an event listener to a button so we can call the above function which will then load our directions
-    document.getElementById("get_directions").addEventListener("click", onChangeHandler);
+    document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
     // Add an event listener to the route
     document.getElementById("routes_num").addEventListener("select", auto_search_routes);
 

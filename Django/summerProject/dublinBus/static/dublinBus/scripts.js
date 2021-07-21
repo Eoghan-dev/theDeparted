@@ -47,7 +47,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     let map = markersArray[0].getMap();
     // Get array of all the markers in the cluster (all the markers on the map)
     // Create empty array to hold the markers on our route so we can only show them
-    markersOnRoute = [];
+    let markersOnRoute = [];
     // Loop through all the markers and find those that match our route and add them to our new array
     for (let currentMarker of markersArray) {
         let markerRoutes = []
@@ -58,6 +58,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
             markersOnRoute.push(currentMarker);
         }
     }
+
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
@@ -124,12 +125,13 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 }
 
 function routesStops(routesJson) {
+    // Loop through the json data of all routes and add them to our datalist for user selection
     let routes_selector = document.getElementById("routes");
     for (id in routesJson) {
         //Adds option to options
         let current_route = routesJson[id];
         let route_option = document.createElement("option");
-        route_option.value = current_route.route_short_name;
+        route_option.value = current_route.route_short_name.toUpperCase();
         route_option.text= current_route.route_id;
         routes_selector.appendChild(route_option);
     }

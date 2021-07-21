@@ -124,7 +124,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     // });
 }
 
-function routesStops(routesJson) {
+function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
     let routes_selector = document.getElementById("routes");
     for (id in routesJson) {

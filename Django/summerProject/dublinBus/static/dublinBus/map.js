@@ -43,7 +43,7 @@ async function initMap() {
     // This is what we can call from our html to pass our already loaded stop/route data to our function that makes
     // the autocomplete search bar for each
     const auto_search_routes = function () {
-        routesStops(routes);
+        loadRoutesSearch(routes);
     }
 
     // Add an event listener to a button so we can call the above function which will then load our directions

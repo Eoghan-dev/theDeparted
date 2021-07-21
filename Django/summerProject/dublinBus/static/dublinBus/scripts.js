@@ -51,7 +51,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     // Loop through all the markers and find those that match our route and add them to our new array
     for (let currentMarker of markersArray) {
         let markerRoutes = []
-         currentMarker.routes.forEach(route => {
+        currentMarker.routes.forEach(route => {
             markerRoutes.push(route[0].split("-")[0]);
         })
         if (markerRoutes.includes(routeNumber)) {
@@ -60,14 +60,12 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     }
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
+    // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < markersOnRoute.length; i++) {
-    bounds.extend(markersOnRoute[i].getPosition());
+        bounds.extend(markersOnRoute[i].getPosition());
     }
     map.fitBounds(bounds)
-    // Pan the map to the co-ordinates of the first marker in markersOnRoute
-    // let panCoords = markersOnRoute[0].getPosition();
-    // map.panTo(panCoords);
 
 // I've commented out the code for the directions from google maps api for now until we decide how best to use it
     // Make the request for directions and display it
@@ -123,4 +121,15 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     //          alert("Error with response from google directions API")
     //      }
     // });
+}
+
+function routesStops(routesJson) {
+    console.log("In Routes stops!")
+    let options = '';
+    for (id in routesJson) {
+        //Adds option to options
+        options += '<option value="' + routesJson[id]['route_short_name'] + '" />';
+    }
+    //Add options to datalist
+    document.getElementById('routes').innerHTML = options;
 }

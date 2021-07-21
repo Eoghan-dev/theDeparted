@@ -5,52 +5,56 @@
 
 <div class="container" style="width: 100%;margin-right: 0px;margin-left: 0px;height: 100%;margin-top: 20px;">
         <div class="row" style="width: 100%;margin-left: 0px;margin-right: 0px;height: 100%;">
-                    <form method="POST">
-     {% csrf_token %}
-      <div class="display">
+{#                    <form method="POST">#}
+{#     {% csrf_token %}#}
+{#      <div class="display">#}
+{##}
+{#        <br>#}
+{#        <div class="dropD" >#}
+{#        <label for="hours">Choose a route and time:</label>#}
+{#        <select id="routes">#}
+{#        </select>#}
 
-        <br>
-        <div class="dropD" >
-        <label for="hours">Choose a route and time:</label>
-        <select id="routes">
-        </select>
-
-        <select id="time">
-          <option value="00:00">00.00 AM</option>
-          <option value="01:00">01.00 AM</option>
-          <option value="02:00">02.00 AM</option>
-          <option value="03:00">03.00 AM</option>
-          <option value="04:00">04.00 AM</option>
-          <option value="05:00">05.00 AM</option>
-          <option value="06:00">06.00 AM</option>
-          <option value="07:00">07.00 AM</option>
-          <option value="08:00">08.00 AM</option>
-          <option value="09:00">09.00 AM</option>
-          <option value="10:00">10.00 AM</option>
-          <option value="11:00">11.00 AM</option>
-          <option value="12:00">12.00 PM</option>
-          <option value="13:00">01.00 PM</option>
-          <option value="14:00">02.00 PM</option>
-          <option value="15:00">03.00 PM</option>
-          <option value="16:00">04.00 PM</option>
-          <option value="17:00">05.00 PM</option>
-          <option value="18:00">06.00 PM</option>
-          <option value="19:00">07.00 PM</option>
-          <option value="20:00">08.00 PM</option>
-          <option value="21:00">09.00 PM</option>
-          <option value="22:00">10.00 PM</option>
-          <option value="23:00">11.00 PM</option>
-        </select>
-            <button type="submit">Submit</button>
-        <br>
-        <br>
-
-        <a>{{route}}</a>
-        </div>
-        <br>
-        <br>
-      </div>
-    </form>
+{#        <select id="time">#}
+{#          <option value="00:00">00.00 AM</option>#}
+{#          <option value="01:00">01.00 AM</option>#}
+{#          <option value="02:00">02.00 AM</option>#}
+{#          <option value="03:00">03.00 AM</option>#}
+{#          <option value="04:00">04.00 AM</option>#}
+{#          <option value="05:00">05.00 AM</option>#}
+{#          <option value="06:00">06.00 AM</option>#}
+{#          <option value="07:00">07.00 AM</option>#}
+{#          <option value="08:00">08.00 AM</option>#}
+{#          <option value="09:00">09.00 AM</option>#}
+{#          <option value="10:00">10.00 AM</option>#}
+{#          <option value="11:00">11.00 AM</option>#}
+{#          <option value="12:00">12.00 PM</option>#}
+{#          <option value="13:00">01.00 PM</option>#}
+{#          <option value="14:00">02.00 PM</option>#}
+{#          <option value="15:00">03.00 PM</option>#}
+{#          <option value="16:00">04.00 PM</option>#}
+{#          <option value="17:00">05.00 PM</option>#}
+{#          <option value="18:00">06.00 PM</option>#}
+{#          <option value="19:00">07.00 PM</option>#}
+{#          <option value="20:00">08.00 PM</option>#}
+{#          <option value="21:00">09.00 PM</option>#}
+{#          <option value="22:00">10.00 PM</option>#}
+{#          <option value="23:00">11.00 PM</option>#}
+{#        </select>#}
+{#            <button type="submit">Submit</button>#}
+{#        <br>#}
+{#        <br>#}
+{##}
+{#        <a>{{route}}</a>#}
+{#        </div>#}
+{#        <br>#}
+{#        <br>#}
+{#      </div>#}
+{#    </form>#}
+               <label for="routes_num">Please enter route number</label>
+    <input id="routes_num" list="stops">
+        <datalist id="routes">
+        </datalist>
 
             <div class="col-md-9"><button id="get_directions">Give route</button><div id="map"></div></div>
         </div>

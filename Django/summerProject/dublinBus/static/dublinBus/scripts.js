@@ -171,7 +171,7 @@ function handleLocationError(browserHasGeolocation, map) {
     // Function to handle errors for geolocation
  alert(
     browserHasGeolocation
-      ? "Error: The Geolocation service failed and we could not find your location. Please refresh the page to try again."
+      ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
       : "Error: Your browser doesn't support geolocation."
   );
 }

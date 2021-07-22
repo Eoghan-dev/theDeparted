@@ -38,10 +38,11 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
     })
 }
 
-function displayRoute(directionsService, directionsRenderer, markersArray, routeNumber) {
+function displayRoute(directionsService, directionsRenderer, markersArray, routeNumberAndDir) {
     // Function that takes a route number, the map being used and our array of markers as a parameter and
     // Displays directions for that route and only the markers on that route on the map
     console.log("In displayRoute function")
+    console.log("Selected route passed through:", routeNumberAndDir)
 
     // Get the map as it's own variable by accessing it through the first marker in markersArray
     let map = markersArray[0].getMap();
@@ -52,9 +53,9 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     for (let currentMarker of markersArray) {
         let markerRoutes = []
         currentMarker.routes.forEach(route => {
-            markerRoutes.push(route[0].split("-")[0]);
+            markerRoutes.push(route);
         })
-        if (markerRoutes.includes(routeNumber)) {
+        if (markerRoutes.includes(routeNumberAndDir)) {
             markersOnRoute.push(currentMarker);
         }
     }
@@ -127,12 +128,41 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
     let routes_selector = document.getElementById("routes");
-    for (id in routesJson) {
-        //Adds option to options
-        let current_route = routesJson[id];
-        let route_option = document.createElement("option");
-        route_option.value = current_route.route_short_name.toUpperCase();
-        route_option.text= current_route.route_id;
-        routes_selector.appendChild(route_option);
+    // First we need to remove all entries in the json file where there is a duplicate route number (route_short_name)
+    // there should be two entries for each route number in the json file as they each represent each direction of the route
+    // for the purposes of loading the route search we only need to access the data for one direction of each route so
+    // we need to effectively half the array before looping through the items and adding them to our search bar
+
+    let entries = []; // array where we will store all the items to be added to the auto search bar
+    // first lets get an array of all the values in the json file
+    let routesArray = Object.values(routesJson);
+    // Code to filter a collection of javascript objects by a certain property adapted from https://stackoverflow.com/a/40784420
+    let halvedRoutes = routesArray.filter(function (route) {
+        if (!this[route.route_short_name]) {
+            this[route.route_short_name] = true;
+            return true;
+        }
+        return false;
+    }, Object.create(null));
+
+    for (current_route of halvedRoutes) {
+        if (current_route.hasOwnProperty('direction')) {
+            // Loop through all the directions the route serves and make them each a separate entry to fill the search bar
+            for (current_direction of current_route.direction) {
+                let route_option = document.createElement("option");
+                route_option.value = current_route.route_short_name.toUpperCase() + ": " + current_direction;
+                // route_option.text = current_direction;
+                entries.push(route_option);
+            }
+        }
+        // If there are no directions given by the route then we still add it to entries but without the text attribute
+        else {
+            let route_option = document.createElement("option");
+            route_option.value = current_route.route_short_name.toUpperCase();
+            entries.push(route_option);
+        }
+        for (let entry of entries) {
+            routes_selector.appendChild(entry);
+        }
     }
 }

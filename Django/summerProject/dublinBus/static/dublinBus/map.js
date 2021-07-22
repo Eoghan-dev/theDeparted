@@ -37,8 +37,9 @@ async function initMap() {
     const displaySelectedRoute = function () {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected route by the user
         let selectedRoute = document.getElementsByName('routes_num')[0];
-        let routeNumber = selectedRoute.value;
-        displayRoute(directionsService, directionsRenderer, markers_array, routeNumber)
+        let routeNumberAndDir = selectedRoute.value;
+        console.log("Selected route was: ", routeNumberAndDir)
+        displayRoute(directionsService, directionsRenderer, markers_array, routeNumberAndDir)
     };
 
     // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
@@ -53,14 +54,19 @@ async function initMap() {
         // Save the routes serving this station in a new array by taking the first index from each entry in station.routes
         let station_routes = []
          station.routes.forEach(route => {
-            station_routes.push(route[0]);
+             // Make a combined string of the first index of each entry in routes (route number) and the second (direction of route)
+             let routes_string = route[0] + ": " + route[1];
+            station_routes.push(routes_string);
         })
             // Create content of window
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
             `<ul>` +
                 `<li>Station Number: ${station.stop_num} </li>` +
-                `<li>Routes served by station: ${station_routes.toString()}` +
-            `</ul>`;
+                `<li>Routes served by station:<ul>`;
+        for (let route of station_routes) {
+            window_content += `<li>${route}</li>`;
+        }
+        window_content += "</ul></ul>";
         // Create info window object
         let current_info_window = new google.maps.InfoWindow({
             content: window_content,
@@ -76,7 +82,7 @@ async function initMap() {
             infowindow: current_info_window,
             // Icon taken from http://kml4earth.appspot.com/icons.html
             // icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png", this is the hideous icon
-            routes: station.routes,
+            routes: station_routes,
         });
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", () => {

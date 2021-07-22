@@ -159,13 +159,13 @@ def route_destinations():
         check = 0
         if route_id in bus_dict:
             for i in bus_dict[route_id]:
-                if i == stop_times[id]["stop_headsign"]:
+                if i == stop_times[id]["stop_headsign"].lstrip():
                     check = 1
             if check == 1:
                 pass
             else:
-                bus_dict[route_id].append(stop_times[id]["stop_headsign"])
+                bus_dict[route_id].append(stop_times[id]["stop_headsign"].lstrip())
         else:
-            bus_dict[route_id]=[stop_times[id]["stop_headsign"]]
+            bus_dict[route_id]=[stop_times[id]["stop_headsign"].lstrip()]
     return bus_dict
 # main()

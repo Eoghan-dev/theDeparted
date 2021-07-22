@@ -1,26 +1,26 @@
-function scrapeCW() {
-    //Function to call the current weather scraper
-    fetch('/scrapeCW').then(res => {
-        console.log("CurrentWeather scraper request sent")
-        if (res.status === 200) {
-            console.log("Scraper ran successfully")
-        } else {
-            console.log("scraper failed :(")
-        }
-    })
-}
-
-function scrapeCB() {
-    //Function to call the current bus scraper
-    fetch('/scrapeCB').then(res => {
-        console.log("CurrentBus scraper request sent")
-        if (res.status === 200) {
-            console.log("Scraper ran successfully")
-        } else {
-            console.log("scraper failed :(")
-        }
-    })
-}
+// function scrapeCW() {
+//     //Function to call the current weather scraper
+//     fetch('/scrapeCW').then(res => {
+//         console.log("CurrentWeather scraper request sent")
+//         if (res.status === 200) {
+//             console.log("Scraper ran successfully")
+//         } else {
+//             console.log("scraper failed :(")
+//         }
+//     })
+// }
+//
+// function scrapeCB() {
+//     //Function to call the current bus scraper
+//     fetch('/scrapeCB').then(res => {
+//         console.log("CurrentBus scraper request sent")
+//         if (res.status === 200) {
+//             console.log("Scraper ran successfully")
+//         } else {
+//             console.log("scraper failed :(")
+//         }
+//     })
+// }
 
 function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes a cluster object with all the markers on the map, an array of the markers we want to make visible and
@@ -155,7 +155,7 @@ function loadRoutesSearch(routesJson) {
                 entries.push(route_option);
             }
         }
-        // If there are no directions given by the route then we still add it to entries but without the text attribute
+        // If there are no directions given by the route then we still add it to entry
         else {
             let route_option = document.createElement("option");
             route_option.value = current_route.route_short_name.toUpperCase();
@@ -166,3 +166,13 @@ function loadRoutesSearch(routesJson) {
         }
     }
 }
+
+function handleLocationError(browserHasGeolocation, map) {
+    // Function to handle errors for geolocation
+ alert(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed and we could not find your location. Please refresh the page to try again."
+      : "Error: Your browser doesn't support geolocation."
+  );
+}
+

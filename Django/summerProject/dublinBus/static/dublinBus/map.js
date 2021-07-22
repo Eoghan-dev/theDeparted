@@ -101,5 +101,30 @@ async function initMap() {
         // Also add each marker to our map
         current_marker.setMap(map);
     }
+    // Get user geolocation (adapted from https://developers.google.com/maps/documentation/javascript/examples/map-geolocation)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+            const user_marker = new google.maps.Marker({
+            position: pos,
+            map: map,
+            name: "user location",
+            // Icon taken from http://kml4earth.appspot.com/icons.html
+             icon: "http://maps.google.com/mapfiles/kml/shapes/man.png",
+        });
+        },
+        () => {
+          handleLocationError(true, map);
+        }
+      );
+    } else {
+      // Browser doesn't support Geolocation
+      handleLocationError(false, map);
+    }
+
     console.log("Markers array:", markers_array)
 }

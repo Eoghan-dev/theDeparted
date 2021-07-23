@@ -21,8 +21,6 @@ async function initMap() {
     var directionsService = new google.maps.DirectionsService();
     var directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
-    // We can initialise our class to handle directions here once we've declared all the arguments
-    new AutocompleteDirectionsHandler(map, directionsService, directionsRenderer);
 
     // Make request to get json object of all dublin bus stops
     // We use await to ensure that we wait until the data is fetched before continuing
@@ -105,6 +103,9 @@ async function initMap() {
         current_marker.setVisible(false)
         current_marker.setMap(map);
     }
+        // We can initialise our class to handle directions here once we've declared all the arguments and filled the markers array
+        new AutocompleteDirectionsHandler(map, markers_array, directionsService, directionsRenderer);
+
     // Get user geolocation (adapted from https://developers.google.com/maps/documentation/javascript/examples/map-geolocation)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(

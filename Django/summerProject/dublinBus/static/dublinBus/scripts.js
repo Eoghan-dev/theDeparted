@@ -49,6 +49,8 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 
     // Get the map as it's own variable by accessing it through the first marker in markersArray
     let map = markersArray[0].getMap();
+    // First we want to remove any directions from the directions api from the map
+    directionsRenderer.set('directions', null);
     // Get array of all the markers in the cluster (all the markers on the map)
     // Create empty array to hold the markers on our route so we can only show them
     let markersOnRoute = [];
@@ -142,15 +144,15 @@ class AutocompleteDirectionsHandler {
     map;
     originPlaceId;
     destinationPlaceId;
-    travelMode;
     directionsService;
     directionsRenderer;
+    markersArray;
 
-    constructor(map, directionsService, directionsRenderer) {
+    constructor(map, markersArray, directionsService, directionsRenderer) {
         this.map = map;
+        this.markersArray = markersArray;
         this.originPlaceId = "";
         this.destinationPlaceId = "";
-        this.travelMode = google.maps.TravelMode.TRANSIT;
         this.directionsService = directionsService;
         this.directionsRenderer = directionsRenderer;
         this.directionsRenderer.setMap(map);
@@ -192,6 +194,8 @@ class AutocompleteDirectionsHandler {
         if (!this.originPlaceId || !this.destinationPlaceId) {
             return;
         }
+        // Clear all (if any) markers from the map before continuing with drawing the directions
+        showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
         const me = this;
         this.directionsService.route(
             {

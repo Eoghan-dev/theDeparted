@@ -47,6 +47,7 @@ async function initMap() {
     loadRoutesSearch(routes);
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
+    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute)
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {

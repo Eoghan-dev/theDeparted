@@ -127,4 +127,5 @@ async function initMap() {
     }
 
     console.log("Markers array:", markers_array)
+    //test
 }

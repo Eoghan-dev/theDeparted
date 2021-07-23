@@ -1,26 +1,26 @@
-// function scrapeCW() {
-//     //Function to call the current weather scraper
-//     fetch('/scrapeCW').then(res => {
-//         console.log("CurrentWeather scraper request sent")
-//         if (res.status === 200) {
-//             console.log("Scraper ran successfully")
-//         } else {
-//             console.log("scraper failed :(")
-//         }
-//     })
-// }
-//
-// function scrapeCB() {
-//     //Function to call the current bus scraper
-//     fetch('/scrapeCB').then(res => {
-//         console.log("CurrentBus scraper request sent")
-//         if (res.status === 200) {
-//             console.log("Scraper ran successfully")
-//         } else {
-//             console.log("scraper failed :(")
-//         }
-//     })
-// }
+function scrapeCW() {
+    //Function to call the current weather scraper
+    fetch('/scrapeCW').then(res => {
+        console.log("CurrentWeather scraper request sent")
+        if (res.status === 200) {
+            console.log("Scraper ran successfully")
+        } else {
+            console.log("scraper failed :(")
+        }
+    })
+}
+
+function scrapeCB() {
+    //Function to call the current bus scraper
+    fetch('/scrapeCB').then(res => {
+        console.log("CurrentBus scraper request sent")
+        if (res.status === 200) {
+            console.log("Scraper ran successfully")
+        } else {
+            console.log("scraper failed :(")
+        }
+    })
+}
 
 function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes a cluster object with all the markers on the map, an array of the markers we want to make visible and
@@ -39,21 +39,17 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
         current_marker.setVisible(true);
     })
     // markers_cluster.repaint()
-    //    new MarkerClusterer(
-    //        map,
-    //        visibleMarkers,
-    //        { ignoreHidden: true },
-    //   {
-    //       imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-    // });
+  //    new MarkerClusterer(
+  //        map,
+  //        visibleMarkers,
+  //        { ignoreHidden: true },
+  //   {
+  //       imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+  // });
 }
-
-function displayRoute(directionsService, directionsRenderer, markersArray, routeNumberAndDir) {
+function displayRoute(directionsService, directionsRenderer, markersArray, routeNumber) {
     // Function that takes a route number, the map being used and our array of markers as a parameter and
     // Displays directions for that route and only the markers on that route on the map
-  
-    console.log("In displayRoute function")
-    console.log("Selected route passed through:", routeNumberAndDir)
 
     // Some logic will be needed here to determine the start and end point co-ordinates of the passed route
     // but for the purposes of the presentation I'm going to hardcode the co-ordinates for route 56A
@@ -65,10 +61,10 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     // Loop through all the markers and find those that match our route and add them to our new array
     for (let currentMarker of markersArray) {
         let markerRoutes = []
-        currentMarker.routes.forEach(route => {
-            markerRoutes.push(route);
+         currentMarker.routes.forEach(route => {
+            markerRoutes.push(route[0].split("-")[0]);
         })
-        if (markerRoutes.includes(routeNumberAndDir)) {
+        if (markerRoutes.includes(routeNumber)) {
             markersOnRoute.push(currentMarker);
         }
     }
@@ -89,106 +85,43 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     };
     directionsService.route(request, function (response, status) {
         console.log(response);
-        if (status == 'OK') {
-            // Loop through all of the possible route directions given back by the api
-            for (let i = 0; i < response.routes.length; i++) {
-                let current_route = response.routes[i];
-                console.count("looping through routes. Current route:", current_route)
-                // Loop through all the legs of the current route
-                for (let j = 0; j < current_route.legs.length; j++) {
-                    let current_leg = current_route.legs[j];
-                    console.group("current_leg is:", current_leg)
-                    // Loop through each step in this leg of the route
-                    for (let k = 0; k < current_leg.steps.length; k++) {
-                        let current_step = current_leg.steps[k];
-                        console.group("current_step is:", current_step)
-                        // Check if this step is using public transport and if so check if it's using the correct route
-                        if (current_step.travel_mode === "TRANSIT") {
-                            console.log("step is in transit")
-                            // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-                            // so we can select the route to be used as the current one in the for loop
-                            if (current_step.transit.line.short_name === routeNumber) {
-                                console.log("56A found")
-                                directionsRenderer.setDirections(response);
-                                directionsRenderer.setRouteIndex(i);
-                                // We want to exit the function now as we've found a match and set the directions,
-                                // so we return to exit all the outer loops
-                                return
-                            }
-                        } else {
-                            console.log("step is not transit")
-                        }
-                    }
-                }
-            }
-            // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-            console.log("Match could not be found with 56A");
-            directionsRenderer.setDirections(response);
-        } else {
-            alert("Error with response from google directions API")
-        }
+         if (status == 'OK') {
+             // Loop through all of the possible route directions given back by the api
+             for (let i = 0; i < response.routes.length; i++) {
+                 let current_route = response.routes[i];
+                 console.count("looping through routes. Current route:", current_route)
+                 // Loop through all the legs of the current route
+                 for (let j = 0; j < current_route.legs.length; j++) {
+                     let current_leg = current_route.legs[j];
+                     console.group("current_leg is:", current_leg)
+                     // Loop through each step in this leg of the route
+                     for (let k = 0; k < current_leg.steps.length; k++) {
+                         let current_step = current_leg.steps[k];
+                         console.group("current_step is:", current_step)
+                         // Check if this step is using public transport and if so check if it's using the correct route
+                         if (current_step.travel_mode === "TRANSIT") {
+                             console.log("step is in transit")
+                             // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
+                             // so we can select the route to be used as the current one in the for loop
+                             if (current_step.transit.line.short_name === routeNumber) {
+                                 console.log("56A found")
+                                 directionsRenderer.setDirections(response);
+                                 directionsRenderer.setRouteIndex(i);
+                                 // We want to exit the function now as we've found a match and set the directions,
+                                 // so we return to exit all the outer loops
+                                 return
+                             }
+                         } else {
+                             console.log("step is not transit")
+                         }
+                     }
+                 }
+             }
+             // Here we'll just set the default route given by google maps as we could not find a match for the entered route
+             console.log("Match could not be found with 56A");
+             directionsRenderer.setDirections(response);
+         } else {
+             alert("Error with response from google directions API")
+         }
     });
-}
-
-function loadStopsSearch(stopsData) {
-    //Function to read in bus stops into a datalist
-    console.log("in stops search")
-    var options = '';
-    for (id in stopsData) {
-        //Adds option to options
-        options += '<option value="' + stopsData[id]['stop_num'] + '" />';
-    }
-    //Add options to datalist
-    document.getElementById('stops').innerHTML = options;
-}
-
-function loadRoutesSearch(routesJson) {
-    // Loop through the json data of all routes and add them to our datalist for user selection
-    let routes_selector = document.getElementById("routes");
-    // First we need to remove all entries in the json file where there is a duplicate route number (route_short_name)
-    // there should be two entries for each route number in the json file as they each represent each direction of the route
-    // for the purposes of loading the route search we only need to access the data for one direction of each route so
-    // we need to effectively half the array before looping through the items and adding them to our search bar
-
-    let entries = []; // array where we will store all the items to be added to the auto search bar
-    // first lets get an array of all the values in the json file
-    let routesArray = Object.values(routesJson);
-    // Code to filter a collection of javascript objects by a certain property adapted from https://stackoverflow.com/a/40784420
-    let halvedRoutes = routesArray.filter(function (route) {
-        if (!this[route.route_short_name]) {
-            this[route.route_short_name] = true;
-            return true;
-        }
-        return false;
-    }, Object.create(null));
-
-    for (current_route of halvedRoutes) {
-        if (current_route.hasOwnProperty('direction')) {
-            // Loop through all the directions the route serves and make them each a separate entry to fill the search bar
-            for (current_direction of current_route.direction) {
-                let route_option = document.createElement("option");
-                route_option.value = current_route.route_short_name.toUpperCase() + ": " + current_direction;
-                // route_option.text = current_direction;
-                entries.push(route_option);
-            }
-        }
-        // If there are no directions given by the route then we still add it to entry
-        else {
-            let route_option = document.createElement("option");
-            route_option.value = current_route.route_short_name.toUpperCase();
-            entries.push(route_option);
-        }
-        for (let entry of entries) {
-            routes_selector.appendChild(entry);
-        }
-    }
-}
-
-function handleLocationError(browserHasGeolocation, map) {
-    // Function to handle errors for geolocation
- alert(
-    browserHasGeolocation
-      ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
-      : "Error: Your browser doesn't support geolocation."
-  );
 }

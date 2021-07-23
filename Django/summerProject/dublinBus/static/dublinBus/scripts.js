@@ -73,61 +73,6 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     map.fitBounds(bounds)
 }
 
-// I've commented out the code for the directions from google maps api for now until we decide how best to use it
-// Make the request for directions and display it
-// var request = {
-//     // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
-//     origin: {lat: 53.3419400535678, lng: -6.23527645441628},
-//     destination: {lat: 53.2860074546224, lng: -6.37377077680564},
-//     travelMode: "TRANSIT",
-//     transitOptions: {
-//         modes: ["BUS"],
-//         routingPreference: "FEWER_TRANSFERS",
-//     },
-//     provideRouteAlternatives: true,
-// };
-// directionsService.route(request, function (response, status) {
-//     console.log(response);
-//      if (status == 'OK') {
-//          // Loop through all of the possible route directions given back by the api
-//          for (let i = 0; i < response.routes.length; i++) {
-//              let current_route = response.routes[i];
-//              console.count("looping through routes. Current route:", current_route)
-//              // Loop through all the legs of the current route
-//              for (let j = 0; j < current_route.legs.length; j++) {
-//                  let current_leg = current_route.legs[j];
-//                  console.group("current_leg is:", current_leg)
-//                  // Loop through each step in this leg of the route
-//                  for (let k = 0; k < current_leg.steps.length; k++) {
-//                      let current_step = current_leg.steps[k];
-//                      console.group("current_step is:", current_step)
-//                      // Check if this step is using public transport and if so check if it's using the correct route
-//                      if (current_step.travel_mode === "TRANSIT") {
-//                          console.log("step is in transit")
-//                          // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-//                          // so we can select the route to be used as the current one in the for loop
-//                          if (current_step.transit.line.short_name === routeNumber) {
-//                              console.log("56A found")
-//                              directionsRenderer.setDirections(response);
-//                              directionsRenderer.setRouteIndex(i);
-//                              // We want to exit the function now as we've found a match and set the directions,
-//                              // so we return to exit all the outer loops
-//                              return
-//                          }
-//                      } else {
-//                          console.log("step is not transit")
-//                      }
-//                  }
-//              }
-//          }
-//          // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-//          console.log("Match could not be found with 56A");
-//          directionsRenderer.setDirections(response);
-//      } else {
-//          alert("Error with response from google directions API")
-//      }
-// });
-// }
 
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
@@ -256,7 +201,6 @@ class AutocompleteDirectionsHandler {
                 transitOptions: {
                     modes: ["BUS"],
                 },
-                provideRouteAlternatives: true,
             },
             (response, status) => {
                 if (status === "OK") {
@@ -270,45 +214,3 @@ class AutocompleteDirectionsHandler {
         );
     }
 }
-
-// directionsService.route(request, function (response, status) {
-//     console.log(response);
-//     if (status == 'OK') {
-//         // Loop through all of the possible route directions given back by the api
-//         for (let i = 0; i < response.routes.length; i++) {
-//             let current_route = response.routes[i];
-//             console.count("looping through routes. Current route:", current_route)
-//             // Loop through all the legs of the current route
-//             for (let j = 0; j < current_route.legs.length; j++) {
-//                 let current_leg = current_route.legs[j];
-//                 console.group("current_leg is:", current_leg)
-//                 // Loop through each step in this leg of the route
-//                 for (let k = 0; k < current_leg.steps.length; k++) {
-//                     let current_step = current_leg.steps[k];
-//                     console.group("current_step is:", current_step)
-//                     // Check if this step is using public transport and if so check if it's using the correct route
-//                     if (current_step.travel_mode === "TRANSIT") {
-//                         console.log("step is in transit")
-//                         // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-//                         // so we can select the route to be used as the current one in the for loop
-//                         if (current_step.transit.line.short_name === routeNumber) {
-//                             console.log("56A found")
-//                             directionsRenderer.setDirections(response);
-//                             directionsRenderer.setRouteIndex(i);
-//                             // We want to exit the function now as we've found a match and set the directions,
-//                             // so we return to exit all the outer loops
-//                             return
-//                         }
-//                     } else {
-//                         console.log("step is not transit")
-//                     }
-//                 }
-//             }
-//         }
-//         // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-//         console.log("Match could not be found with 56A");
-//         directionsRenderer.setDirections(response);
-//     } else {
-//         alert("Error with response from google directions API")
-//     }
-// });

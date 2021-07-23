@@ -21,6 +21,7 @@ async function initMap() {
     var directionsService = new google.maps.DirectionsService();
     var directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
+    // We can initialise our class to handle directions here once we've declared all the arguments
     new AutocompleteDirectionsHandler(map, directionsService, directionsRenderer);
 
     // Make request to get json object of all dublin bus stops

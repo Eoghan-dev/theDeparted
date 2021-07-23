@@ -200,11 +200,9 @@ class AutocompleteDirectionsHandler {
     travelMode;
     directionsService;
     directionsRenderer;
-    markersArray;
 
-    constructor(map, markersArray, directionsService, directionsRenderer) {
+    constructor(map, directionsService, directionsRenderer) {
         this.map = map;
-        this.markersArray = markersArray;
         this.originPlaceId = "";
         this.destinationPlaceId = "";
         this.travelMode = google.maps.TravelMode.TRANSIT;
@@ -264,33 +262,6 @@ class AutocompleteDirectionsHandler {
                 if (status === "OK") {
                     console.log("RESPONSE LOOK HERE:::", response)
                     me.directionsRenderer.setDirections(response);
-                    // There should only ever be one route and one leg within this route returned by the api response so we can take the first indexes
-                    let generatedRoute = response.routes[0];
-                    let routeLeg = generatedRoute.legs[0];
-                    // There is a varying amount of steps however (walk/various buses etc) so we need to loop through these to find the route number
-                    // We can then show only the markers for stops that are served by that route/routes
-                    let routeNumberAndDir = "";
-                    for (let step of routeLeg.steps) {
-                        if (step.travel_mode === "TRANSIT") {
-                            routeNumberAndDir = step.transit.line.short_name + ": " + step.transit.headsign;
-                            console.log("route number:", routeNumberAndDir)
-                            // Create an array to hold all markers on the route
-                            let markersOnRoute = [];
-                            // Loop through all the markers and find those that match our route and add them to our new array
-                            for (let currentMarker of me.markersArray) {
-                                let markerRoutes = []
-                                currentMarker.routes.forEach(route => {
-                                    markerRoutes.push(route);
-                                })
-                                if (markerRoutes.includes(routeNumberAndDir)) {
-                                    markersOnRoute.push(currentMarker);
-                                }
-                            }
-                            // Show only the markers on that route
-                            console.log("MARKERS ON ROUTE:", markersOnRoute)
-                            showCertainMarkers(me.markersArray, markersOnRoute);
-                        }
-                    }
 
                 } else {
                     window.alert("Directions request failed due to " + status);

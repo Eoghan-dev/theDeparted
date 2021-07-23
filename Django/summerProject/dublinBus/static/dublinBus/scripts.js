@@ -71,62 +71,63 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
         bounds.extend(markersOnRoute[i].getPosition());
     }
     map.fitBounds(bounds)
+}
 
 // I've commented out the code for the directions from google maps api for now until we decide how best to use it
-    // Make the request for directions and display it
-    // var request = {
-    //     // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
-    //     origin: {lat: 53.3419400535678, lng: -6.23527645441628},
-    //     destination: {lat: 53.2860074546224, lng: -6.37377077680564},
-    //     travelMode: "TRANSIT",
-    //     transitOptions: {
-    //         modes: ["BUS"],
-    //         routingPreference: "FEWER_TRANSFERS",
-    //     },
-    //     provideRouteAlternatives: true,
-    // };
-    // directionsService.route(request, function (response, status) {
-    //     console.log(response);
-    //      if (status == 'OK') {
-    //          // Loop through all of the possible route directions given back by the api
-    //          for (let i = 0; i < response.routes.length; i++) {
-    //              let current_route = response.routes[i];
-    //              console.count("looping through routes. Current route:", current_route)
-    //              // Loop through all the legs of the current route
-    //              for (let j = 0; j < current_route.legs.length; j++) {
-    //                  let current_leg = current_route.legs[j];
-    //                  console.group("current_leg is:", current_leg)
-    //                  // Loop through each step in this leg of the route
-    //                  for (let k = 0; k < current_leg.steps.length; k++) {
-    //                      let current_step = current_leg.steps[k];
-    //                      console.group("current_step is:", current_step)
-    //                      // Check if this step is using public transport and if so check if it's using the correct route
-    //                      if (current_step.travel_mode === "TRANSIT") {
-    //                          console.log("step is in transit")
-    //                          // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-    //                          // so we can select the route to be used as the current one in the for loop
-    //                          if (current_step.transit.line.short_name === routeNumber) {
-    //                              console.log("56A found")
-    //                              directionsRenderer.setDirections(response);
-    //                              directionsRenderer.setRouteIndex(i);
-    //                              // We want to exit the function now as we've found a match and set the directions,
-    //                              // so we return to exit all the outer loops
-    //                              return
-    //                          }
-    //                      } else {
-    //                          console.log("step is not transit")
-    //                      }
-    //                  }
-    //              }
-    //          }
-    //          // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-    //          console.log("Match could not be found with 56A");
-    //          directionsRenderer.setDirections(response);
-    //      } else {
-    //          alert("Error with response from google directions API")
-    //      }
-    // });
-}
+// Make the request for directions and display it
+// var request = {
+//     // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
+//     origin: {lat: 53.3419400535678, lng: -6.23527645441628},
+//     destination: {lat: 53.2860074546224, lng: -6.37377077680564},
+//     travelMode: "TRANSIT",
+//     transitOptions: {
+//         modes: ["BUS"],
+//         routingPreference: "FEWER_TRANSFERS",
+//     },
+//     provideRouteAlternatives: true,
+// };
+// directionsService.route(request, function (response, status) {
+//     console.log(response);
+//      if (status == 'OK') {
+//          // Loop through all of the possible route directions given back by the api
+//          for (let i = 0; i < response.routes.length; i++) {
+//              let current_route = response.routes[i];
+//              console.count("looping through routes. Current route:", current_route)
+//              // Loop through all the legs of the current route
+//              for (let j = 0; j < current_route.legs.length; j++) {
+//                  let current_leg = current_route.legs[j];
+//                  console.group("current_leg is:", current_leg)
+//                  // Loop through each step in this leg of the route
+//                  for (let k = 0; k < current_leg.steps.length; k++) {
+//                      let current_step = current_leg.steps[k];
+//                      console.group("current_step is:", current_step)
+//                      // Check if this step is using public transport and if so check if it's using the correct route
+//                      if (current_step.travel_mode === "TRANSIT") {
+//                          console.log("step is in transit")
+//                          // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
+//                          // so we can select the route to be used as the current one in the for loop
+//                          if (current_step.transit.line.short_name === routeNumber) {
+//                              console.log("56A found")
+//                              directionsRenderer.setDirections(response);
+//                              directionsRenderer.setRouteIndex(i);
+//                              // We want to exit the function now as we've found a match and set the directions,
+//                              // so we return to exit all the outer loops
+//                              return
+//                          }
+//                      } else {
+//                          console.log("step is not transit")
+//                      }
+//                  }
+//              }
+//          }
+//          // Here we'll just set the default route given by google maps as we could not find a match for the entered route
+//          console.log("Match could not be found with 56A");
+//          directionsRenderer.setDirections(response);
+//      } else {
+//          alert("Error with response from google directions API")
+//      }
+// });
+// }
 
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
@@ -172,11 +173,11 @@ function loadRoutesSearch(routesJson) {
 
 function handleLocationError(browserHasGeolocation, map) {
     // Function to handle errors for geolocation
- alert(
-    browserHasGeolocation
-      ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
-      : "Error: Your browser doesn't support geolocation."
-  );
+    alert(
+        browserHasGeolocation
+            ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
+            : "Error: Your browser doesn't support geolocation."
+    );
 }
 
 function loadStopsSearch(stopsData) {
@@ -190,3 +191,153 @@ function loadStopsSearch(stopsData) {
     //Add options to datalist
     document.getElementById('stops').innerHTML = options;
 }
+
+class AutocompleteDirectionsHandler {
+    // Code for AutoCompleteDirectionsHandler adapted from https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-directions#maps_places_autocomplete_directions-javascript
+    map;
+    originPlaceId;
+    destinationPlaceId;
+    travelMode;
+    directionsService;
+    directionsRenderer;
+    markersArray;
+
+    constructor(map, markersArray, directionsService, directionsRenderer) {
+        this.map = map;
+        this.markersArray = markersArray;
+        this.originPlaceId = "";
+        this.destinationPlaceId = "";
+        this.travelMode = google.maps.TravelMode.TRANSIT;
+        this.directionsService = directionsService;
+        this.directionsRenderer = directionsRenderer;
+        this.directionsRenderer.setMap(map);
+        const originInput = document.getElementById("origin-input");
+        const destinationInput = document.getElementById("destination-input");
+        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+        // Specify just the place data fields that you need.
+        originAutocomplete.setFields(["place_id"]);
+        const destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput
+        );
+        // Specify just the place data fields that you need.
+        destinationAutocomplete.setFields(["place_id"]);
+
+        this.setupPlaceChangedListener(originAutocomplete, "ORIG");
+        this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
+    }
+
+    setupPlaceChangedListener(autocomplete, mode) {
+        autocomplete.bindTo("bounds", this.map);
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+
+            if (!place.place_id) {
+                window.alert("Please select an option from the dropdown list.");
+                return;
+            }
+
+            if (mode === "ORIG") {
+                this.originPlaceId = place.place_id;
+            } else {
+                this.destinationPlaceId = place.place_id;
+            }
+            this.route();
+        });
+    }
+
+    route() {
+        if (!this.originPlaceId || !this.destinationPlaceId) {
+            return;
+        }
+        const me = this;
+        this.directionsService.route(
+            {
+                origin: {placeId: this.originPlaceId},
+                destination: {placeId: this.destinationPlaceId},
+                travelMode: "TRANSIT",
+                transitOptions: {
+                    modes: ["BUS"],
+                },
+                provideRouteAlternatives: true,
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    console.log("RESPONSE LOOK HERE:::", response)
+                    me.directionsRenderer.setDirections(response);
+                    // There should only ever be one route and one leg within this route returned by the api response so we can take the first indexes
+                    let generatedRoute = response.routes[0];
+                    let routeLeg = generatedRoute.legs[0];
+                    // There is a varying amount of steps however (walk/various buses etc) so we need to loop through these to find the route number
+                    // We can then show only the markers for stops that are served by that route/routes
+                    let routeNumberAndDir = "";
+                    for (let step of routeLeg.steps) {
+                        if (step.travel_mode === "TRANSIT") {
+                            routeNumberAndDir = step.transit.line.short_name + ": " + step.transit.headsign;
+                            console.log("route number:", routeNumberAndDir)
+                            // Create an array to hold all markers on the route
+                            let markersOnRoute = [];
+                            // Loop through all the markers and find those that match our route and add them to our new array
+                            for (let currentMarker of me.markersArray) {
+                                let markerRoutes = []
+                                currentMarker.routes.forEach(route => {
+                                    markerRoutes.push(route);
+                                })
+                                if (markerRoutes.includes(routeNumberAndDir)) {
+                                    markersOnRoute.push(currentMarker);
+                                }
+                            }
+                            // Show only the markers on that route
+                            console.log("MARKERS ON ROUTE:", markersOnRoute)
+                            showCertainMarkers(me.markersArray, markersOnRoute);
+                        }
+                    }
+
+                } else {
+                    window.alert("Directions request failed due to " + status);
+                }
+            }
+        );
+    }
+}
+
+// directionsService.route(request, function (response, status) {
+//     console.log(response);
+//     if (status == 'OK') {
+//         // Loop through all of the possible route directions given back by the api
+//         for (let i = 0; i < response.routes.length; i++) {
+//             let current_route = response.routes[i];
+//             console.count("looping through routes. Current route:", current_route)
+//             // Loop through all the legs of the current route
+//             for (let j = 0; j < current_route.legs.length; j++) {
+//                 let current_leg = current_route.legs[j];
+//                 console.group("current_leg is:", current_leg)
+//                 // Loop through each step in this leg of the route
+//                 for (let k = 0; k < current_leg.steps.length; k++) {
+//                     let current_step = current_leg.steps[k];
+//                     console.group("current_step is:", current_step)
+//                     // Check if this step is using public transport and if so check if it's using the correct route
+//                     if (current_step.travel_mode === "TRANSIT") {
+//                         console.log("step is in transit")
+//                         // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
+//                         // so we can select the route to be used as the current one in the for loop
+//                         if (current_step.transit.line.short_name === routeNumber) {
+//                             console.log("56A found")
+//                             directionsRenderer.setDirections(response);
+//                             directionsRenderer.setRouteIndex(i);
+//                             // We want to exit the function now as we've found a match and set the directions,
+//                             // so we return to exit all the outer loops
+//                             return
+//                         }
+//                     } else {
+//                         console.log("step is not transit")
+//                     }
+//                 }
+//             }
+//         }
+//         // Here we'll just set the default route given by google maps as we could not find a match for the entered route
+//         console.log("Match could not be found with 56A");
+//         directionsRenderer.setDirections(response);
+//     } else {
+//         alert("Error with response from google directions API")
+//     }
+// });

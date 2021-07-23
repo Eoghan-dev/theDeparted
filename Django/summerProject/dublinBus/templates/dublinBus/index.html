@@ -3,34 +3,54 @@
 
 {% block content %}
 
-<div class="container" style="width: 100%;margin-right: 0px;margin-left: 0px;height: 100%;margin-top: 20px;">
-        <div class="row" style="width: 100%;margin-left: 0px;margin-right: 0px;height: 100%;">
+    <div class="container" style="width: 100%;margin-right: 0px;margin-left: 0px;height: 100%;margin-top: 20px;">
+    <div class="row" style="width: 100%;margin-left: 0px;margin-right: 0px;height: 100%;">
 
         <label for="stops_num">Please enter Stop number</label>
-    <input id="stops_num" list="stops">
+        <input id="stops_num" list="stops">
         <datalist id="stops">
         </datalist>
-               <label for="routes_num">Please enter route number</label>
-    <input id="routes_num" list="routes" name="routes_num">
+        <label for="routes_num">Please enter route number</label>
+        <input id="routes_num" list="routes" name="routes_num">
         <datalist id="routes">
         </datalist>
 
-            <div class="col-md-9"><button id="get_directions">Give route</button><div id="map"></div></div>
+        <div class="col-md-9">
+            <button id="get_directions">Give route</button>
+
+            {#Code for taking user directions taken from https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-directions#maps_places_autocomplete_directions-html#}
+            <div id="directions_input">
+                <input
+                        id="origin-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter an origin location"
+                />
+
+                <input
+                        id="destination-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter a destination location"
+                />
+            </div>
+                <div id="map"></div>
+            </div>
         </div>
     </div>
 
-{#    {% if user.is_authenticated %}#}
-{#        Welcome, {{ user.username }}!#}
-{#        <a href="{% url 'logout' %}">Logout</a>#}
-{#    {% else %}#}
-{#        <p>You are not logged in</p>#}
-{#        <a href="{% url 'login' %}">Login</a>#}
-{#    {% endif %}#}
+    {#    {% if user.is_authenticated %}#}
+    {#        Welcome, {{ user.username }}!#}
+    {#        <a href="{% url 'logout' %}">Logout</a>#}
+    {#    {% else %}#}
+    {#        <p>You are not logged in</p>#}
+    {#        <a href="{% url 'login' %}">Login</a>#}
+    {#    {% endif %}#}
 {% endblock %}
 
 {% block scripts %}
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=&v=weekly"
-        async
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly"
+            async
     ></script>
 {% endblock %}

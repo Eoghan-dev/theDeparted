@@ -88,7 +88,10 @@ def json_convertor(filename):
                         dict2[fields[i]] = description[i]
                     i = i + 1
                 # appending the record of each id
-                dict1[id] = dict2
+                if filename == "routes.txt" and len(dict2) == 5:
+                    pass
+                else:
+                    dict1[id] = dict2
             l = l + 1
     # creating json file
     filename = filename.strip('.txt')

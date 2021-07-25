@@ -41,11 +41,15 @@ async function initMap() {
         console.log("Selected route was: ", routeNumberAndDir)
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumberAndDir)
     };
-        const displaySelectedStop = function () {
+    const displaySelectedStop = function () {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected stop by the user
         let selectedStop = document.getElementsByName('stops_num')[0];
         let stopNum = selectedStop.value;
-        console.log("Selected route was: ", stopNum)
+      //  let stopVal = selectedStop.value;
+        // The data-value attribute of the datalist can't be accessed directly so we need to use the following to get it
+        // let stopNum = document.querySelector("#stops" + " option[value='" + selectedStop + "']").dataset.value;
+
+        console.log("Selected stop was: ", stopNum)
         displayStop(markers_array, stopNum)
     };
     // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
@@ -63,16 +67,21 @@ async function initMap() {
         // Create info window for each station before creating a marker
         // Save the routes serving this station in a new array by taking the first index from each entry in station.routes
         let station_routes = []
-         station.routes.forEach(route => {
-             // Make a combined string of the first index of each entry in routes (route number) and the second (direction of route)
-             let routes_string = route[0] + ": " + route[1];
+        // Extract the stop number as the second word from station.stop_num
+        let station_number_arr = station.stop_num.split(" ");
+        let station_number = parseInt(station_number_arr[2]);
+
+        station.routes.forEach(route => {
+            // Make a combined string of the first index of each entry in routes (route number) and the second (direction of route)
+            let routes_string = route[0] + ": " + route[1];
             station_routes.push(routes_string);
         })
-            // Create content of window
+
+        // Create content of window
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
             `<ul>` +
-                `<li>Station Number: ${station.stop_num} </li>` +
-                `<li>Routes served by station:<ul>`;
+            `<li>Station Number: ${station_number} </li>` +
+            `<li>Routes served by station:<ul>`;
         for (let route of station_routes) {
             window_content += `<li>${route}</li>`;
         }
@@ -84,10 +93,6 @@ async function initMap() {
 
         // Create marker for each station
         const current_marker_location = new google.maps.LatLng(station.stop_lat, station.stop_lon);
-        // Extract the stop number as the second word from station.stop_num
-        let station_number_arr = station.stop_num.split(" ");
-        let station_number = parseInt(station_number_arr[2]);
-
         const current_marker = new google.maps.Marker({
             position: current_marker_location,
             map: map,
@@ -116,32 +121,32 @@ async function initMap() {
         current_marker.setVisible(false)
         current_marker.setMap(map);
     }
-        // We can initialise our class to handle directions here once we've declared all the arguments and filled the markers array
-        new AutocompleteDirectionsHandler(map, markers_array, directionsService, directionsRenderer);
+    // We can initialise our class to handle directions here once we've declared all the arguments and filled the markers array
+    new AutocompleteDirectionsHandler(map, markers_array, directionsService, directionsRenderer);
 
     // Get user geolocation (adapted from https://developers.google.com/maps/documentation/javascript/examples/map-geolocation)
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-            const user_marker = new google.maps.Marker({
-            position: pos,
-            map: map,
-            name: "user location",
-            // Icon taken from http://kml4earth.appspot.com/icons.html
-             icon: "http://maps.google.com/mapfiles/kml/shapes/man.png",
-        });
-        },
-        () => {
-          handleLocationError(true, map);
-        }
-      );
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+                const user_marker = new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    name: "user location",
+                    // Icon taken from http://kml4earth.appspot.com/icons.html
+                    icon: "http://maps.google.com/mapfiles/kml/shapes/man.png",
+                });
+            },
+            () => {
+                handleLocationError(true, map);
+            }
+        );
     } else {
-      // Browser doesn't support Geolocation
-      handleLocationError(false, map);
+        // Browser doesn't support Geolocation
+        handleLocationError(false, map);
     }
 
     console.log("Markers array:", markers_array)

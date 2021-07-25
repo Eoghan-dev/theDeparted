@@ -76,14 +76,25 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 }
 
 function displayStop(markersArray, stopNumber) {
+    console.log("In displayStop, stopNumber is", stopNumber)
+     console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();
+    // Close all info windows
+     markersArray.forEach(current_marker => {
+                current_marker.infowindow.close(map, current_marker)
+            });
     // Hide all markers before showing the selected stop
     showCertainMarkers(markersArray, []);
     for (let marker of markersArray) {
-        if (marker.number === stopNumber) {
+        if (marker.number == stopNumber) {
+            console.log("Marker found", marker.number);
             marker.setVisible(true);
-            map.panTo(marker.getPosition());
-            marker.infoWindow.open();
+            infoWindow = marker.infowindow;
+            infoWindow.open({
+                anchor: marker,
+                map: map,
+                shouldFocus: true,
+            });
         }
     }
 }
@@ -99,8 +110,6 @@ function loadStopsSearch(stopsData) {
         stopOption.value = stopNum;
         stopsSelector.appendChild(stopOption);
     }
-    //Add options to datalist
-    document.getElementById('stops').innerHTML = options;
 }
 
 function loadRoutesSearch(routesJson) {

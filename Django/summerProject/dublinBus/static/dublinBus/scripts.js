@@ -83,12 +83,11 @@ function displayStop(markersArray, stopNumber) {
      markersArray.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
             });
-    // Hide all markers before showing the selected stop
-    showCertainMarkers(markersArray, []);
+    // Hide all markers before showing the selected stop;
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
-            marker.setVisible(true);
+            showCertainMarkers(markersArray, [marker])
             infoWindow = marker.infowindow;
             infoWindow.open({
                 anchor: marker,

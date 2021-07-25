@@ -41,13 +41,21 @@ async function initMap() {
         console.log("Selected route was: ", routeNumberAndDir)
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumberAndDir)
     };
+        const displaySelectedStop = function () {
+        // The first index of the array returned by getElementsByName for our datalist with always be the selected stop by the user
+        let selectedStop = document.getElementsByName('stops_num')[0];
+        let stopNum = selectedStop.value;
+        console.log("Selected route was: ", stopNum)
+        displayStop(markers_array, stopNum)
+    };
     // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
     loadStopsSearch(bus_stop_data);
     // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
     loadRoutesSearch(routes);
     // Add an event listener to a button so we can call the above function which will then load our directions
     document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
-    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute)
+    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
+    document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {
@@ -76,11 +84,15 @@ async function initMap() {
 
         // Create marker for each station
         const current_marker_location = new google.maps.LatLng(station.stop_lat, station.stop_lon);
+        // Extract the stop number as the second word from station.stop_num
+        let station_number_arr = station.stop_num.split(" ");
+        let station_number = parseInt(station_number_arr[2]);
+
         const current_marker = new google.maps.Marker({
             position: current_marker_location,
             map: map,
             name: station.stop_name,
-            number: parseInt(station.stop_num),
+            number: station_number,
             infowindow: current_info_window,
             // Icon taken from http://kml4earth.appspot.com/icons.html
             // icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png", this is the hideous icon

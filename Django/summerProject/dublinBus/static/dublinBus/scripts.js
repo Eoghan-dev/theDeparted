@@ -75,14 +75,33 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     map.fitBounds(bounds)
 }
 
-function displayStops(markersArray, stopNumber) {
+function displayStop(markersArray, stopNumber) {
+    let map = markersArray[0].getMap();
+    // Hide all markers before showing the selected stop
+    showCertainMarkers(markersArray, []);
     for (let marker of markersArray) {
         if (marker.number === stopNumber) {
-            //Do something
+            marker.setVisible(true);
+            map.panTo(marker.getPosition());
+            marker.infoWindow.open();
         }
     }
 }
 
+function loadStopsSearch(stopsData) {
+    //Function to read in bus stops into a datalist
+    let stopsSelector = document.getElementById("stops");
+    for (id in stopsData) {
+        let currentStop = stopsData[id];
+        let stopOption = document.createElement("option");
+        let stopNumArr = currentStop.stop_num.split(" ");
+        let stopNum = parseInt(stopNumArr[2]);
+        stopOption.value = stopNum;
+        stopsSelector.appendChild(stopOption);
+    }
+    //Add options to datalist
+    document.getElementById('stops').innerHTML = options;
+}
 
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
@@ -133,18 +152,6 @@ function handleLocationError(browserHasGeolocation, map) {
             ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
             : "Error: Your browser doesn't support geolocation."
     );
-}
-
-function loadStopsSearch(stopsData) {
-    //Function to read in bus stops into a datalist
-    console.log("in stops search")
-    var options = '';
-    for (id in stopsData) {
-        //Adds option to options
-        options += '<option value="' + stopsData[id]['stop_num'] + '" />';
-    }
-    //Add options to datalist
-    document.getElementById('stops').innerHTML = options;
 }
 
 class AutocompleteDirectionsHandler {

@@ -75,6 +75,14 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     map.fitBounds(bounds)
 }
 
+function displayStops(markersArray, stopNumber) {
+    for (let marker of markersArray) {
+        if (marker.number === stopNumber) {
+            //Do something
+        }
+    }
+}
+
 
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection

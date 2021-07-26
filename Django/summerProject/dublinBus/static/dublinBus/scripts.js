@@ -64,7 +64,10 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
             markersOnRoute.push(currentMarker);
         }
     }
-
+    // Hide any open info windows
+    markersArray.forEach(marker => {
+        marker.infowindow.close(map, current_marker);
+    });
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
@@ -81,13 +84,13 @@ function displayStop(markersArray, stopNumber) {
     let map = markersArray[0].getMap();
     // Close all info windows
      markersArray.forEach(current_marker => {
-                current_marker.infowindow.close(map, current_marker)
+                current_marker.infowindow.close(map, current_marker);
             });
     // Hide all markers before showing the selected stop;
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
-            showCertainMarkers(markersArray, [marker])
+            showCertainMarkers(markersArray, [marker]);
             infoWindow = marker.infowindow;
             infoWindow.open({
                 anchor: marker,

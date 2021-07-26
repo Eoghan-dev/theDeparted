@@ -16,4 +16,4 @@ def register(request):
     # If form was not posted then nothing was submitted by user so just load an empty form
     else:
         form = RegistrationForm()
-        return render(request, 'users/register.html', {"form": form})
+    return render(request, 'users/register.html', {"form": form})

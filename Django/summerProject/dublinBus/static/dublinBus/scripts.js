@@ -49,6 +49,8 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
 
     // Get the map as it's own variable by accessing it through the first marker in markersArray
     let map = markersArray[0].getMap();
+    // First we want to remove any directions from the directions api from the map
+    directionsRenderer.set('directions', null);
     // Get array of all the markers in the cluster (all the markers on the map)
     // Create empty array to hold the markers on our route so we can only show them
     let markersOnRoute = [];
@@ -62,7 +64,10 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
             markersOnRoute.push(currentMarker);
         }
     }
-
+    // Hide any open info windows
+    markersArray.forEach(marker => {
+        marker.infowindow.close(map, current_marker);
+    });
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
@@ -71,61 +76,42 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
         bounds.extend(markersOnRoute[i].getPosition());
     }
     map.fitBounds(bounds)
+}
 
-// I've commented out the code for the directions from google maps api for now until we decide how best to use it
-    // Make the request for directions and display it
-    // var request = {
-    //     // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
-    //     origin: {lat: 53.3419400535678, lng: -6.23527645441628},
-    //     destination: {lat: 53.2860074546224, lng: -6.37377077680564},
-    //     travelMode: "TRANSIT",
-    //     transitOptions: {
-    //         modes: ["BUS"],
-    //         routingPreference: "FEWER_TRANSFERS",
-    //     },
-    //     provideRouteAlternatives: true,
-    // };
-    // directionsService.route(request, function (response, status) {
-    //     console.log(response);
-    //      if (status == 'OK') {
-    //          // Loop through all of the possible route directions given back by the api
-    //          for (let i = 0; i < response.routes.length; i++) {
-    //              let current_route = response.routes[i];
-    //              console.count("looping through routes. Current route:", current_route)
-    //              // Loop through all the legs of the current route
-    //              for (let j = 0; j < current_route.legs.length; j++) {
-    //                  let current_leg = current_route.legs[j];
-    //                  console.group("current_leg is:", current_leg)
-    //                  // Loop through each step in this leg of the route
-    //                  for (let k = 0; k < current_leg.steps.length; k++) {
-    //                      let current_step = current_leg.steps[k];
-    //                      console.group("current_step is:", current_step)
-    //                      // Check if this step is using public transport and if so check if it's using the correct route
-    //                      if (current_step.travel_mode === "TRANSIT") {
-    //                          console.log("step is in transit")
-    //                          // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-    //                          // so we can select the route to be used as the current one in the for loop
-    //                          if (current_step.transit.line.short_name === routeNumber) {
-    //                              console.log("56A found")
-    //                              directionsRenderer.setDirections(response);
-    //                              directionsRenderer.setRouteIndex(i);
-    //                              // We want to exit the function now as we've found a match and set the directions,
-    //                              // so we return to exit all the outer loops
-    //                              return
-    //                          }
-    //                      } else {
-    //                          console.log("step is not transit")
-    //                      }
-    //                  }
-    //              }
-    //          }
-    //          // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-    //          console.log("Match could not be found with 56A");
-    //          directionsRenderer.setDirections(response);
-    //      } else {
-    //          alert("Error with response from google directions API")
-    //      }
-    // });
+function displayStop(markersArray, stopNumber) {
+    console.log("In displayStop, stopNumber is", stopNumber)
+     console.log("In displayStop, markers array is", markersArray)
+    let map = markersArray[0].getMap();
+    // Close all info windows
+     markersArray.forEach(current_marker => {
+                current_marker.infowindow.close(map, current_marker);
+            });
+    // Hide all markers before showing the selected stop;
+    for (let marker of markersArray) {
+        if (marker.number == stopNumber) {
+            console.log("Marker found", marker.number);
+            showCertainMarkers(markersArray, [marker]);
+            infoWindow = marker.infowindow;
+            infoWindow.open({
+                anchor: marker,
+                map: map,
+                shouldFocus: true,
+            });
+        }
+    }
+}
+
+function loadStopsSearch(stopsData) {
+    //Function to read in bus stops into a datalist
+    let stopsSelector = document.getElementById("stops");
+    for (id in stopsData) {
+        let currentStop = stopsData[id];
+        let stopOption = document.createElement("option");
+        let stopNumArr = currentStop.stop_num.split(" ");
+        let stopNum = parseInt(stopNumArr[2]);
+        stopOption.value = stopNum;
+        stopsSelector.appendChild(stopOption);
+    }
 }
 
 function loadRoutesSearch(routesJson) {
@@ -172,21 +158,89 @@ function loadRoutesSearch(routesJson) {
 
 function handleLocationError(browserHasGeolocation, map) {
     // Function to handle errors for geolocation
- alert(
-    browserHasGeolocation
-      ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
-      : "Error: Your browser doesn't support geolocation."
-  );
+    alert(
+        browserHasGeolocation
+            ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
+            : "Error: Your browser doesn't support geolocation."
+    );
 }
 
-function loadStopsSearch(stopsData) {
-    //Function to read in bus stops into a datalist
-    console.log("in stops search")
-    var options = '';
-    for (id in stopsData) {
-        //Adds option to options
-        options += '<option value="' + stopsData[id]['stop_num'] + '" />';
+class AutocompleteDirectionsHandler {
+    // Code for AutoCompleteDirectionsHandler adapted from https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-directions#maps_places_autocomplete_directions-javascript
+    map;
+    originPlaceId;
+    destinationPlaceId;
+    directionsService;
+    directionsRenderer;
+    markersArray;
+
+    constructor(map, markersArray, directionsService, directionsRenderer) {
+        this.map = map;
+        this.markersArray = markersArray;
+        this.originPlaceId = "";
+        this.destinationPlaceId = "";
+        this.directionsService = directionsService;
+        this.directionsRenderer = directionsRenderer;
+        this.directionsRenderer.setMap(map);
+        const originInput = document.getElementById("origin-input");
+        const destinationInput = document.getElementById("destination-input");
+        const originAutocomplete = new google.maps.places.Autocomplete(originInput);
+        // Specify just the place data fields that you need.
+        originAutocomplete.setFields(["place_id"]);
+        const destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput
+        );
+        // Specify just the place data fields that you need.
+        destinationAutocomplete.setFields(["place_id"]);
+
+        this.setupPlaceChangedListener(originAutocomplete, "ORIG");
+        this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
     }
-    //Add options to datalist
-    document.getElementById('stops').innerHTML = options;
+
+    setupPlaceChangedListener(autocomplete, mode) {
+        autocomplete.bindTo("bounds", this.map);
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+
+            if (!place.place_id) {
+                window.alert("Please select an option from the dropdown list.");
+                return;
+            }
+
+            if (mode === "ORIG") {
+                this.originPlaceId = place.place_id;
+            } else {
+                this.destinationPlaceId = place.place_id;
+            }
+            this.route();
+        });
+    }
+
+    route() {
+        if (!this.originPlaceId || !this.destinationPlaceId) {
+            return;
+        }
+        // Clear all (if any) markers from the map before continuing with drawing the directions
+        showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
+        const me = this;
+        this.directionsService.route(
+            {
+                origin: {placeId: this.originPlaceId},
+                destination: {placeId: this.destinationPlaceId},
+                travelMode: "TRANSIT",
+                transitOptions: {
+                    modes: ["BUS"],
+                },
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    console.log("RESPONSE LOOK HERE:::", response)
+                    me.directionsRenderer.setDirections(response);
+
+                } else {
+                    window.alert("Directions request failed due to " + status);
+                }
+            }
+        );
+    }
 }

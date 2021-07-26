@@ -66,7 +66,7 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     }
     // Hide any open info windows
     markersArray.forEach(marker => {
-        marker.infowindow.close(map, current_marker);
+        marker.infowindow.close(map, marker);
     });
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);

@@ -26,10 +26,11 @@ function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes a cluster object with all the markers on the map, an array of the markers we want to make visible and
     // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
 
-
+    let map = allMarkers[0].getMap();
     // First make all markers invisible
     allMarkers.forEach(current_marker => {
         current_marker.setVisible(false);
+        current_marker.infowindow.close(current_marker, map)
     })
 
     // Now loop over the markers we want to make visible and make only them visible
@@ -64,10 +65,6 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
             markersOnRoute.push(currentMarker);
         }
     }
-    // Hide any open info windows
-    markersArray.forEach(marker => {
-        marker.infowindow.close(map, marker);
-    });
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
@@ -82,15 +79,14 @@ function displayStop(markersArray, stopNumber) {
     console.log("In displayStop, stopNumber is", stopNumber)
      console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();
-    // Close all info windows
-     markersArray.forEach(current_marker => {
-                current_marker.infowindow.close(map, current_marker);
-            });
+    // Close all info windows and hide markers
+     showCertainMarkers(markersArray, []);
     // Hide all markers before showing the selected stop;
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
-            showCertainMarkers(markersArray, [marker]);
+            // Make that marker visible
+            marker.setVisible(true);
             infoWindow = marker.infowindow;
             infoWindow.open({
                 anchor: marker,

@@ -64,7 +64,10 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
             markersOnRoute.push(currentMarker);
         }
     }
-
+    // Hide any open info windows
+    markersArray.forEach(marker => {
+        marker.infowindow.close(map, current_marker);
+    });
     // Hide all markers except those in our new array which are on our route
     showCertainMarkers(markersArray, markersOnRoute);
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
@@ -75,6 +78,41 @@ function displayRoute(directionsService, directionsRenderer, markersArray, route
     map.fitBounds(bounds)
 }
 
+function displayStop(markersArray, stopNumber) {
+    console.log("In displayStop, stopNumber is", stopNumber)
+     console.log("In displayStop, markers array is", markersArray)
+    let map = markersArray[0].getMap();
+    // Close all info windows
+     markersArray.forEach(current_marker => {
+                current_marker.infowindow.close(map, current_marker);
+            });
+    // Hide all markers before showing the selected stop;
+    for (let marker of markersArray) {
+        if (marker.number == stopNumber) {
+            console.log("Marker found", marker.number);
+            showCertainMarkers(markersArray, [marker]);
+            infoWindow = marker.infowindow;
+            infoWindow.open({
+                anchor: marker,
+                map: map,
+                shouldFocus: true,
+            });
+        }
+    }
+}
+
+function loadStopsSearch(stopsData) {
+    //Function to read in bus stops into a datalist
+    let stopsSelector = document.getElementById("stops");
+    for (id in stopsData) {
+        let currentStop = stopsData[id];
+        let stopOption = document.createElement("option");
+        let stopNumArr = currentStop.stop_num.split(" ");
+        let stopNum = parseInt(stopNumArr[2]);
+        stopOption.value = stopNum;
+        stopsSelector.appendChild(stopOption);
+    }
+}
 
 function loadRoutesSearch(routesJson) {
     // Loop through the json data of all routes and add them to our datalist for user selection
@@ -125,18 +163,6 @@ function handleLocationError(browserHasGeolocation, map) {
             ? "Error: The Geolocation service failed and we could not find your location. Please ensure your location is turned on and you have granted location permissions and refresh the page to try again."
             : "Error: Your browser doesn't support geolocation."
     );
-}
-
-function loadStopsSearch(stopsData) {
-    //Function to read in bus stops into a datalist
-    console.log("in stops search")
-    var options = '';
-    for (id in stopsData) {
-        //Adds option to options
-        options += '<option value="' + stopsData[id]['stop_num'] + '" />';
-    }
-    //Add options to datalist
-    document.getElementById('stops').innerHTML = options;
 }
 
 class AutocompleteDirectionsHandler {

@@ -12,7 +12,7 @@ urlpatterns = [
     # ex: /scrapeCB
     path('scrapeCB', views.scrapeCB, name='scrapeCB'),
     #ex: /scrape_bus_stops/
-    path('MyAccount', views.MyAccount, name='MyAccount'),
+    path('myAccount', views.myAccount, name='myAccount'),
     #ex: /scrape_bus_stops/
     path('scrape_bus_stops', views.scrape_bus_stops, name='scrape_bus_stops'),
     #ex: /get_bus_stops/

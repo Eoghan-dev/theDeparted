@@ -9,55 +9,37 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
-                <div class="container">
+                <div class="container" id="directions_input">
                     <div class="row">
-                        <div class="col-md-12" style="background: rgb(174,184,254);"><input type="text" style="width: 80%;background: rgb(241,242,246);margin-top: 6px;border-color: rgb(255,134,0);"></div>
+                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
+                        id="origin-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter an origin location"
+                /></div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12" style="background: rgb(174,184,254);"><input type="text" style="width: 80%;background: rgb(241,242,246);border-style: solid;border-color: rgb(255,134,0);"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col"><select>
-                                <optgroup label="This is a group">
-                                    <option value="12" selected="">This is item 1</option>
-                                    <option value="13">This is item 2</option>
-                                    <option value="14">This is item 3</option>
-                                </optgroup>
-                            </select><select>
-                                <optgroup label="This is a group">
-                                    <option value="12" selected="">This is item 1</option>
-                                    <option value="13">This is item 2</option>
-                                    <option value="14">This is item 3</option>
-                                </optgroup>
-                            </select></div>
+                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
+                        id="destination-input"
+                        class="controls"
+                        type="text"
+                        placeholder="Enter a destination location"
+                /></div>
                     </div>
                 </div>
             </div>
-            <div class="tab-pane" role="tabpanel" id="tab-2"><input type="search" style="width: 100%;">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Column 1</th>
-                                <th>Column 2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Cell 1</td>
-                                <td>Cell 2</td>
-                            </tr>
-                            <tr>
-                                <td>Cell 3</td>
-                                <td>Cell 4</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
+        <input id="routes_num" list="routes" name="routes_num">
+        <datalist id="routes">
+        </datalist>
+                <button id="get_directions">Give route</button>
             </div>
-            <div class="tab-pane" role="tabpanel" id="tab-3"><input type="text"></div>
+            <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
+        <input id="stops_num" list="stops" name="stops_num">
+        <datalist id="stops">
+        </datalist></div>
         </div>
-        <div class="container" style="height: auto;width: auto;"><div id="map" width="100%" height="400"></div></div>
+        <div id="map"></div>
 
 
 {#    {% if user.is_authenticated %}#}
@@ -71,5 +53,4 @@
 
 {% block scripts %}
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=&v=weekly" async></script>
-    <script type="text/javascript" src='{% static "dublinBus/map.js" %}'></script>
 {% endblock %}

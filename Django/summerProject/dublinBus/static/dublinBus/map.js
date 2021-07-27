@@ -9,7 +9,7 @@ async function initMap() {
     let routes = await fetch('/get_routes').then(res => {
         return res.json()
     }).then(data => {
-        console.log("all routes:", data)
+        //console.log("all routes:", data)
         return data
     });
 
@@ -27,7 +27,7 @@ async function initMap() {
     let bus_stop_data = await fetch('/get_bus_stops').then(res => {
         return res.json()
     }).then(data => {
-        console.log("bus stop data:", data)
+        //console.log("bus stop data:", data)
         return data
     });
     // Declare an empty array where we will keep all of our markers for each stop
@@ -38,7 +38,7 @@ async function initMap() {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected route by the user
         let selectedRoute = document.getElementsByName('routes_num')[0];
         let routeNumberAndDir = selectedRoute.value;
-        console.log("Selected route was: ", routeNumberAndDir)
+        //console.log("Selected route was: ", routeNumberAndDir)
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumberAndDir)
     };
     const displaySelectedStop = function () {
@@ -49,17 +49,17 @@ async function initMap() {
         // The data-value attribute of the datalist can't be accessed directly so we need to use the following to get it
         // let stopNum = document.querySelector("#stops" + " option[value='" + selectedStop + "']").dataset.value;
 
-        console.log("Selected stop was: ", stopNum)
+        //console.log("Selected stop was: ", stopNum)
         displayStop(markers_array, stopNum)
     };
     // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
-    //loadStopsSearch(bus_stop_data);
+    loadStopsSearch(bus_stop_data);
     // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
-    //loadRoutesSearch(routes);
+    loadRoutesSearch(routes);
     // Add an event listener to a button so we can call the above function which will then load our directions
-    //document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
-    //document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
-    //document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
+    document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
+    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
+    document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {
@@ -122,7 +122,7 @@ async function initMap() {
         current_marker.setMap(map);
     }
     // We can initialise our class to handle directions here once we've declared all the arguments and filled the markers array
-    //new AutocompleteDirectionsHandler(map, markers_array, directionsService, directionsRenderer);
+    new AutocompleteDirectionsHandler(map, markers_array, directionsService, directionsRenderer);
 
     // Get user geolocation (adapted from https://developers.google.com/maps/documentation/javascript/examples/map-geolocation)
     if (navigator.geolocation) {
@@ -149,5 +149,5 @@ async function initMap() {
         handleLocationError(false, map);
     }
 
-    console.log("Markers array:", markers_array)
+    //.log("Markers array:", markers_array)
 }

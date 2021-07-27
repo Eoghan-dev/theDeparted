@@ -1,6 +1,6 @@
 {% extends "dublinBus/base.html" %}
 {% block title %}journey{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="container">
         <div class="row">
@@ -29,6 +29,7 @@
             </tbody>
         </table>
     </div>
+    <div id="map"></div>
 {% endblock %}
 
 {% block scripts %}
@@ -36,4 +37,5 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIcs79d43mNxy4DHlrmVXPVT13Twe6PT4&callback=initMap&libraries=&v=weekly"
         async
     ></script>
+<script type="text/javascript" src='{% static "dublinBus/map.js" %}'></script>
 {% endblock %}

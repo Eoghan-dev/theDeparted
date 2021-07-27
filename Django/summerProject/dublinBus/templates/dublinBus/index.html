@@ -1,56 +1,56 @@
 {% extends "dublinBus/base.html" %}
 {% block title %}Test home page{% endblock %}
-
+{% load static %}
 {% block content %}
-
-    <div class="container" style="width: 100%;margin-right: 0px;margin-left: 0px;height: 100%;margin-top: 20px;">
-    <div class="row" style="width: 100%;margin-left: 0px;margin-right: 0px;height: 100%;">
-
-        <label for="stops_num">Please enter Stop number</label>
-        <input id="stops_num" list="stops" name="stops_num">
-        <datalist id="stops">
-        </datalist>
-        <label for="routes_num">Please enter route number</label>
-        <input id="routes_num" list="routes" name="routes_num">
-        <datalist id="routes">
-        </datalist>
-
-        <div class="col-md-9">
-            <button id="get_directions">Give route</button>
-
-            {#Code for taking user directions taken from https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-directions#maps_places_autocomplete_directions-html#}
-            <div id="directions_input">
-                <input
+        <ul class="nav nav-tabs nav-fill" role="tablist">
+            <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-1" style="border-color: var(--bs-dark);background: #758bfd;color: #f1f2f6;">Directions</a></li>
+            <li class="nav-item" role="presentation" style="border-color: var(--bs-dark);background: #758bfd;color: #f1f2f6;"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-2" style="border-color: var(--bs-dark);background: #758bfd;color: #f1f2f6;">Routes</a></li>
+            <li class="nav-item" role="presentation" style="border-color: var(--bs-dark);background: #758bfd;color: #f1f2f6;"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-3" style="border-color: var(--bs-dark);color: #f1f2f6;background: #758bfd;">Stops</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
+                <div class="container" id="directions_input">
+                    <div class="row">
+                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
                         id="origin-input"
                         class="controls"
                         type="text"
                         placeholder="Enter an origin location"
-                />
-
-                <input
+                /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
                         id="destination-input"
                         class="controls"
                         type="text"
                         placeholder="Enter a destination location"
-                />
+                /></div>
+                    </div>
+                </div>
             </div>
-                <div id="map"></div>
+            <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
+        <input id="routes_num" list="routes" name="routes_num">
+        <datalist id="routes">
+        </datalist>
+                <button id="get_directions">Give route</button>
             </div>
+            <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
+        <input id="stops_num" list="stops" name="stops_num">
+        <datalist id="stops">
+        </datalist></div>
         </div>
-    </div>
+        <div id="map"></div>
 
-    {#    {% if user.is_authenticated %}#}
-    {#        Welcome, {{ user.username }}!#}
-    {#        <a href="{% url 'logout' %}">Logout</a>#}
-    {#    {% else %}#}
-    {#        <p>You are not logged in</p>#}
-    {#        <a href="{% url 'login' %}">Login</a>#}
-    {#    {% endif %}#}
+
+{#    {% if user.is_authenticated %}#}
+{#        Welcome, {{ user.username }}!#}
+{#        <a href="{% url 'logout' %}">Logout</a>#}
+{#    {% else %}#}
+{#        <p>You are not logged in</p>#}
+{#        <a href="{% url 'login' %}">Login</a>#}
+{#    {% endif %}#}
 {% endblock %}
 
 {% block scripts %}
-    <script
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly"
-            async
-    ></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=&v=weekly" async></script>
 {% endblock %}

@@ -28,6 +28,10 @@ def journey(request):
     """View to load the journey page of our application"""
     return render(request, 'dublinBus/journey.html')
 
+def MyAccount(request):
+    """View to load the accounts page of our application"""
+    return render(request, 'dublinBus/my_accounts.html')
+
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()

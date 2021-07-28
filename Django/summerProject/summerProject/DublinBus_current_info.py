@@ -155,20 +155,21 @@ def route_destinations():
     out_file.close()
     bus_dict = {}
     for id in stop_times:
-        bus_num = list(stop_times[id]["trip_id"].split("."))
-        bus_num = list(bus_num[2].split("-"))
+        dir = {}
+        bus_route = list(stop_times[id]["trip_id"].split("."))
+        bus_num = list(bus_route[2].split("-"))
         route_id = bus_num[1]
         route_id = route_id.strip("'")
+        route_id_dir = bus_route[4]
         check = 0
         if route_id in bus_dict:
             for i in bus_dict[route_id]:
-                if i == stop_times[id]["stop_headsign"].lstrip():
+                if i == [stop_times[id]["stop_headsign"].lstrip(), route_id_dir]:
                     check = 1
             if check == 1:
                 pass
             else:
-                bus_dict[route_id].append(stop_times[id]["stop_headsign"].lstrip())
+                bus_dict[route_id].append([stop_times[id]["stop_headsign"].lstrip(), route_id_dir])
         else:
-            bus_dict[route_id]=[stop_times[id]["stop_headsign"].lstrip()]
+            bus_dict[route_id]=[[stop_times[id]["stop_headsign"].lstrip(), route_id_dir]]
     return bus_dict
-# main()

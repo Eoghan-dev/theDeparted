@@ -48,7 +48,8 @@
                     </div>
                     <div class="container" id="user_settings">
                         {# The form only begins here because all the above information is unchangeable by the user #}
-                        <form action="">
+                        <form action="update_user" method="post">
+                            {% csrf_token %}
                             <div class="row">
                                 <div class="col-md-6" id="fare_status_radio">
                                     {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
@@ -57,10 +58,11 @@
                                     {% if user.fare_status == 'child' %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
                                                                        id="child_radio" checked="checked"
-                                                                       name="fare_status_radios">
+                                                                       name="fare_status_radios" value="child">
                                     {% else %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="child_radio" name="fare_status_radios">
+                                                                       id="child_radio" name="fare_status_radios"
+                                                                       value="child">
                                     {% endif %}
                                     <label class="form-check-label"
                                            for="child_radio">Child</label>
@@ -69,10 +71,11 @@
                                     {% if user.fare_status == 'student' %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
                                                                        id="student_radio" checked="checked"
-                                                                       name="fare_status_radios">
+                                                                       name="fare_status_radios" value="student">
                                     {% else %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="student_radio" name="fare_status_radios">
+                                                                       id="student_radio" name="fare_status_radios"
+                                                                       value="student">
                                     {% endif %}
                                     <label class="form-check-label"
                                            for="student_radio">Student</label>
@@ -81,10 +84,11 @@
                                     {% if user.fare_status == 'adult' %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
                                                                        id="adult_radio" checked="checked"
-                                                                       name="fare_status_radios">
+                                                                       name="fare_status_radios" value="adult">
                                     {% else %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="adult_radio" name="fare_status_radios">
+                                                                       id="adult_radio" name="fare_status_radios"
+                                                                       value="adult">
                                     {% endif %}
                                     <label class="form-check-label"
                                            for="adult_radio">Adult</label>
@@ -93,10 +97,11 @@
                                     {% if user.fare_status == 'free' %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
                                                                        id="free_radio" checked="checked"
-                                                                       name="fare_status_radios">
+                                                                       name="fare_status_radios" value="fre">
                                     {% else %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="free_radio" name="fare_status_radios">
+                                                                       id="free_radio" name="fare_status_radios"
+                                                                       value="free">
                                     {% endif %}
                                     <label class="form-check-label"
                                            for="free_radio">65+ /
@@ -134,14 +139,16 @@
                                         </div>
                                         </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col">
-                                                <h1>Password</h1><a href="#">Change Password</a>
-                                            </div>
-                                        </div>
                                         <div><input type="submit" id="user_settings_button"></div>
                         </form>
                     </div>
+                    <div class="row">
+                        <div class="col">
+                            <h1>Password</h1><a href="#">Change Password</a>
+                        </div>
+                    </div>
+
+
                 </div>
                 {#                {% if user.fare_status == 'student' %}<p>fare status is student</p>{% endif %}#}
                 {#  Tab 2 starts from here  #}

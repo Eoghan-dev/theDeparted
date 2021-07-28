@@ -32,6 +32,29 @@ def myAccount(request):
     """View to load the accounts page of our application"""
     return render(request, 'dublinBus/myAccount.html')
 
+def updateUser(request):
+    print("IN UPDATE USER")
+    if request.method == "POST":
+        # Get the values for fare_status and leap card
+        fare_status = request.POST.get('fare_status_radios')
+        leap_card_str = request.POST.get('leap_card_radios')
+        # Parse the leap card string returned to get boolean
+        if leap_card_str == "true":
+            leap_card = True
+        else:
+            leap_card = False
+        # Get the instance of our user model being used
+        user = request.user
+        # Make changes and save to db
+        print("fare status", fare_status)
+        print("leap card", leap_card)
+        user.fare_status = fare_status
+        user.leap_card = leap_card
+        user.save()
+        return render(request, 'dublinBus/myAccount.html')
+    else:
+        return HttpResponse("error, message was not posted")
+
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()

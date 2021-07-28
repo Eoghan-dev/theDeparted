@@ -24,11 +24,11 @@
                     <div></div>
                     <div class="container">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="first_name">
                                 <h1>First Name</h1>
                                 <p>{{ request.user.first_name }}</p>
                             </div>
-                            <div class="col">
+                            <div class="col" id="last_name">
                                 <h1>Last Name</h1>
                                 <p>{{ request.user.last_name }}</p>
                             </div>
@@ -36,38 +36,44 @@
                     </div>
                     <div class="container">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="email">
                                 <h1>Email</h1>
-                                <p>Insert Email Here</p>
+                                <p>{{ request.user.email }}</p>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="username">
                                 <h1>User Name</h1>
-                                <p>Insert User name here</p>
+                                <p>{{ request.user.username }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="container">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="fare_status_radio">
                                 <h1>Fare Status</h1>
                                 <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-1"><label class="form-check-label"
-                                                                                       for="formCheck-1">Child</label>
+                                                               id="child"><label class="form-check-label"
+                                                                                 for="formCheck-1"
+                                                                                 {{% if user.fare_status == 'child' %}}
+                                                                                 checked="checked" {{% endif %}}>Child</label>
+                                </div>
+
+                                <div class="form-check"><input class="form-check-input" type="radio"
+                                                               id="student"><label class="form-check-label"
+                                                                                   for="formCheck-2"
+                                                                                   {{% if user.fare_status == 'student' %}}
+                                                                                   checked='checked'{{% endif %}}>Student</label>
                                 </div>
                                 <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-2"><label class="form-check-label"
-                                                                                       for="formCheck-2">Student</label>
+                                                               id="adult"><label class="form-check-label"
+                                                                                 for="formCheck-3">Adult</label>
                                 </div>
                                 <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-3"><label class="form-check-label"
-                                                                                       for="formCheck-3">Adult</label>
-                                </div>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-4"><label class="form-check-label"
-                                                                                       for="formCheck-4">65+ /
+                                                               id="free"><label class="form-check-label"
+                                                                                for="formCheck-4">65+ /
                                     Disability / Free Travel</label></div>
                             </div>
-                            <div class="col-md-6">
+                            `
+                            <div class="col-md-6" id="leapcard">
                                 <h1>Do You Own a LeapCard?</h1>
                                 <div class="form-check"><input class="form-check-input" type="radio"
                                                                id="formCheck-7"><label class="form-check-label"

@@ -1,8 +1,5 @@
-from django.shortcuts import render
-
 from django.http import HttpResponse, JsonResponse
-from django.template import loader
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
 from .models import CurrentWeather, CurrentBus, BusStops
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
@@ -12,6 +9,8 @@ import pickle
 from datetime import timedelta
 base = settings.BASE_DIR
 from summerProject import DublinBus_current_info
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 def index(request):
     """View to load the homepage of our application"""
@@ -30,7 +29,16 @@ def journey(request):
 
 def myAccount(request):
     """View to load the accounts page of our application"""
-    return render(request, 'dublinBus/myAccount.html')
+    # If request was posted then a change was made to the password reset form on the page
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            return redirect('myAccount')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'dublinBus/myAccount.html', {'form': form})
 
 def updateUser(request):
     print("IN UPDATE USER")
@@ -53,7 +61,7 @@ def updateUser(request):
         user.save()
         return render(request, 'dublinBus/myAccount.html')
     else:
-        return HttpResponse("error, message was not posted")
+        return HttpResponse("error with updating user settings")
 
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""

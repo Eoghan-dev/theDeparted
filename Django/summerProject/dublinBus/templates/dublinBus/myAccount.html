@@ -46,52 +46,82 @@
                             </div>
                         </div>
                     </div>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-6" id="fare_status_radio">
-                                <h1>Fare Status</h1>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="child"><label class="form-check-label"
-                                                                                 for="formCheck-1"
-                                                                                 {{% if user.fare_status == 'child' %}}
-                                                                                 checked="checked" {{% endif %}}>Child</label>
-                                </div>
+                    <div class="container" id="user_settings">
+                        {# The form only begins here because all the above information is unchangeable by the user #}
+                        <form action="">
+                            <div class="row">
+                                <div class="col-md-6" id="fare_status_radio">
+                                    {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
+                                    <h1>Fare Status</h1>
+                                    {#  Child radio  #}
+                                    {% if user.fare_status == 'child' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="child_radio" checked="checked">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="child_radio">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="child_radio">Child</label>
+                                    </div>
+                                    {#  Student radio  #}
+                                    {% if user.fare_status == 'student' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="student_radio" checked="checked">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="student_radio" value="test">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="student_radio">Student</label>
+                                    </div>
+                                    {#  Adult radio  #}
+                                    {% if user.fare_status == 'adult' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="adult_radio" checked="checked">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="adult_radio">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="adult_radio">Adult</label>
+                                    </div>
+                                    {#  Free travel radio  #}
+                                    {% if user.fare_status == 'free' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="free_radio" checked="checked">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="free_radio">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="free_radio">65+ /
+                                        Disability / Free Travel</label></div>
+                                    </div>
 
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="student"><label class="form-check-label"
-                                                                                   for="formCheck-2"
-                                                                                   {{% if user.fare_status == 'student' %}}
-                                                                                   checked='checked'{{% endif %}}>Student</label>
-                                </div>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="adult"><label class="form-check-label"
-                                                                                 for="formCheck-3">Adult</label>
-                                </div>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="free"><label class="form-check-label"
-                                                                                for="formCheck-4">65+ /
-                                    Disability / Free Travel</label></div>
-                            </div>
-                            `
-                            <div class="col-md-6" id="leapcard">
-                                <h1>Do You Own a LeapCard?</h1>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-7"><label class="form-check-label"
-                                                                                       for="formCheck-5">Yes</label>
-                                </div>
-                                <div class="form-check"><input class="form-check-input" type="radio"
-                                                               id="formCheck-8"><label class="form-check-label"
-                                                                                       for="formCheck-6">No</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <h1>Password</h1><a href="#">Change Password</a>
-                            </div>
-                        </div>
+                                    <div class="col-md-6" id="leapcard">
+                                        <h1>Do You Own a LeapCard?</h1>
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="formCheck-7"><label class="form-check-label"
+                                                                                               for="formCheck-5">Yes</label>
+                                        </div>
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="formCheck-8"><label class="form-check-label"
+                                                                                               for="formCheck-6">No</label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <h1>Password</h1><a href="#">Change Password</a>
+                                        </div>
+                                    </div>
+                                    <div><input type="submit" id="user_settings_button"></div>
+                        </form>
                     </div>
                 </div>
+{#                {% if user.fare_status == 'student' %}<p>fare status is student</p>{% endif %}#}
+                {#  Tab 2 starts from here  #}
                 <div class="tab-pane active" role="tabpanel" id="tab-3">
                     <div>
                         <div class="container">

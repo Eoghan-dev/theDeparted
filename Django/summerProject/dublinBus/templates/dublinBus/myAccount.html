@@ -101,26 +101,39 @@
 
                                     <div class="col-md-6" id="leapcard">
                                         <h1>Do You Own a LeapCard?</h1>
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="formCheck-7"><label class="form-check-label"
-                                                                                               for="formCheck-5">Yes</label>
+                                        {# leap card true radio #}
+                                        {% if user.leap_card %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_true" checked="checked">
+                                        {% else %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_true">
+                                            <label class="form-check-label" for="leap_card_true">Yes</label>
+                                        {% endif %}
                                         </div>
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="formCheck-8"><label class="form-check-label"
-                                                                                               for="formCheck-6">No</label>
+                                        {# leap card false radio #}
+                                        {% if not user.leap_card %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_false" checked="checked">
+                                        {% else %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_false">
+                                                <label class="form-check-label"
+                                                       for="leap_card_false">No</label>
+                                            </div>
+                                        {% endif %}
                                         </div>
-                                    </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <h1>Password</h1><a href="#">Change Password</a>
                                         </div>
-                                    </div>
-                                    <div><input type="submit" id="user_settings_button"></div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <h1>Password</h1><a href="#">Change Password</a>
+                                            </div>
+                                        </div>
+                                        <div><input type="submit" id="user_settings_button"></div>
                         </form>
                     </div>
                 </div>
-{#                {% if user.fare_status == 'student' %}<p>fare status is student</p>{% endif %}#}
+                {#                {% if user.fare_status == 'student' %}<p>fare status is student</p>{% endif %}#}
                 {#  Tab 2 starts from here  #}
                 <div class="tab-pane active" role="tabpanel" id="tab-3">
                     <div>

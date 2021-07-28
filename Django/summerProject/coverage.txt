@@ -1,0 +1,27 @@
+Name                                      Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------
+dublinBus\__init__.py                         0      0   100%
+dublinBus\admin.py                            5      0   100%
+dublinBus\apps.py                             4      0   100%
+dublinBus\migrations\__init__.py              0      0   100%
+dublinBus\models.py                          86     18    79%   43-48, 56-59, 79-84, 89-92, 107-114, 118-119, 135-141, 146-147
+dublinBus\scrapers.py                       108     95    12%   14-20, 28-66, 72-84, 93-156, 160-208, 214-233
+dublinBus\tests.py                           26      0   100%
+dublinBus\urls.py                             3      0   100%
+dublinBus\views.py                           66     39    41%   19-22, 33-34, 38-39, 43-44, 48-52, 57-62, 68-81, 87-108, 112-113
+manage.py                                    12      2    83%   12-13
+summerProject\DublinBus_current_info.py     133    122     8%   8-11, 15-31, 35-103, 106-147, 150-173
+summerProject\__init__.py                     0      0   100%
+summerProject\logins.py                       3      0   100%
+summerProject\settings.py                    30      0   100%
+summerProject\urls.py                         4      0   100%
+users\__init__.py                             0      0   100%
+users\admin.py                                1      0   100%
+users\apps.py                                 3      0   100%
+users\forms.py                               11      0   100%
+users\migrations\__init__.py                  0      0   100%
+users\models.py                               1      0   100%
+users\tests.py                                1      0   100%
+users\views.py                               12      7    42%   9-19
+-----------------------------------------------------------------------
+TOTAL                                       509    283    44%

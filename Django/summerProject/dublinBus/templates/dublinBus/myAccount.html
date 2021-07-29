@@ -171,9 +171,9 @@
                                     <h1>Routes</h1>
                                     <div id="user_routes_container">
                                         <form method="post" action="update_user_routes">
-                                        <label for="user_routes">Please enter route number</label>
-                                         <input id="user_routes" list="user_routes" name="user_routes">
-                                        <datalist id="user_routes"><option value="test"></option></datalist>
+                                        <label for="user_routes_form">Please enter route number</label>
+                                         <input id="user_routes_form" list="user_routes" name="user_routes_form">
+                                        <datalist id="user_routes"></datalist>
                                         <button type="submit">Add Route to Favourites</button>
                                             </form>
                                     </div>
@@ -189,6 +189,7 @@
                                             <tbody>
                                             <tr>
                                                 <td>Cell 1</td>
+                                                <td>Cell 2</td>
                                                 <td>Cell 2</td>
                                                 <td>Cell 3</td>
                                             </tr>
@@ -247,6 +248,8 @@
             <a href="{% url 'login' %}">Login</a>
         {% endif %}
     {% block scripts %}
-        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+        <script>loadDataListsUser()</script>
+{#        <script src="assets/bootstrap/js/bootstrap.min.js">#}
+{#        </script>#}
     {% endblock %}
 {% endblock %}

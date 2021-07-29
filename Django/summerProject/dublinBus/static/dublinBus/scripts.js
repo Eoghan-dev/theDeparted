@@ -101,11 +101,12 @@ function loadStopsSearch(stopsData) {
     //Function to read in bus stops into a datalist for either the home or user page depending on which page is loaded
 
     // If the user is looking at the my account page load that datalist, if not load the one on the homepage
+    let stopsSelector;
     if (document.URL.includes('myAccount')) {
-        let stopsSelector = document.getElementById('user_stops');
+        stopsSelector = document.getElementById('user_stops');
     }
     else {
-        let stopsSelector = document.getElementById("stops");
+        stopsSelector = document.getElementById("stops");
     }
     for (id in stopsData) {
         let currentStop = stopsData[id];
@@ -122,13 +123,14 @@ function loadRoutesSearch(routesJson) {
     // or user page depending on which page is loaded
 
     // If the user is looking at the my account page load that datalist, if not load the one on the homepage
+    let routes_selector;
     if (document.URL.includes('myAccount')) {
         console.log("in load routes search in my account page")
-        let routes_selector = document.getElementById("user_routes");
+        routes_selector = document.getElementById("user_routes");
     }
     else {
         console.log("in load routes search not in my account page")
-        let routes_selector = document.getElementById("routes");
+        routes_selector = document.getElementById("routes");
     }
     // First we need to remove all entries in the json file where there is a duplicate route number (route_short_name)
     // there should be two entries for each route number in the json file as they each represent each direction of the route

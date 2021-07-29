@@ -2,11 +2,6 @@
 {% block title %}MyAccount{% endblock %}
 {% load static %}
 {% load crispy_forms_tags %}
-{#Load the data into our datalist on this page by calling loadDataListsUser before continuing#}
-<script type="text/javascript">
-    console.log("test")
-    loadDataListsUser()
-</script>
 {% block content %}
     <div>
         {% if user.is_authenticated %}
@@ -171,11 +166,12 @@
                                     <h1>Routes</h1>
                                     <div id="user_routes_container">
                                         <form method="post" action="update_user_routes">
-                                        <label for="user_routes_form">Please enter route number</label>
-                                         <input id="user_routes_form" list="user_routes" name="user_routes_form">
-                                        <datalist id="user_routes"></datalist>
-                                        <button type="submit">Add Route to Favourites</button>
-                                            </form>
+                                            {% csrf_token %}
+                                            <label for="user_routes_form">Please enter route number</label>
+                                            <input id="user_routes_form" list="user_routes" name="user_routes_form">
+                                            <datalist id="user_routes"></datalist>
+                                            <button type="submit">Add Route to Favourites</button>
+                                        </form>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -206,11 +202,12 @@
                                     <h1>Stops</h1>
                                     <div id="user_stops_container">
                                         <form method="post" action="update_user_stops">
-                                        <label for="user_stops_form">Please enter stop number</label>
-                                         <input id="user_stops_form" list="user_stops" name="user_stops_form">
-                                        <datalist id="user_stops"></datalist>
-                                        <button type="submit">Add Route to Favourites</button>
-                                            </form>
+                                            {% csrf_token %}
+                                            <label for="user_stops_form">Please enter stop number</label>
+                                            <input id="user_stops_form" list="user_stops" name="user_stops_form">
+                                            <datalist id="user_stops"></datalist>
+                                            <button type="submit">Add Route to Favourites</button>
+                                        </form>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -249,7 +246,6 @@
         {% endif %}
     {% block scripts %}
         <script>loadDataListsUser()</script>
-{#        <script src="assets/bootstrap/js/bootstrap.min.js">#}
-{#        </script>#}
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     {% endblock %}
 {% endblock %}

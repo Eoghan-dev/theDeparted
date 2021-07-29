@@ -13,6 +13,10 @@ urlpatterns = [
     path('scrapeCB', views.scrapeCB, name='scrapeCB'),
     # ex: /update_user
     path('update_user', views.updateUser, name='updateUser'),
+    # ex: /update_user_routes
+    path('update_user_routes', views.updateUserRoutes, name='updateUserRoutes'),
+    # ex: /update_user_stops
+    path('update_user_stops', views.updateUserStops, name='updateUserStops'),
     #ex: /myAccount/
     path('myAccount', views.myAccount, name='myAccount'),
     #ex: /scrape_bus_stops/

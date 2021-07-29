@@ -36,22 +36,9 @@ async function initMap() {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected stop by the user
         let selectedStop = document.getElementsByName('stops_num')[0];
         let stopNum = selectedStop.value;
-      //  let stopVal = selectedStop.value;
-        // The data-value attribute of the datalist can't be accessed directly so we need to use the following to get it
-        // let stopNum = document.querySelector("#stops" + " option[value='" + selectedStop + "']").dataset.value;
-
         console.log("Selected stop was: ", stopNum)
         displayStop(markers_array, stopNum)
     };
-    // // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
-    // loadStopsSearchHome(bus_stop_data);
-    // // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
-    // loadRoutesSearchHome(routes);
-    // // Add an event listener to a button so we can call the above function which will then load our directions
-    // document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
-    // document.getElementById("get_stops").addEventListener("click", displaySelectedStop);
-    // document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
-    // document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array

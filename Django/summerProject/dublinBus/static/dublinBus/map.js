@@ -5,13 +5,8 @@ async function initMap() {
     // This is useful for things such as querying our db to get bus stop co-ordinates so that we can ensure that we have
     // these co-ordinates before trying to fill the map with markers based around them.
 
-    // Fill the drop down selector of routes before continuing
-    let routes = await fetch('/get_routes').then(res => {
-        return res.json()
-    }).then(data => {
-        console.log("all routes:", data)
-        return data
-    });
+    // Make requests to get json object of all routes
+    let routes = await loadRoutes();
 
     // load map
     const map = new google.maps.Map(document.getElementById("map"), {
@@ -24,12 +19,7 @@ async function initMap() {
 
     // Make request to get json object of all dublin bus stops
     // We use await to ensure that we wait until the data is fetched before continuing
-    let bus_stop_data = await fetch('/get_bus_stops').then(res => {
-        return res.json()
-    }).then(data => {
-        console.log("bus stop data:", data)
-        return data
-    });
+    let bus_stop_data = await loadStops();
     // Declare an empty array where we will keep all of our markers for each stop
     const markers_array = [];
 
@@ -150,4 +140,24 @@ async function initMap() {
     }
 
     console.log("Markers array:", markers_array)
+}
+
+async function loadRoutes() {
+        let routes = await fetch('/get_routes').then(res => {
+        return res.json()
+    }).then(data => {
+        console.log("all routes:", data)
+        return data
+    });
+        return routes
+}
+
+async function loadStops() {
+        let bus_stop_data = await fetch('/get_bus_stops').then(res => {
+        return res.json()
+    }).then(data => {
+        console.log("bus stop data:", data)
+        return data
+    });
+        return bus_stop_data
 }

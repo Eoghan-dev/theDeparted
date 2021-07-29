@@ -2,6 +2,7 @@
 {% block title %}MyAccount{% endblock %}
 {% load static %}
 {% load crispy_forms_tags %}
+<script type="text/javascript">test()</script>
 {% block content %}
     <div>
         {% if user.is_authenticated %}
@@ -164,9 +165,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <h1>Routes</h1>
-                                    <div>
-                                        <div><datalist id="user_routes"></datalist></div>
+                                    <div id="user_routes_container">
+                                        <form method="post" action="update_user_routes">
+                                        <label for="user_routes">Please enter route number</label>
+                                         <input id="user_routes" list="user_routes" name="user_routes">
+                                        <datalist id="user_routes"><option value="test"></option></datalist>
                                         <button type="submit">Add Route to Favourites</button>
+                                            </form>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -194,9 +199,13 @@
                                 </div>
                                 <div class="col-md-6">
                                     <h1>Stops</h1>
-                                    <div>
-                                        <datalist id="user_stops"<option value="test"></option></datalist>
-                                        <button type="submit">Add Stop to Favourites</button>
+                                    <div id="user_stops_container">
+                                        <form method="post" action="update_user_stops">
+                                        <label for="user_stops_form">Please enter stop number</label>
+                                         <input id="user_stops_form" list="user_stops" name="user_stops_form">
+                                        <datalist id="user_stops"></datalist>
+                                        <button type="submit">Add Route to Favourites</button>
+                                            </form>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table">

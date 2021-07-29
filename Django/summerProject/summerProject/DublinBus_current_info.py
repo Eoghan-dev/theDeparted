@@ -85,13 +85,18 @@ def json_convertor(filename):
                         elif description[2].upper() in bus_dict:
                             dict2[fields[i]] = bus_dict[description[2].upper()]
                     else:
-                        dict2[fields[i]] = description[i]
+                        dict2[fields[i]] = description[i].lstrip()
                     i = i + 1
                 # appending the record of each id
                 if filename == "routes.txt" and len(dict2) == 5:
                     pass
                 else:
-                    dict1[id] = dict2
+                    if filename == "routes.txt":
+                        dict1[description[2]] = dict2
+                    elif filename == "stops.txt":
+                        dict1[description[2].lstrip(" stop ")] = dict2
+                    else:
+                        dict1[id] = dict2
             l = l + 1
     # creating json file
     filename = filename.strip('.txt')
@@ -112,25 +117,27 @@ def route_to_stop():
     bus_dir = {}
     #Iterates through all id's in stop times
     for id in stop_times:
+        if stop_times[id]["stop_sequence"] == "1":
+            stop_sequence = stop_times[id]["stop_id"]
         if stop_times[id]["stop_id"] in bus_dict.keys():
             bus_num = list(stop_times[id]["trip_id"].split("."))
             bus_num = list(bus_num[2].split("-"))
             route_id = bus_num[1]
-            if [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]] in bus_dict[stop_times[id]["stop_id"]]:
+            if [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence] in bus_dict[stop_times[id]["stop_id"]]:
                 pass
             else:
                 list_1 = bus_dict[stop_times[id]["stop_id"]]
                 if bus_num[1] in bus_dir.keys():
                     if bus_dir[route_id] == stop_times[id]["stop_headsign"]:
-                        bus_list = [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]]
+                        bus_list = [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]
                         list_1.append(bus_list)
                         bus_dict[stop_times[id]["stop_id"]] = list_1
                     else:
-                        list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]])
+                        list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence])
                         bus_dict[stop_times[id]["stop_id"]] = list_1
                 else:
-                    list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]])
-                    bus_dict[stop_times[id]["stop_id"]] = [str(list_1), stop_times[id]["stop_headsign"].lstrip()]
+                    list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence])
+                    bus_dict[stop_times[id]["stop_id"]] = [str(list_1), stop_times[id]["stop_headsign"].lstrip(), stop_sequence]
                     bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
 
         else:
@@ -138,12 +145,12 @@ def route_to_stop():
             bus_num = list(bus_num[2].split("-"))
             if bus_num[1] in bus_dir:
                 if bus_dir[bus_num[1]] == stop_times[id]["stop_headsign"]:
-                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]]]
+                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
                 else:
-                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]]]
+                    bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
             else:
                 bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
-                bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"]]]
+                bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
     return bus_dict
 
 def route_destinations():

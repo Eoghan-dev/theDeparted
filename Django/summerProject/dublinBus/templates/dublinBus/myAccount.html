@@ -2,7 +2,11 @@
 {% block title %}MyAccount{% endblock %}
 {% load static %}
 {% load crispy_forms_tags %}
-<script type="text/javascript">test()</script>
+{#Load the data into our datalist on this page by calling loadDataListsUser before continuing#}
+<script type="text/javascript">
+    console.log("test")
+    loadDataListsUser()
+</script>
 {% block content %}
     <div>
         {% if user.is_authenticated %}

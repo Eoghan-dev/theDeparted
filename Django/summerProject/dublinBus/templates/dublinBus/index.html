@@ -32,12 +32,14 @@
         <input id="routes_num" list="routes" name="routes_num">
         <datalist id="routes">
         </datalist>
-                <button id="get_directions">Give route</button>
+                <button id="get_directions" onclick="displaySelectedRoute">Give route</button>
             </div>
             <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
         <input id="stops_num" list="stops" name="stops_num">
         <datalist id="stops">
-        </datalist></div>
+        </datalist>
+            <button id="get_stops">Give stops</button>
+            </div>
         </div>
         <div id="map"></div>
 

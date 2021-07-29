@@ -20,6 +20,7 @@ async function initMap() {
     // Make request to get json object of all dublin bus stops
     // We use await to ensure that we wait until the data is fetched before continuing
     let bus_stop_data = await loadStops();
+
     // Declare an empty array where we will keep all of our markers for each stop
     const markers_array = [];
 
@@ -42,14 +43,16 @@ async function initMap() {
         console.log("Selected stop was: ", stopNum)
         displayStop(markers_array, stopNum)
     };
-    // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
-    loadStopsSearch(bus_stop_data);
-    // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
-    loadRoutesSearch(routes);
-    // Add an event listener to a button so we can call the above function which will then load our directions
-    document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
-    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
-    document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
+    // // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
+    // loadStopsSearchHome(bus_stop_data);
+    // // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
+    // loadRoutesSearchHome(routes);
+    // // Add an event listener to a button so we can call the above function which will then load our directions
+    // document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
+    // document.getElementById("get_stops").addEventListener("click", displaySelectedStop);
+    // document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
+    // document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
+    loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {
@@ -142,22 +145,3 @@ async function initMap() {
     console.log("Markers array:", markers_array)
 }
 
-async function loadRoutes() {
-        let routes = await fetch('/get_routes').then(res => {
-        return res.json()
-    }).then(data => {
-        console.log("all routes:", data)
-        return data
-    });
-        return routes
-}
-
-async function loadStops() {
-        let bus_stop_data = await fetch('/get_bus_stops').then(res => {
-        return res.json()
-    }).then(data => {
-        console.log("bus stop data:", data)
-        return data
-    });
-        return bus_stop_data
-}

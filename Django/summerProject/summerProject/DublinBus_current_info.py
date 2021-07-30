@@ -84,6 +84,8 @@ def json_convertor(filename):
                             dict2[fields[i]] = bus_dict[description[2]]
                         elif description[2].upper() in bus_dict:
                             dict2[fields[i]] = bus_dict[description[2].upper()]
+                    elif filename == "routes.txt" and i == 2:
+                        dict2[fields[i]] = description[i].lstrip().upper()
                     else:
                         dict2[fields[i]] = description[i].lstrip()
                     i = i + 1

@@ -11,7 +11,7 @@ base = settings.BASE_DIR
 from summerProject import DublinBus_current_info
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-import pprint
+import json
 
 def index(request):
     """View to load the homepage of our application"""
@@ -35,11 +35,26 @@ def myAccount(request):
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            update_session_auth_hash(request, user)
             return redirect('myAccount')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'dublinBus/myAccount.html', {'form': form})
+
+    # Regardless of the form loaded above we also want to parse the users stops and routes into arrays and pass them
+    # to the page in that form instead of as a comma seperated string
+    # initialise fav routes and stops json before the if statement so that they can be passed to page even if empty
+    fav_stops_list = []
+    fav_routes_list = []
+    if request.user.is_authenticated:
+        user = request.user
+        # Get users fav routes and stops, convert to array and then convert to json so it can be passed as a context
+        fav_routes = user.favourite_routes
+        fav_routes_list = fav_routes.split(",")
+        fav_routes_json = json.dumps(fav_routes_list)
+        fav_stops = user.favourite_stops
+        fav_stops_list = fav_stops.split(",")
+        fav_stops_json = json.dumps(fav_stops_list)
+    return render(request, 'dublinBus/myAccount.html', {'form': form, 'fav_routes': fav_routes_list, 'fav_stops': fav_stops_list})
 
 def updateUser(request):
     """View to update user fare status and leap card from user settings page"""
@@ -64,7 +79,7 @@ def updateUser(request):
     else:
         return HttpResponse("error with updating user settings")
 
-def updateUserRoutes(request):
+def addUserRoute(request):
     """View to update users favourite routes from favourites tab in my account page"""
     # Get the route that was selected by the user
     user_route = request.POST.get('user_routes_form')
@@ -78,7 +93,7 @@ def updateUserRoutes(request):
     # Get all values from the dictionary so we have a list of dictionaries with the data we want
     routes = routes_dict.values()
     # remove any dictionaries from the list with the duplicate route short names, effectively halving the list
-    # Make a set with all the route numbers so there's no duplicates
+    # Make a set with all the route numbers(route_short_name) so there's no duplicates
     found_routes = set()
     halved_routes = []
     for route in routes:
@@ -98,18 +113,20 @@ def updateUserRoutes(request):
                     previous_fav_routes = user.favourite_routes
                     # Convert from comma seperated string to a list
                     fav_routes_list = previous_fav_routes.split(",")
-                    fav_routes_list.append(user_route)
-                    # Convert back from list to comma seperated string
-                    new_fav_routes = ",".join(fav_routes_list)
-                    user.favourite_routes = new_fav_routes
-                    user.save()
-                    return redirect('myAccount')
+                    # Check if the route the user selected is already added to favourites and return early if so
+                    if user_route in fav_routes_list:
+                        return redirect('myAccount')
+                    else:
+                        fav_routes_list.append(user_route)
+                        # Convert back from list to comma seperated string
+                        new_fav_routes = ",".join(fav_routes_list)
+                        user.favourite_routes = new_fav_routes
+                        user.save()
+                        return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
     return HttpResponse("Error, your inputted favourite route was not valid, please try again and make sure you select the full suggested route name")
 
-
-
-def updateUserStops(request):
+def addUserStop(request):
     """View to update users favourite stops from favourites tab in my account page"""
     # Get the route that was selected by the user
     user_stop = request.POST.get('user_stops_form')
@@ -130,6 +147,9 @@ def updateUserStops(request):
             previous_fav_stops = user.favourite_stops
             # Convert from comma seperated string to a list
             fav_stops_list = previous_fav_stops.split(",")
+            # Check if the stop the user selected is already added to favourites and return early if so
+            if user_stop in fav_stops_list:
+                return redirect('myAccount')
             fav_stops_list.append(user_stop)
             # Convert back from list to comma seperated string
             new_fav_stops = ",".join(fav_stops_list)
@@ -138,6 +158,32 @@ def updateUserStops(request):
             return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
     return HttpResponse("Error, your inputted favourite stop was not valid, please try again and make sure you select the full suggested route name")
+
+def delUserRoute(request, route):
+    """View to delete a particular route chosen by the user"""
+    user = request.user
+    fav_routes = user.favourite_routes
+    # Convert to array and remove the passed route from it
+    fav_routes_list = fav_routes.split(",")
+    fav_routes_list.remove(route)
+    # Convert back to comma seperated string
+    fav_routes = ",".join(fav_routes_list)
+    user.favourite_routes = fav_routes
+    user.save()
+    return redirect('myAccount')
+
+def delUserStop(request, stop):
+    """View to delete a particular stop chosen by the user"""
+    user = request.user
+    fav_stops = user.favourite_stops
+    # Convert to array and remove the passed route from it
+    fav_stops_list = fav_stops.split(",")
+    fav_stops_list.remove(stop)
+    # Convert back to comma seperated string
+    fav_stops = ",".join(fav_stops_list)
+    user.favourite_stops = fav_stops
+    user.save()
+    return redirect('myAccount')
 
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""

@@ -165,7 +165,7 @@
                                 <div class="col-md-6">
                                     <h1>Routes</h1>
                                     <div id="user_routes_container">
-                                        <form method="post" action="update_user_routes">
+                                        <form method="post" action="add_user_route">
                                             {% csrf_token %}
                                             <label for="user_routes_form">Please enter route number</label>
                                             <input id="user_routes_form" list="user_routes" name="user_routes_form">
@@ -174,7 +174,7 @@
                                         </form>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table">
+                                        <table class="table" id="fav_routes_table">
                                             <thead>
                                             <tr>
                                                 <th>Route</th>
@@ -183,17 +183,13 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>Cell 1</td>
-                                                <td>Cell 2</td>
-                                                <td>Cell 2</td>
-                                                <td>Cell 3</td>
+                                           {% for fav_route in fav_routes %}
+                                           <tr>
+                                                <td>{{fav_route}}</td>
+                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
+                                               <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
                                             </tr>
-                                            <tr>
-                                                <td>Cell 3</td>
-                                                <td>Cell 4</td>
-                                                <td>Cell 3</td>
-                                            </tr>
+                                            {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>
@@ -201,34 +197,31 @@
                                 <div class="col-md-6">
                                     <h1>Stops</h1>
                                     <div id="user_stops_container">
-                                        <form method="post" action="update_user_stops">
+                                        <form method="post" action="add_user_stop">
                                             {% csrf_token %}
                                             <label for="user_stops_form">Please enter stop number</label>
                                             <input id="user_stops_form" list="user_stops" name="user_stops_form">
                                             <datalist id="user_stops"></datalist>
-                                            <button type="submit">Add Route to Favourites</button>
+                                            <button type="submit">Add Stop to Favourites</button>
                                         </form>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table">
+                                        <table class="table" id="fav_stops_table">
                                             <thead>
                                             <tr>
-                                                <th>Route</th>
+                                                <th>Stop</th>
                                                 <th>Timetable</th>
                                                 <th>Delete</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>Cell 1</td>
-                                                <td>Cell 2</td>
-                                                <td>Cell 2</td>
+                                           {% for fav_stop in fav_stops %}
+                                           <tr>
+                                                <td>{{fav_stop}}</td>
+                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
+                                               <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
                                             </tr>
-                                            <tr>
-                                                <td>Cell 3</td>
-                                                <td>Cell 2</td>
-                                                <td>Cell 4</td>
-                                            </tr>
+                                            {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>

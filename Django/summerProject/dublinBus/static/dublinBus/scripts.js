@@ -300,6 +300,4 @@ async function loadDataListsUser() {
     let stops = await loadStops();
     loadRoutesSearch(routes);
     loadStopsSearch(stops);
-
-
 }

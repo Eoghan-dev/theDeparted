@@ -109,11 +109,8 @@ function loadStopsSearch(stopsData) {
         stopsSelector = document.getElementById("stops");
     }
     for (id in stopsData) {
-        let currentStop = stopsData[id];
         let stopOption = document.createElement("option");
-        let stopNumArr = currentStop.stop_num.split(" ");
-        let stopNum = parseInt(stopNumArr[2]);
-        stopOption.value = stopNum;
+        stopOption.value = id;
         stopsSelector.appendChild(stopOption);
     }
 }
@@ -154,7 +151,7 @@ function loadRoutesSearch(routesJson) {
             // Loop through all the directions the route serves and make them each a separate entry to fill the search bar
             for (current_direction of current_route.direction) {
                 let route_option = document.createElement("option");
-                route_option.value = current_route.route_short_name.toUpperCase() + ": " + current_direction;
+                route_option.value = current_route.route_short_name.toUpperCase() + ": " + current_direction[0];
                 // route_option.text = current_direction;
                 entries.push(route_option);
             }

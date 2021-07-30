@@ -105,7 +105,7 @@ def addUserRoute(request):
     for route in halved_routes:
         if route['direction']:
             for direction in route['direction']:
-                route_and_headsign = route['route_short_name'] + ": " + direction
+                route_and_headsign = route['route_short_name'] + ": " + direction[0]
                 print(route_and_headsign)
                 # If the route + headsign was valid (exists in our dict) then save it to the users profile
                 if route_and_headsign == user_route:
@@ -137,11 +137,11 @@ def addUserStop(request):
     f = open(file_path, encoding="utf-8-sig")
     stops_dict = json.load(f)
     # Get all values from the dictionary so we have a list of dictionaries with the data we want
-    stops = stops_dict.values()
+    stops = stops_dict.keys()
 
     # Look through our list of stop dictionaries and check if the stop number entered by the user exists
     for stop in stops:
-        if stop['stop_num'].split(" ")[2] == user_stop:
+        if stop == user_stop:
             # If the stop number exists we can save it
             user = request.user
             previous_fav_stops = user.favourite_stops

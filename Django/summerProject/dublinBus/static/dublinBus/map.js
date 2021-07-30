@@ -47,9 +47,7 @@ async function initMap() {
         // Create info window for each station before creating a marker
         // Save the routes serving this station in a new array by taking the first index from each entry in station.routes
         let station_routes = []
-        // Extract the stop number as the second word from station.stop_num
-        let station_number_arr = station.stop_num.split(" ");
-        let station_number = parseInt(station_number_arr[2]);
+        let station_number = key;
 
         station.routes.forEach(route => {
             // Make a combined string of the first index of each entry in routes (route number) and the second (direction of route)

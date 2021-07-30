@@ -1,0 +1,244 @@
+{% extends "dublinBus/base.html" %}
+{% block title %}MyAccount{% endblock %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div>
+        {% if user.is_authenticated %}
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation" style="width: 50%;text-align: center;"><a class="nav-link"
+                                                                                                   role="tab"
+                                                                                                   data-bs-toggle="tab"
+                                                                                                   href="#tab-1"
+                                                                                                   style="background: #819ca9;color: #ffffff;">User
+                    Setting</a></li>
+                <li class="nav-item" role="presentation"
+                    style="background: #819ca9;color: #ffffff;width: 50%;text-align: center;"><a class="nav-link active"
+                                                                                                 role="tab"
+                                                                                                 data-bs-toggle="tab"
+                                                                                                 href="#tab-3"
+                                                                                                 style="background: #819ca9;color: #ffffff;">Favourites</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane" role="tabpanel" id="tab-1">
+                    <div></div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6" id="first_name">
+                                <h1>First Name</h1>
+                                <p>{{ request.user.first_name }}</p>
+                            </div>
+                            <div class="col" id="last_name">
+                                <h1>Last Name</h1>
+                                <p>{{ request.user.last_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6" id="email">
+                                <h1>Email</h1>
+                                <p>{{ request.user.email }}</p>
+                            </div>
+                            <div class="col-md-6" id="username">
+                                <h1>User Name</h1>
+                                <p>{{ request.user.username }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container" id="user_settings">
+                        {# The form only begins here because all the above information is unchangeable by the user #}
+                        <form action="update_user" method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6" id="fare_status_radio">
+                                    {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
+                                    <h1>Fare Status</h1>
+                                    {#  Child radio  #}
+                                    {% if user.fare_status == 'child' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="child_radio" checked="checked"
+                                                                       name="fare_status_radios" value="child">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="child_radio" name="fare_status_radios"
+                                                                       value="child">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="child_radio">Child</label>
+                                    </div>
+                                    {#  Student radio  #}
+                                    {% if user.fare_status == 'student' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="student_radio" checked="checked"
+                                                                       name="fare_status_radios" value="student">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="student_radio" name="fare_status_radios"
+                                                                       value="student">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="student_radio">Student</label>
+                                    </div>
+                                    {#  Adult radio  #}
+                                    {% if user.fare_status == 'adult' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="adult_radio" checked="checked"
+                                                                       name="fare_status_radios" value="adult">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="adult_radio" name="fare_status_radios"
+                                                                       value="adult">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="adult_radio">Adult</label>
+                                    </div>
+                                    {#  Free travel radio  #}
+                                    {% if user.fare_status == 'free' %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="free_radio" checked="checked"
+                                                                       name="fare_status_radios" value="fre">
+                                    {% else %}
+                                        <div class="form-check"><input class="form-check-input" type="radio"
+                                                                       id="free_radio" name="fare_status_radios"
+                                                                       value="free">
+                                    {% endif %}
+                                    <label class="form-check-label"
+                                           for="free_radio">65+ /
+                                        Disability / Free Travel</label></div>
+                                    </div>
+
+                                    {# Leap card section #}
+                                    <div class="col-md-6" id="leapcard">
+                                        <h1>Do You Own a LeapCard?</h1>
+                                        {# leap card true radio #}
+                                        {% if user.leap_card %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_true" checked="checked"
+                                                                           name="leap_card_radios">
+                                        {% else %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_true" name="leap_card_radios">
+
+                                        {% endif %}
+                                        <label class="form-check-label" for="leap_card_true">Yes</label>
+                                        </div>
+                                        {# leap card false radio #}
+                                        {% if not user.leap_card %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_false" checked="checked"
+                                                                           name="leap_card_radios">
+                                        {% else %}
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                           id="leap_card_false" name="leap_card_radios">
+
+
+                                        {% endif %}
+                                        <label class="form-check-label"
+                                               for="leap_card_false">No</label>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        <div><input type="submit" id="user_settings_button"></div>
+                        </form>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <form method="post">
+                                <h1>Update Password</h1>
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <button type="submit">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+                {#                {% if user.fare_status == 'student' %}<p>fare status is student</p>{% endif %}#}
+                {#  Tab 2 starts from here  #}
+                <div class="tab-pane active" role="tabpanel" id="tab-3">
+                    <div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h1>Routes</h1>
+                                    <div id="user_routes_container">
+                                        <form method="post" action="add_user_route">
+                                            {% csrf_token %}
+                                            <label for="user_routes_form">Please enter route number</label>
+                                            <input id="user_routes_form" list="user_routes" name="user_routes_form">
+                                            <datalist id="user_routes"></datalist>
+                                            <button type="submit">Add Route to Favourites</button>
+                                        </form>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table" id="fav_routes_table">
+                                            <thead>
+                                            <tr>
+                                                <th>Route</th>
+                                                <th>Timetable</th>
+                                                <th>Delete</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                           {% for fav_route in fav_routes %}
+                                           <tr>
+                                                <td>{{fav_route}}</td>
+                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
+                                               <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h1>Stops</h1>
+                                    <div id="user_stops_container">
+                                        <form method="post" action="add_user_stop">
+                                            {% csrf_token %}
+                                            <label for="user_stops_form">Please enter stop number</label>
+                                            <input id="user_stops_form" list="user_stops" name="user_stops_form">
+                                            <datalist id="user_stops"></datalist>
+                                            <button type="submit">Add Stop to Favourites</button>
+                                        </form>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table" id="fav_stops_table">
+                                            <thead>
+                                            <tr>
+                                                <th>Stop</th>
+                                                <th>Timetable</th>
+                                                <th>Delete</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                           {% for fav_stop in fav_stops %}
+                                           <tr>
+                                                <td>{{fav_stop}}</td>
+                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
+                                               <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+        {% else %}
+            <p>You are not logged in</p>
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    {% block scripts %}
+        <script>loadDataListsUser()</script>
+        <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    {% endblock %}
+{% endblock %}

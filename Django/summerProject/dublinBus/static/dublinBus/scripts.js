@@ -98,8 +98,16 @@ function displayStop(markersArray, stopNumber) {
 }
 
 function loadStopsSearch(stopsData) {
-    //Function to read in bus stops into a datalist
-    let stopsSelector = document.getElementById("stops");
+    //Function to read in bus stops into a datalist for either the home or user page depending on which page is loaded
+
+    // If the user is looking at the my account page load that datalist, if not load the one on the homepage
+    let stopsSelector;
+    if (document.URL.includes('myAccount')) {
+        stopsSelector = document.getElementById('user_stops');
+    }
+    else {
+        stopsSelector = document.getElementById("stops");
+    }
     for (id in stopsData) {
         let currentStop = stopsData[id];
         let stopOption = document.createElement("option");
@@ -111,8 +119,19 @@ function loadStopsSearch(stopsData) {
 }
 
 function loadRoutesSearch(routesJson) {
-    // Loop through the json data of all routes and add them to our datalist for user selection
-    let routes_selector = document.getElementById("routes");
+    // Loop through the json data of all routes and add them to our datalist for user selection to either home
+    // or user page depending on which page is loaded
+
+    // If the user is looking at the my account page load that datalist, if not load the one on the homepage
+    let routes_selector;
+    if (document.URL.includes('myAccount')) {
+        console.log("in load routes search in my account page")
+        routes_selector = document.getElementById("user_routes");
+    }
+    else {
+        console.log("in load routes search not in my account page")
+        routes_selector = document.getElementById("routes");
+    }
     // First we need to remove all entries in the json file where there is a duplicate route number (route_short_name)
     // there should be two entries for each route number in the json file as they each represent each direction of the route
     // for the purposes of loading the route search we only need to access the data for one direction of each route so
@@ -237,4 +256,46 @@ class AutocompleteDirectionsHandler {
             }
         );
     }
+}
+async function loadRoutes() {
+        let routes = await fetch('/get_routes').then(res => {
+        return res.json()
+    }).then(data => {
+        console.log("all routes:", data)
+        return data
+    });
+        return routes
+}
+
+async function loadStops() {
+        let bus_stop_data = await fetch('/get_bus_stops').then(res => {
+        return res.json()
+    }).then(data => {
+        console.log("bus stop data:", data)
+        return data
+    });
+        return bus_stop_data
+}
+
+function loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop) {
+    // Function to load data into the datalists on the homepage and add event listeners to execute the relevant functions
+     // Call the function so the data is loaded in the search bar ready to autocomplete before it's clicked
+    loadStopsSearch(bus_stop_data);
+    // Call our function to load the route data into the autocomplete search bar here so it's ready to go once the user clicks it
+    loadRoutesSearch(routes);
+    // Add an event listener to a button so we can call the above function which will then load our directions
+    document.getElementById("get_directions").addEventListener("click", displaySelectedRoute);
+    document.getElementById("get_stops").addEventListener("click", displaySelectedStop);
+    document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
+    document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
+}
+
+async function loadDataListsUser() {
+    console.log("in load data lists user")
+    // Function to load datalists for user page. Currently calling server for bus and stop data again even though
+    // we've already loaded them in the homepage which is fairly wasteful and pointless but can't think of another way atm
+    let routes = await loadRoutes();
+    let stops = await loadStops();
+    loadRoutesSearch(routes);
+    loadStopsSearch(stops);
 }

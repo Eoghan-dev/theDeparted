@@ -13,14 +13,15 @@ RUN mkdir /code
 WORKDIR /code
 # Copy our requirements file to this directory
 COPY ./requirements.txt /code/
-# Install cron
-RUN apt-get install -y cron
+
 # Enable https and dependencies and curl so we can install microsoft server
 RUN apt-get update && apt-get -y install apt-transport-https curl
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 # Install sql server for debian 10
 RUN curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN exit
+# Install cron
+RUN apt-get install -y cron
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get -y install msodbcsql17
 # Install other dependencies

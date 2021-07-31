@@ -5,3 +5,4 @@ mssql-django
 django-crispy-forms
 pandas
 sklearn
+django-crontab

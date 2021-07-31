@@ -100,6 +100,8 @@ def json_convertor(filename):
                     else:
                         dict1[id] = dict2
             l = l + 1
+    #if filename == "stops.txt":
+        #dicconvert_stop_id_to_num(dict1)
     # creating json file
     filename = filename.strip('.txt')
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", filename)
@@ -117,15 +119,40 @@ def route_to_stop():
     out_file.close()
     bus_dict = {}
     bus_dir = {}
+    id_list =[]
+    first_line = True
     #Iterates through all id's in stop times
     for id in stop_times:
         if stop_times[id]["stop_sequence"] == "1":
+            if first_line == False:
+                for sub_id in id_list:
+                    dir_list = bus_dict[sub_id]
+
+                    counter = 0
+                    for route in dir_list:
+                        if route[0] == prev_route and route[1] == prev_headsign and route[3] == stop_sequence and len(route)==4:
+                            route.append(stop_sequence_last)
+                            temp_list = route
+                            dir_list[counter] = temp_list
+                            bus_dict[sub_id] = dir_list
+                        counter += 1
+                id_list = []
+                last_stop = stop_sequence_last
             stop_sequence = stop_times[id]["stop_id"]
+            first_line = False
         if stop_times[id]["stop_id"] in bus_dict.keys():
             bus_num = list(stop_times[id]["trip_id"].split("."))
             bus_num = list(bus_num[2].split("-"))
             route_id = bus_num[1]
-            if [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence] in bus_dict[stop_times[id]["stop_id"]]:
+            check_list = [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]
+            list_check = False
+            for sub_list in bus_dict[stop_times[id]["stop_id"]]:
+                if len(sub_list)==5:
+                    if check_list[0] == sub_list[0] and check_list[1] == sub_list[1] and check_list[2] == sub_list[2] and check_list[3] == sub_list[3]:
+                        list_check = True
+            if list_check == True:
+                pass
+            elif [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence] in bus_dict[stop_times[id]["stop_id"]]:
                 pass
             else:
                 list_1 = bus_dict[stop_times[id]["stop_id"]]
@@ -153,6 +180,12 @@ def route_to_stop():
             else:
                 bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
                 bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
+        stop_sequence_last = stop_times[id]["stop_id"]
+        id_list.append(stop_sequence_last)
+        prev_headsign = stop_times[id]["stop_headsign"]
+        prev_route = list(stop_times[id]["trip_id"].split("."))
+        prev_route = list(prev_route[2].split("-"))
+        prev_route = prev_route[1]
     return bus_dict
 
 def route_destinations():
@@ -182,3 +215,17 @@ def route_destinations():
         else:
             bus_dict[route_id]=[[stop_times[id]["stop_headsign"].lstrip(), route_id_dir]]
     return bus_dict
+
+def convert_stop_id_to_num(Stop_dict_og):
+    stops_id = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    stops_dict = {}
+    with open(stops_id, encoding="utf-8-sig") as out_file:
+        stop_id = json.loads(out_file.read())
+    for id in Stop_dict_og:
+        stops_dict[Stop_dict_og[id]["stop_id"]] = id
+    for stop in Stop_dict_og:
+        for route in Stop_dict_og[stop]["routes"]:
+            Stop_dict_og[stop]["routes"][route][3] = stops_dict[Stop_dict_og[stop]["routes"][route][3]]
+            Stop_dict_og[stop]["routes"][route][4] = stops_dict[Stop_dict_og[stop]["routes"][route][3]]
+    print(Stop_dict_og)
+    return Stop_dict_og

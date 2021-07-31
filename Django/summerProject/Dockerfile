@@ -31,5 +31,7 @@ RUN pip install -r requirements.txt
 COPY . /code/
 # Expose port 8000 so the application can be accessed
 EXPOSE 8000
+# Run the command to start the cron tab tasks
+CMD ["python", "manage.py", "crontab", "add"]
 # Run the command to start the django project
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

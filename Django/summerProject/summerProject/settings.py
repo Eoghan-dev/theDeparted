@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'dublinBus.apps.DublinbusConfig',
     'users.apps.UsersConfig',
     'crispy_forms',
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,3 +154,9 @@ EMAIL_HOST = logins.mail['hostname']
 EMAIL_PORT = logins.mail['port']
 EMAIL_HOST_USER = logins.mail['username']
 EMAIL_HOST_PASSWORD = logins.mail['password']
+
+# Crontab stuff
+# Runs the run_scrapers method in cron.py every day at 1 am
+CRONJOBS = [
+    ('0 1 * * *', 'dublinBus.cron.run_scrapers')
+]

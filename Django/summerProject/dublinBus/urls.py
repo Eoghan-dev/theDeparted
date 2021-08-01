@@ -17,7 +17,7 @@ urlpatterns = [
     path('add_user_route', views.addUserRoute, name='updateUserRoutes'),
     # ex: /add_user_stops
     path('add_user_stop', views.addUserStop, name='updateUserStops'),
-    # ex: /del_user_route
+    # ex: /del_user_route/56A
     path('del_user_route/<str:route>', views.delUserRoute, name="del_user_route"),
     #ex: /del_user_stop
     path('del_user_stop/<str:stop>', views.delUserStop, name="del_user_stop"),
@@ -33,4 +33,6 @@ urlpatterns = [
     path('get_routes', views.get_routes, name='get_routes'),
     #ex: /get_bus_json/
     path('get_bus_json', views.get_bus_json, name='get_bus_json'),
+    #ex: /get_next_bus_time/56A:+Ringsend+road
+    path('get_next_bus_time/<str:route>', views.get_next_bus_time, name='get_next_bus_time'),
 ]

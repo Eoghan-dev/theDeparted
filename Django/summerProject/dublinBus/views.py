@@ -186,7 +186,7 @@ def delUserStop(request, stop):
     user.save()
     return redirect('myAccount')
 
-def getRouteDepartureTime(request, route):
+def get_next_bus_time(request, route):
     """View to return the closest scheduled departure time for a certain bus route to the current time"""
     current_date_time = datetime.now()
     current_24hr_time = current_date_time.strftime("%H:%M:%S")
@@ -207,16 +207,16 @@ def getRouteDepartureTime(request, route):
     # Get current day of the week (0=monday and 6=sunday)
     current_day = datetime.today().weekday()
     if current_day == 5:
-        times = route_timetable['sat'].values()[0]
+        times = list(route_timetable['sat'].values())[0]
     elif current_day == 6:
-        times = route_timetable['sun'].values()[0]
+        times = list(route_timetable['sun'].values())[0]
     else:
-        times = route_timetable['mon'].values()[0]
+        times = list(route_timetable['mon'].values())[0]
     # Make an array with all the times converted to a datetime object (hours and minutes only)
-    converted_times = list(map(lambda x: datetime.strptime(x, "%H:%M"), times))
+    converted_times = list(map(lambda x: datetime.strptime(x, "%H:%M:%S"), times))
     # Get current time as datetime object also with only hours and minutes
-    now = datetime.now().strftime("%H:%M")
-    now_dt = datetime.strptime(now, "%H:%M")
+    now = datetime.now().strftime("%H:%M:%S")
+    now_dt = datetime.strptime(now, "%H:%M:%S")
     # Remove all items from the timetable list that are before the current time as they're useless in this context
     filtered_times = list(filter(lambda x: x >= now_dt, converted_times))
     # Check if any times existed or if it's too late in the day

@@ -202,27 +202,32 @@ def getRouteDepartureTime(request, route):
     # find the route number from the timetable
     route_num_timetable = timetable_dict[route_num]
     # Find the correct headsign from within this route
-    # It's a list of dictionaries so need to find it this way
-    for headsign_dict in route_num_timetable:
-        if route_headsign in headsign_dict.keys():
-            route_timetable = headsign_dict[route_headsign]
-            break
-    # route_timetable = route_num_timetable[route_headsign]
+    route_timetable = route_num_timetable[route_headsign]
     # Get the correct timetable based on the current day (can be sat/sun/mon-fri)
-    # this is also a list of dictionaries so we need to loop through the same way as above
     # Get current day of the week (0=monday and 6=sunday)
     current_day = datetime.today().weekday()
-    for weekday_dict in route_timetable:
-        # If today is saturday
-        if current_day == 5:
-            wanted_timetable = weekday_dict['sat']
-        elif current_day == 6:
-            wanted_timetable = weekday_dict['sun']
-        else:
-            wanted_timetable = weekday_dict['mon']
-
-
-    # Now find the closest time to the current time from this list of times
+    if current_day == 5:
+        times = route_timetable['sat'].values()[0]
+    elif current_day == 6:
+        times = route_timetable['sun'].values()[0]
+    else:
+        times = route_timetable['mon'].values()[0]
+    # Make an array with all the times converted to a datetime object (hours and minutes only)
+    converted_times = list(map(lambda x: datetime.strptime(x, "%H:%M"), times))
+    # Get current time as datetime object also with only hours and minutes
+    now = datetime.now().strftime("%H:%M")
+    now_dt = datetime.strptime(now, "%H:%M")
+    # Remove all items from the timetable list that are before the current time as they're useless in this context
+    filtered_times = list(filter(lambda x: x >= now_dt, converted_times))
+    # Check if any times existed or if it's too late in the day
+    if len(filtered_times) > 0:
+        # Now find the closest match in filtered time to the current time
+        closest_time = min(filtered_times, key=lambda dt: abs(dt - now_dt))
+        # Extract the hour and minutes as a string and return it
+        closest_time_str = closest_time.strftime("%H:%M:%S")
+        return HttpResponse(closest_time_str)
+    else:
+        return HttpResponse("error")
 
 
 def scrapeCW(request):

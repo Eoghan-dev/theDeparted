@@ -84,40 +84,32 @@ def get_timetable(index):
                     date = index[date]["Days"]
                     if route in bus_times:
                         success_dir = 0
-                        for i in range(0,len(bus_times[route])):
-                            if direction in bus_times[route][i]:
-                                success_dir = 1
-                                success_dt = 0
-                                for j in range(0,len(bus_times[route][i][direction])):
-                                    if date[0] in bus_times[route][i][direction][j]:
-                                        success_dt = 1
-                                        success_stop = 0
-                                        for k in range(0, len(bus_times[route][i][direction][j][date[0]])):
-                                            if stop in bus_times[route][i][direction][j][date[0]][k]:
-                                                success_stop = 1
-                                                if time in bus_times[route][i][direction][j][date[0]][k][stop]:
-                                                    pass
-                                                else:
-                                                    bus_times[route][i][direction][j][date[0]][k][stop].append(time)
-                                                    bus_times[route][i][direction][j][date[0]][k][stop] = sorted(bus_times[route][i][direction][j][date[0]][k][stop])
-                                            elif stop not in bus_times[route][i][direction][j][date[0]][k] and k == (len(bus_times[route][i][direction][j][date[0]]) - 1) and success_stop == 0:
-                                                stop_dict_create[stop] = [time]
-                                                bus_times[route][i][direction][j][date[0]].append(stop_dict_create)
-                                    elif date[0] not in bus_times[route][i][direction][j] and j == (len(bus_times[route][i][direction]) - 1) and success_dt == 0:
-                                        stop_dict_create[stop] = [time]
-                                        date_dict[date[0]] = [stop_dict_create]
-                                        bus_times[route][i][direction].append(date_dict)
-                            elif (direction not in bus_times[route][i]) and i == len(bus_times[route]) -1 and success_dir == 0:
+                        if direction in bus_times[route]:
+                            if date[0] in bus_times[route][direction]:
+                                if stop in bus_times[route][direction][date[0]]:
+                                    if time in bus_times[route][direction][date[0]][stop]:
+                                        pass
+                                    else:
+                                        bus_times[route][direction][date[0]][stop].append(time)
+                                        bus_times[route][direction][date[0]][stop] = sorted(bus_times[route][direction][date[0]][stop])
+                                else:
+                                    bus_times[route][direction][date[0]][stop] = [time]
+                            else:
                                 stop_dict_create[stop] = [time]
-                                date_dict[date[0]] = [stop_dict_create]
-                                dir_dict[direction] = [date_dict]
-                                bus_times[route].append(dir_dict)
+                                #date_dict[date[0]] = stop_dict_create
+                                bus_times[route][direction][date[0]] = stop_dict_create
+                        else:
+                            stop_dict_create[stop] = [time]
+                            date_dict[date[0]] = stop_dict_create
+                            #dir_dict[direction] = date_dict
+                            bus_times[route][direction] = date_dict
                     else:
                         count = count + 1
                         stop_dict_create[stop] = [time]
-                        date_dict[date[0]] = [stop_dict_create]
-                        dir_dict[direction] = [date_dict]
-                        bus_times[route] = [dir_dict]
+                        date_dict[date[0]] = stop_dict_create
+                        dir_dict[direction] = date_dict
+                        bus_times[route] = dir_dict
+
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times")
     #Writes Json file for bus timetable data
     out_file = open(file_location+".json", "w")

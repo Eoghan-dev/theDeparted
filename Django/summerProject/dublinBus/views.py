@@ -12,6 +12,7 @@ from summerProject import DublinBus_current_info
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import json
+from datetime import datetime
 
 def index(request):
     """View to load the homepage of our application"""
@@ -184,6 +185,45 @@ def delUserStop(request, stop):
     user.favourite_stops = fav_stops
     user.save()
     return redirect('myAccount')
+
+def getRouteDepartureTime(request, route):
+    """View to return the closest scheduled departure time for a certain bus route to the current time"""
+    current_date_time = datetime.now()
+    current_24hr_time = current_date_time.strftime("%H:%M:%S")
+    # Open the json file of all route timetables as a dictionary
+    file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times.json")
+    # Open the file and load it as a dictionary
+    f = open(file_path, encoding="utf-8-sig")
+    timetable_dict = json.load(f)
+    # parse the route number and headsign seperately from route
+    route_arr = route.split(":")
+    route_num = route_arr[0]
+    route_headsign = route_arr[1].strip()
+    # find the route number from the timetable
+    route_num_timetable = timetable_dict[route_num]
+    # Find the correct headsign from within this route
+    # It's a list of dictionaries so need to find it this way
+    for headsign_dict in route_num_timetable:
+        if route_headsign in headsign_dict.keys():
+            route_timetable = headsign_dict[route_headsign]
+            break
+    # route_timetable = route_num_timetable[route_headsign]
+    # Get the correct timetable based on the current day (can be sat/sun/mon-fri)
+    # this is also a list of dictionaries so we need to loop through the same way as above
+    # Get current day of the week (0=monday and 6=sunday)
+    current_day = datetime.today().weekday()
+    for weekday_dict in route_timetable:
+        # If today is saturday
+        if current_day == 5:
+            wanted_timetable = weekday_dict['sat']
+        elif current_day == 6:
+            wanted_timetable = weekday_dict['sun']
+        else:
+            wanted_timetable = weekday_dict['mon']
+
+
+    # Now find the closest time to the current time from this list of times
+
 
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""

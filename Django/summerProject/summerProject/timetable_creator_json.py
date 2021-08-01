@@ -1,6 +1,6 @@
 import json
 import os
-import DublinBus_current_info
+from . import DublinBus_current_info
 from django.conf import settings
 import time
 base = settings.BASE_DIR

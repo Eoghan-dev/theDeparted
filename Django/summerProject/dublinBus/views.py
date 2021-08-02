@@ -33,6 +33,9 @@ def myAccount(request):
     """View to load the accounts page of our application"""
     # If request was posted then a change was made to the password reset form on the page
     if request.method == 'POST':
+        # Ensure that it was the password change form that was clicked and not any of the other post requests
+        # if 'password_change' in request.POST:
+        print("found")
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
@@ -49,11 +52,19 @@ def myAccount(request):
     if request.user.is_authenticated:
         user = request.user
         # Get users fav routes and stops, convert to array and then convert to json so it can be passed as a context
-        fav_routes = user.favourite_routes
+        fav_routes = user.favourite_routes.strip()
         fav_routes_list = fav_routes.split(",")
+        # Check if the first index is empty and remove it if so (bug with unknown cause)
+        if len(fav_routes_list[0]) < 1:
+            del fav_routes_list[0]
         fav_routes_json = json.dumps(fav_routes_list)
-        fav_stops = user.favourite_stops
+        fav_stops = user.favourite_stops.strip()
         fav_stops_list = fav_stops.split(",")
+        # Check if the first index is empty and remove it if so (bug with unknown cause)
+        if len(fav_stops_list[0]) < 1:
+            del fav_stops_list[0]
+        print(fav_routes)
+        print("LOOK HERE", fav_stops_list)
         fav_stops_json = json.dumps(fav_stops_list)
     return render(request, 'dublinBus/myAccount.html', {'form': form, 'fav_routes': fav_routes_list, 'fav_stops': fav_stops_list})
 
@@ -71,12 +82,10 @@ def updateUser(request):
         # Get the instance of our user model being used
         user = request.user
         # Make changes and save to db
-        print("fare status", fare_status)
-        print("leap card", leap_card)
         user.fare_status = fare_status
         user.leap_card = leap_card
         user.save()
-        return render(request, 'dublinBus/myAccount.html')
+        return redirect('myAccount')
     else:
         return HttpResponse("error with updating user settings")
 
@@ -119,9 +128,12 @@ def addUserRoute(request):
                         return redirect('myAccount')
                     else:
                         fav_routes_list.append(user_route)
+                        # Remove empty item from start of list
+                        if len(fav_routes_list[0]) < 1:
+                            del fav_routes_list[0]
                         # Convert back from list to comma seperated string
                         new_fav_routes = ",".join(fav_routes_list)
-                        user.favourite_routes = new_fav_routes
+                        user.favourite_routes = new_fav_routes.strip()
                         user.save()
                         return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
@@ -152,6 +164,8 @@ def addUserStop(request):
             if user_stop in fav_stops_list:
                 return redirect('myAccount')
             fav_stops_list.append(user_stop)
+            if len(fav_stops_list[0]) < 1:
+                del fav_stops_list[0]
             # Convert back from list to comma seperated string
             new_fav_stops = ",".join(fav_stops_list)
             user.favourite_stops = new_fav_stops

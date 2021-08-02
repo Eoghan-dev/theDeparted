@@ -24,6 +24,15 @@ class CurrentWeather(models.Model):
                      f"*****\n"
         return str_output
 
+    def __str__(self):
+        """String representation of the model, can be changed to anything"""
+        str_output = f"\n*****\n" \
+                     f"Entry id:{self.entry_id}\n" \
+                     f"Weather description:{self.weather_description}\n" \
+                     f"Datetime:{self.dt}\n" \
+                     f"*****\n"
+        return str_output
+
     @classmethod
     def scrape(cls):
         """

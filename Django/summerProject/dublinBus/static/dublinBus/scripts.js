@@ -227,6 +227,7 @@ class AutocompleteDirectionsHandler {
     markersArray;
     userLat;
     userLon;
+    usingUserInput; // Boolean for whether the start location is the users geolocation or manually entered
 
     constructor(map, markersArray, directionsService, directionsRenderer) {
         this.map = map;
@@ -244,6 +245,7 @@ class AutocompleteDirectionsHandler {
         const destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
         // Specify just the place data fields that you need.
         destinationAutocomplete.setFields(["place_id"]);
+        this.usingUserInput = false;
 
         this.setupPlaceChangedListener(originAutocomplete, "ORIG");
         this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
@@ -270,17 +272,32 @@ class AutocompleteDirectionsHandler {
 
     }
     setupUserStartListener() {
-            document.getElementById('dir_from_user_location').addEventListener('click', this.route(true));
-        }
+            document.getElementById('dir_from_user_location').addEventListener('click', () => {
+                if (this.usingUserInput) {
+                    // If user input was previously true then they want to change to false
+                    // this means we should display the autocomplete search box and change to false
+                    document.getElementById('origin-input').style.display = "inline-block";
+                    this.usingUserInput = false;
+                    // Change the text of the button
+                    document.getElementById('dir_from_user_location').innerHTML = "Use current location"
+                }
+                else {
+                    // If user input was false then they want to change to true so we should hide the autocomplete box
+                    document.getElementById('origin-input').style.display = "none";
+                    this.usingUserInput = true;
+                    document.getElementById('dir_from_user_location').innerHTML = "Enter start location manually"
+                }
+            });
+        };
 
-    route(user_start) {
+    route() {
         // user_start is a boolean to indicate whether the start point was a user location(true) or place id
         console.log("in autocomplete route()")
 
         // Clear all (if any) markers from the map before continuing with drawing the directions
         showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
         const me = this;
-        if (user_start === false) {
+        if (this.usingUserInput === false) {
             if (!this.originPlaceId || !this.destinationPlaceId) {
                 return;
             }
@@ -303,7 +320,7 @@ class AutocompleteDirectionsHandler {
                     }
                 }
             );
-        } else if (user_start === true) {
+        } else if (this.usingUserInput === true) {
             console.log("user location button clicked")
             if (navigator.geolocation) {
                 if (!this.destinationPlaceId) {

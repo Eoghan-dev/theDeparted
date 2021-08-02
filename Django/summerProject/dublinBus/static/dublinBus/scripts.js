@@ -146,7 +146,8 @@ function displayStop(markersArray, stopNumber) {
     let map = markersArray[0].getMap();
     // Close all info windows and hide markers
      showCertainMarkers(markersArray, []);
-    // Hide all markers before showing the selected stop;
+     // First we want to remove any directions from the directions api from the map
+    directionsRenderer.set('directions', null);
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);

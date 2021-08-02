@@ -191,7 +191,6 @@ def route_to_stop():
         prev_route = list(stop_times[id]["trip_id"].split("."))
         prev_route = list(prev_route[2].split("-"))
         prev_route = prev_route[1]
-    print(bus_dict)
     for id in bus_dict:
         for i in range(0, len(bus_dict[id])):
             save_route = bus_dict[id][i][0]

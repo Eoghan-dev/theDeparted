@@ -100,8 +100,8 @@ def json_convertor(filename):
                     else:
                         dict1[id] = dict2
             l = l + 1
-    #if filename == "stops.txt":
-        #dicconvert_stop_id_to_num(dict1)
+    if filename == "stops.txt":
+        dict1 = convert_stop_id_to_num(dict1)
     # creating json file
     filename = filename.strip('.txt')
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", filename)
@@ -161,12 +161,14 @@ def route_to_stop():
                         bus_list = [bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]
                         list_1.append(bus_list)
                         bus_dict[stop_times[id]["stop_id"]] = list_1
+
                     else:
                         list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence])
                         bus_dict[stop_times[id]["stop_id"]] = list_1
+
                 else:
-                    list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence])
-                    bus_dict[stop_times[id]["stop_id"]] = [str(list_1), stop_times[id]["stop_headsign"].lstrip(), stop_sequence]
+                    list_1.append([bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"],  stop_sequence])
+                    bus_dict[stop_times[id]["stop_id"]] = list_1
                     bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
 
         else:
@@ -175,17 +177,37 @@ def route_to_stop():
             if bus_num[1] in bus_dir:
                 if bus_dir[bus_num[1]] == stop_times[id]["stop_headsign"]:
                     bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
+
                 else:
                     bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
+
             else:
                 bus_dir[bus_num[1]] = stop_times[id]["stop_headsign"]
                 bus_dict[stop_times[id]["stop_id"]] = [[bus_num[1], stop_times[id]["stop_headsign"].lstrip(), stop_times[id]["stop_sequence"], stop_sequence]]
+
         stop_sequence_last = stop_times[id]["stop_id"]
         id_list.append(stop_sequence_last)
         prev_headsign = stop_times[id]["stop_headsign"]
         prev_route = list(stop_times[id]["trip_id"].split("."))
         prev_route = list(prev_route[2].split("-"))
         prev_route = prev_route[1]
+    print(bus_dict)
+    for id in bus_dict:
+        for i in range(0, len(bus_dict[id])):
+            save_route = bus_dict[id][i][0]
+            save_start = bus_dict[id][i][3]
+            save_end = bus_dict[id][i][4]
+            save_seq = bus_dict[id][i][2]
+            save_ele = i
+            del_list = []
+            for ele in range(0, len(bus_dict[id])):
+                if bus_dict[id][ele][0] == save_route and bus_dict[id][ele][4] == save_start and bus_dict[id][ele][4] == save_end and i != ele:
+                    if bus_dict[id][ele][2] < save_seq and ele not in del_list:
+                        del_list.append(ele)
+                    elif bus_dict[id][ele][2] > save_seq and save_ele not in del_list:
+                        del_list.append(save_ele)
+        for j in sorted(del_list, reverse = True):
+            del bus_dict[id][j]
     return bus_dict
 
 def route_destinations():
@@ -216,16 +238,15 @@ def route_destinations():
             bus_dict[route_id]=[[stop_times[id]["stop_headsign"].lstrip(), route_id_dir]]
     return bus_dict
 
-def convert_stop_id_to_num(Stop_dict_og):
+def convert_stop_id_to_num(dict1):
     stops_id = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
     stops_dict = {}
     with open(stops_id, encoding="utf-8-sig") as out_file:
-        stop_id = json.loads(out_file.read())
-    for id in Stop_dict_og:
-        stops_dict[Stop_dict_og[id]["stop_id"]] = id
-    for stop in Stop_dict_og:
-        for route in Stop_dict_og[stop]["routes"]:
-            Stop_dict_og[stop]["routes"][route][3] = stops_dict[Stop_dict_og[stop]["routes"][route][3]]
-            Stop_dict_og[stop]["routes"][route][4] = stops_dict[Stop_dict_og[stop]["routes"][route][3]]
-    print(Stop_dict_og)
-    return Stop_dict_og
+        stop_id = dict1
+    for id in stop_id:
+        stops_dict[stop_id[id]["stop_id"]] = id
+    for stop in stop_id:
+        for route in range(0, len(stop_id[stop]["routes"])):
+            stop_id[stop]["routes"][route][3] = stops_dict[stop_id[stop]["routes"][route][3]]
+            stop_id[stop]["routes"][route][4] = stops_dict[stop_id[stop]["routes"][route][4]]
+    return stop_id

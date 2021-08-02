@@ -1,27 +1,3 @@
-// function scrapeCW() {
-//     //Function to call the current weather scraper
-//     fetch('/scrapeCW').then(res => {
-//         console.log("CurrentWeather scraper request sent")
-//         if (res.status === 200) {
-//             console.log("Scraper ran successfully")
-//         } else {
-//             console.log("scraper failed :(")
-//         }
-//     })
-// }
-//
-// function scrapeCB() {
-//     //Function to call the current bus scraper
-//     fetch('/scrapeCB').then(res => {
-//         console.log("CurrentBus scraper request sent")
-//         if (res.status === 200) {
-//             console.log("Scraper ran successfully")
-//         } else {
-//             console.log("scraper failed :(")
-//         }
-//     })
-// }
-
 function showCertainMarkers(allMarkers, visibleMarkers) {
     // Function that takes all the markers on the map, an array of the markers we want to make visible and
     // the google map object. The function makes only 'visibleMarkers' visible and hides all other markers
@@ -140,7 +116,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
 
 }
 
-function displayStop(markersArray, stopNumber) {
+function displayStop(markersArray, stopNumber, directionsRenderer) {
     console.log("In displayStop, stopNumber is", stopNumber)
      console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();

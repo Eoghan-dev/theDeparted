@@ -37,7 +37,7 @@ async function initMap() {
         let selectedStop = document.getElementsByName('stops_num')[0];
         let stopNum = selectedStop.value;
         console.log("Selected stop was: ", stopNum)
-        displayStop(markers_array, stopNum)
+        displayStop(markers_array, stopNum, directionsRenderer)
     };
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
 

@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
 from django.utils import timezone
+from summerProject import logins
 
 def get_current_weather():
     """
@@ -13,7 +14,7 @@ def get_current_weather():
     """
     latitude = '53.349805'
     longitude = '-6.26031'
-    weather_key = "7ac118753938be7d1540e9f996c5aab4"
+    weather_key = logins.apis['OpenWeather']
     weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/weather'
     r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
     weather_json = r.json()
@@ -46,7 +47,7 @@ def get_weather_forecast():
     """
     latitude = '53.349805'
     longitude = '-6.26031'
-    weather_key = "7ac118753938be7d1540e9f996c5aab4"
+    weather_key = logins.apis['OpenWeather']
     weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/forecast'
     r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
     weather_json = r.json()

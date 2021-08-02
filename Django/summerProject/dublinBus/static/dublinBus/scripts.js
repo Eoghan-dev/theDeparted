@@ -82,7 +82,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
     let dep_time_mins = parseInt(departure_time.split(":")[1]);
     let date_obj = new Date();
     date_obj.setHours(dep_time_hrs)
-    date_obj.setMinutes(dep_time_mins)
+    date_obj.setMinutes(dep_time_mins - 5)
     console.log("formatted departure time:", date_obj)
     // Make the request for directions and display it
     var request = {

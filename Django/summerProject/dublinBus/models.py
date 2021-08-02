@@ -35,6 +35,28 @@ class CurrentWeather(models.Model):
         scrapers.write_current_weather(weather_json)
         print("Finished scraping CurrentWeather!")
 
+class WeatherForecast(models.Model):
+    """Stores current weather information,
+    data for this model will be harvested from the openweather api 3 hour forecast for 5 days
+    """
+    timestamp = models.BigIntegerField() # Timestamp of when the API call was made
+    dt = models.DateTimeField()
+    weather_main = models.CharField(max_length=256)
+    weather_description = models.CharField(max_length=500)
+    weather_icon = models.CharField(max_length=256)
+    weather_icon_url = models.CharField(max_length=256)
+    main_temp = models.FloatField()
+
+    @classmethod
+    def scrape(cls):
+        """
+        Method to make a call to the open weather for a hard coded set of co-ordinates and save the info in our db
+        """
+        # Make api call to get the results in a json file
+        weather_json = scrapers.get_weather_forecast()
+        # Create a CurrentWeather object with this json file and write it to the db
+        scrapers.write_weather_forecast(weather_json)
+        print("Finished scraping CurrentWeather!")
 
 class CurrentBus(models.Model):
     """

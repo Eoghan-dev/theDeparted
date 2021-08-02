@@ -40,6 +40,42 @@ def write_current_weather(weather_json):
     # Store the object which represents a row in our table into the database table
     latestUpdate.save()
 
+def get_weather_forecast():
+    """
+    Function to make an api call to openweather for 3 hour forecast for next 5 days at hard-coded location, returns it as json
+    """
+    latitude = '53.349805'
+    longitude = '-6.26031'
+    weather_key = "7ac118753938be7d1540e9f996c5aab4"
+    weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/forecast'
+    r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
+    weather_json = r.json()
+    return weather_json
+
+def write_weather_forecast(weather_json):
+    """
+    Method to make a WeaetherForecast object from a given json object
+    and then writes this object to our WeatherForecast model
+    """
+    # Make an instance of the model for each 3 hourly forecast for the next 5 days
+    # Store all these to a list and then bulk add all from the list to the db
+    entries = []
+    for forecast in weather_json['list']:
+        latestUpdate = models.WeatherForecast(
+            timestamp=int(forecast['dt']),
+            dt=datetime.fromtimestamp(int(forecast['dt'])),
+
+            weather_main=forecast['weather'][0]['main'],
+            weather_description=forecast['weather'][0]['description'],
+            weather_icon=forecast['weather'][0]['icon'],
+            weather_icon_url='http://openweathermap.org/img/wn/{}@2x.png'.format(forecast['weather'][0]['icon']),
+
+            main_temp=forecast['main']['temp'],
+        )
+        entries.append(latestUpdate)
+    # Store all our entries from the list to the db
+    models.WeatherForecast.objects.bulk_create(entries)
+
 def get_current_bus():
     """
     Function to get current data from the gtfs transport for ireland api and return it in json format
@@ -195,9 +231,9 @@ def get_bus_timetable():
     models.Current_timetable.objects.all().delete()
     entries = []
     for routes in timetable:
-        for directions in timetable[route]:
-            for day in timetable[route][directions]:
-                for time in timetable[route][directions][day]:
+        for directions in timetable[routes]:
+            for day in timetable[routes][directions]:
+                for time in timetable[routes][directions][day]:
                     latestUpdate = models.Current_timetable(
                         route=routes,
                         direction=directions,

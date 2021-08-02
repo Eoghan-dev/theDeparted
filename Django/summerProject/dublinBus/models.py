@@ -7,36 +7,13 @@ class CurrentWeather(models.Model):
     Stores current weather information,
     data for this model will be harvested from the openweather api
     """
-    entry_id = models.AutoField(primary_key=True) # Auto increment primary key
     timestamp = models.BigIntegerField() # Timestamp of when the API call was made
     dt = models.DateTimeField()
-    weather_id = models.IntegerField()
     weather_main = models.CharField(max_length=256)
-    coord_lon = models.FloatField()
-    coord_lat = models.FloatField()
     weather_description = models.CharField(max_length=500)
     weather_icon = models.CharField(max_length=256)
     weather_icon_url = models.CharField(max_length=256)
-    base = models.CharField(max_length=256)
     main_temp = models.FloatField()
-    main_feels_like = models.FloatField()
-    main_temp_min = models.FloatField()
-    main_temp_max = models.FloatField()
-    main_pressure = models.IntegerField()
-    main_humidity = models.IntegerField()
-    visibility = models.IntegerField()
-    wind_speed = models.FloatField()
-    wind_deg = models.IntegerField()
-    clouds_all = models.IntegerField()
-    sys_type = models.IntegerField()
-    sys_id = models.IntegerField()
-    sys_country = models.CharField(max_length=256)
-    sys_sunrise = models.BigIntegerField()
-    sys_sunset = models.BigIntegerField()
-    timezone = models.BigIntegerField()
-    id = models.BigIntegerField()
-    name = models.CharField(max_length=256)
-    cod = models.IntegerField()
 
     def __str__(self):
         """String representation of the model, can be changed to anything"""

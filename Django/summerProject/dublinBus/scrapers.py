@@ -28,39 +28,14 @@ def write_current_weather(weather_json):
     latestUpdate = models.CurrentWeather(
         timestamp=int(weather_json['dt']),
         dt=datetime.fromtimestamp(int(weather_json['dt'])),
-        coord_lon='53.349805',
-        coord_lat='53.349805',
 
-        weather_id=weather_json['weather'][0]['id'],
         weather_main=weather_json['weather'][0]['main'],
         weather_description=weather_json['weather'][0]['description'],
         weather_icon=weather_json['weather'][0]['icon'],
         weather_icon_url='http://openweathermap.org/img/wn/{}@2x.png'.format(weather_json['weather'][0]['icon']),
 
-        base=weather_json['base'],
         main_temp=weather_json['main']['temp'],
-        main_feels_like=weather_json['main']['feels_like'],
-        main_temp_min=weather_json['main']['temp_min'],
-        main_temp_max=weather_json['main']['temp_max'],
-        main_pressure=weather_json['main']['pressure'],
-        main_humidity=weather_json['main']['humidity'],
-        visibility=weather_json['visibility'],
 
-        wind_speed=weather_json['wind']['speed'],
-        wind_deg=weather_json['wind']['deg'],
-
-        clouds_all=weather_json['clouds']['all'],
-
-        sys_type=weather_json['sys']['type'],
-        sys_id=weather_json['sys']['id'],
-        sys_country=weather_json['sys']['country'],
-        sys_sunrise=weather_json['sys']['sunrise'],
-        sys_sunset=weather_json['sys']['sunset'],
-
-        timezone=weather_json['timezone'],
-        id=weather_json['id'],
-        name=weather_json['name'],
-        cod=weather_json['cod'],
     )
     # Store the object which represents a row in our table into the database table
     latestUpdate.save()

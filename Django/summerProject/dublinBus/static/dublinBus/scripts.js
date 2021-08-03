@@ -48,89 +48,94 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
         bounds.extend(markersOnRoute[i].getPosition());
     }
     map.fitBounds(bounds);
+    try {
+        // Make request to get the next departure time for this route from the timetable
+        let res = await fetch(`/get_next_bus_time/${routeNumberAndDir}`);
+        let data = await res.json();
+        console.log("LOOK HERE FOR DATA", data)
+        // Pull the departure time and coordinates for start and end stops on the route from the response
+        let departure_time = data['time'];
+        let route_start_end_coords = data['coords'];
+        console.log("unformatted departure time:", departure_time);
+        // Convert the time from 24hr to a Date object
+        let dep_time_hrs = parseInt(departure_time.split(":")[0]);
+        let dep_time_mins = parseInt(departure_time.split(":")[1]);
+        let date_obj = new Date();
+        date_obj.setHours(dep_time_hrs);
+        date_obj.setMinutes(dep_time_mins - 5);
+        console.log("formatted departure time:", date_obj);
 
-    // Make request to get the next departure time for this route from the timetable
-    let res = await fetch(`/get_next_bus_time/${routeNumberAndDir}`);
-    let data = await res.json();
-    console.log("LOOK HERE FOR DATA", data)
-    // Pull the departure time and coordinates for start and end stops on the route from the response
-    let departure_time = data['time'];
-    let route_start_end_coords = data['coords'];
-    console.log("unformatted departure time:", departure_time);
-    // Convert the time from 24hr to a Date object
-    let dep_time_hrs = parseInt(departure_time.split(":")[0]);
-    let dep_time_mins = parseInt(departure_time.split(":")[1]);
-    let date_obj = new Date();
-    date_obj.setHours(dep_time_hrs);
-    date_obj.setMinutes(dep_time_mins - 5);
-    console.log("formatted departure time:", date_obj);
+        // Extract the start and end coords
+        let start_coords = route_start_end_coords[0];
+        let start_lat = start_coords['lat'];
+        let start_lon = start_coords['lon'];
+        let end_coords = route_start_end_coords[1];
+        let end_lat = end_coords['lat'];
+        let end_lon = end_coords['lon'];
 
-    // Extract the start and end coords
-    let start_coords = route_start_end_coords[0];
-    let start_lat = start_coords['lat'];
-    let start_lon = start_coords['lon'];
-    let end_coords = route_start_end_coords[1];
-    let end_lat = end_coords['lat'];
-    let end_lon = end_coords['lon'];
-
-    let start_coords_formatted = new google.maps.LatLng(start_lat, start_lon);
-    let end_coords_formatted = new google.maps.LatLng(end_lat, end_lon);
-    // Make the request for directions and display it
-    var request = {
-        // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
-        origin: start_coords_formatted,
-        destination: end_coords_formatted,
-        travelMode: "TRANSIT",
-        transitOptions: {
-            modes: ["BUS"],
-            departureTime: date_obj,
-        },
-        provideRouteAlternatives: true,
-    };
-    directionsService.route(request, function (response, status) {
-        console.log(response);
-        if (status == 'OK') {
-            // Loop through all of the possible route directions given back by the api
-            for (let i = 0; i < response.routes.length; i++) {
-                let current_route = response.routes[i];
-                console.count("looping through routes. Current route:", current_route)
-                // Loop through all the legs of the current route
-                for (let j = 0; j < current_route.legs.length; j++) {
-                    let current_leg = current_route.legs[j];
-                    console.group("current_leg is:", current_leg)
-                    // Loop through each step in this leg of the route
-                    for (let k = 0; k < current_leg.steps.length; k++) {
-                        let current_step = current_leg.steps[k];
-                        console.group("current_step is:", current_step)
-                        // Check if this step is using public transport and if so check if it's using the correct route
-                        if (current_step.travel_mode === "TRANSIT") {
-                            console.log("step is in transit")
-                            // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
-                            // so we can select the route to be used as the current one in the for loop
-                            if (current_step.transit.line.short_name === routeNumberAndDir.split(":")[0]) {
-                                console.log("56A found")
-                                directionsRenderer.setDirections(response);
-                                directionsRenderer.setRouteIndex(i);
-                                // We want to exit the function now as we've found a match and set the directions,
-                                // so we return to exit all the outer loops
+        let start_coords_formatted = new google.maps.LatLng(start_lat, start_lon);
+        let end_coords_formatted = new google.maps.LatLng(end_lat, end_lon);
+        // Make the request for directions and display it
+        var request = {
+            // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
+            origin: start_coords_formatted,
+            destination: end_coords_formatted,
+            travelMode: "TRANSIT",
+            transitOptions: {
+                modes: ["BUS"],
+                departureTime: date_obj,
+            },
+            provideRouteAlternatives: true,
+        };
+        directionsService.route(request, function (response, status) {
+            console.log(response);
+            if (status == 'OK') {
+                // Loop through all of the possible route directions given back by the api
+                for (let i = 0; i < response.routes.length; i++) {
+                    let current_route = response.routes[i];
+                    console.count("looping through routes. Current route:", current_route)
+                    // Loop through all the legs of the current route
+                    for (let j = 0; j < current_route.legs.length; j++) {
+                        let current_leg = current_route.legs[j];
+                        console.group("current_leg is:", current_leg)
+                        // Loop through each step in this leg of the route
+                        for (let k = 0; k < current_leg.steps.length; k++) {
+                            let current_step = current_leg.steps[k];
+                            console.group("current_step is:", current_step)
+                            // Check if this step is using public transport and if so check if it's using the correct route
+                            if (current_step.travel_mode === "TRANSIT") {
+                                console.log("step is in transit")
+                                // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
+                                // so we can select the route to be used as the current one in the for loop
+                                if (current_step.transit.line.short_name === routeNumberAndDir.split(":")[0]) {
+                                    console.log("56A found")
+                                    directionsRenderer.setDirections(response);
+                                    directionsRenderer.setRouteIndex(i);
                                     // Hide all markers except those in our new array which are on our route
-                                showCertainMarkers(markersArray, markersOnRoute);
-                                return
+                                    showCertainMarkers(markersArray, markersOnRoute);
+                                    // We want to exit the function now as we've found a match and set the directions,
+                                    // so we return to exit all the outer loops
+                                    return
+                                }
+                            } else {
+                                console.log("step is not transit")
                             }
-                        } else {
-                            console.log("step is not transit")
                         }
                     }
                 }
+                // Here we'll just set the default route given by google maps as we could not find a match for the entered route
+                console.log("Match could not be found with 56A");
+                //directionsRenderer.setDirections(response);
+            } else {
+                alert("Error with response from google directions API")
             }
-            // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-            console.log("Match could not be found with 56A");
-            //directionsRenderer.setDirections(response);
-        } else {
-            alert("Error with response from google directions API")
-        }
-    });
+        });
+    } catch(err) {
+        // If we couldn't display the route and markers then just display the markers
+        showCertainMarkers(markersArray, markersOnRoute);
+        console.log("Error displaying route for this map from directions api. Err code:", err)
 
+    };
 }
 
 function displayStop(markersArray, stopNumber, directionsRenderer) {

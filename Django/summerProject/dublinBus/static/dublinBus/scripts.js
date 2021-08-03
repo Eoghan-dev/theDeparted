@@ -41,8 +41,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
             markersOnRoute.push(currentMarker);
         }
     }
-    // Hide all markers except those in our new array which are on our route
-    showCertainMarkers(markersArray, markersOnRoute);
+
     // Make a new bounds object with the coordinates of markersOnRoute which will ensure all the markers are shown
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < markersOnRoute.length; i++) {
@@ -114,6 +113,8 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
                                 directionsRenderer.setRouteIndex(i);
                                 // We want to exit the function now as we've found a match and set the directions,
                                 // so we return to exit all the outer loops
+                                    // Hide all markers except those in our new array which are on our route
+                                showCertainMarkers(markersArray, markersOnRoute);
                                 return
                             }
                         } else {

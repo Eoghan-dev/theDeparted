@@ -48,23 +48,39 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
     for (var i = 0; i < markersOnRoute.length; i++) {
         bounds.extend(markersOnRoute[i].getPosition());
     }
-    map.fitBounds(bounds)
+    map.fitBounds(bounds);
 
     // Make request to get the next departure time for this route from the timetable
-    let res = await fetch(`/get_next_bus_time/${routeNumberAndDir}`)
-    let departure_time = await res.text();
-    console.log("unformatted departure time:", departure_time)
+    let res = await fetch(`/get_next_bus_time/${routeNumberAndDir}`);
+    let data = await res.json();
+    console.log("LOOK HERE FOR DATA", data)
+    // Pull the departure time and coordinates for start and end stops on the route from the response
+    let departure_time = data['time'];
+    let route_start_end_coords = data['coords'];
+    console.log("unformatted departure time:", departure_time);
+    // Convert the time from 24hr to a Date object
     let dep_time_hrs = parseInt(departure_time.split(":")[0]);
     let dep_time_mins = parseInt(departure_time.split(":")[1]);
     let date_obj = new Date();
-    date_obj.setHours(dep_time_hrs)
-    date_obj.setMinutes(dep_time_mins - 5)
-    console.log("formatted departure time:", date_obj)
+    date_obj.setHours(dep_time_hrs);
+    date_obj.setMinutes(dep_time_mins - 5);
+    console.log("formatted departure time:", date_obj);
+
+    // Extract the start and end coords
+    let start_coords = route_start_end_coords[0];
+    let start_lat = start_coords['lat'];
+    let start_lon = start_coords['lon'];
+    let end_coords = route_start_end_coords[1];
+    let end_lat = end_coords['lat'];
+    let end_lon = end_coords['lon'];
+
+    let start_coords_formatted = new google.maps.LatLng(start_lat, start_lon);
+    let end_coords_formatted = new google.maps.LatLng(end_lat, end_lon);
     // Make the request for directions and display it
     var request = {
         // We'll need to adjust this so the co-ordinates aren't hard-coded and are for start and end points of a route
-        origin: {lat: 53.3419400535678, lng: -6.23527645441628},
-        destination: {lat: 53.2860074546224, lng: -6.37377077680564},
+        origin: start_coords_formatted,
+        destination: end_coords_formatted,
         travelMode: "TRANSIT",
         transitOptions: {
             modes: ["BUS"],

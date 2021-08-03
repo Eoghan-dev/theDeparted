@@ -222,10 +222,39 @@ def get_next_bus_time(request, route):
     current_day = datetime.today().weekday()
     if current_day == 5:
         times = list(route_timetable['sat'].values())[0]
+        # Get the stop number for the start of this route + headsign
+        start_stop_num = list(route_timetable['sat'].keys())[0]
+        # Save the start stop number for the route to a variable as we will return it later
     elif current_day == 6:
         times = list(route_timetable['sun'].values())[0]
+        # Get the stop number for the start of this route + headsign
+        start_stop_num = list(route_timetable['sun'].keys())[0]
     else:
         times = list(route_timetable['mon'].values())[0]
+        # Get the stop number for the start of this route + headsign
+        start_stop_num = list(route_timetable['mon'].keys())[0]
+
+    # start_stop_num = list(route_timetable.keys())[0]
+    # get the end stop number for this route
+    # Load stops.json as a dictionary
+    file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    f = open(file_path, encoding="utf-8-sig")
+    stops_dict = json.load(f)
+    # look up the start stop in this
+    start_stop_data = stops_dict[start_stop_num]
+    start_stop_coords = {'lat': start_stop_data['stop_lat'], 'lon': start_stop_data['stop_lon']}
+    # Get the end stop number
+    start_stop_routes = start_stop_data['routes']
+    for stop_route in start_stop_routes:
+        print(stop_route)
+        print(route_num, route_headsign, start_stop_num)
+        if stop_route[0] == route_num and stop_route[1] == route_headsign and int(stop_route[3]) == int(start_stop_num):
+            end_route_num = stop_route[4]
+    # Get the coordinates for the end stop
+    end_stop_data = stops_dict[end_route_num]
+    end_stop_coords = {'lat': end_stop_data['stop_lat'], 'lon': end_stop_data['stop_lon']}
+    route_start_and_end = [start_stop_coords, end_stop_coords]
+
     # Make an array with all the times converted to a datetime object (hours and minutes only)
     converted_times = list(map(lambda x: datetime.strptime(x, "%H:%M:%S"), times))
     # Get current time as datetime object also with only hours and minutes
@@ -239,7 +268,8 @@ def get_next_bus_time(request, route):
         closest_time = min(filtered_times, key=lambda dt: abs(dt - now_dt))
         # Extract the hour and minutes as a string and return it
         closest_time_str = closest_time.strftime("%H:%M:%S")
-        return HttpResponse(closest_time_str)
+        returnable_data = {'time': closest_time_str, 'coords': route_start_and_end}
+        return JsonResponse(returnable_data)
     else:
         return HttpResponse("error")
 

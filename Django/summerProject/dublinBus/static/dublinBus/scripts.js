@@ -371,6 +371,13 @@ class AutocompleteDirectionsHandler {
 
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(returnableData)
+                        fetch(`get_direction_bus/${returnableData}`).then(res => {
+                            if (res.status === 200) {
+                                console.log("data sent for predictions")
+                            } else {
+                                console.log("data for predictions could not send")
+                            }
+                        })
                     } else {
                         alert("Directions request failed due to " + status);
                     }
@@ -413,6 +420,13 @@ class AutocompleteDirectionsHandler {
                                     let returnableData = getInfoFromDirections(response);
                                     // Send the relevant data to our backend so it can get model predictions
                                     console.log(returnableData)
+                                    fetch(`get_direction_bus/${returnableData}`).then(res => {
+                                        if (res.status === 200) {
+                                            console.log("data sent for predictions")
+                                        } else {
+                                            console.log("data for predictions could not send")
+                                        }
+                                    })
 
                                 } else {
                                     window.alert("Directions request failed due to " + status);

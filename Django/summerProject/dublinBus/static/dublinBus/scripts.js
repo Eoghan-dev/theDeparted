@@ -321,16 +321,12 @@ class AutocompleteDirectionsHandler {
 
     route() {
         // user_start is a boolean to indicate whether the start point was a user location(true) or place id
-        console.log("in autocomplete route()")
-
-
         const me = this;
 
         // Get the time selected by the user/automatically generated as current time from the date/time input
         let date = document.getElementById('date_input').value;
         let time = document.getElementById('time_input').value;
-        console.log(time)
-        console.log(date)
+
         let selectedDateTime = new Date();
         let hours = time.split(":")[0];
         let minutes = time.split(":")[1];
@@ -369,8 +365,12 @@ class AutocompleteDirectionsHandler {
                 (response, status) => {
                     if (status === "OK") {
                         console.log("RESPONSE LOOK HERE:::", response)
+                        // Set the directions on the map
                         me.directionsRenderer.setDirections(response);
+                        let returnableData = getInfoFromDirections(response);
 
+                        // Send the relevant data to our backend so it can get model predictions
+                        console.log(returnableData)
                     } else {
                         alert("Directions request failed due to " + status);
                     }
@@ -408,7 +408,11 @@ class AutocompleteDirectionsHandler {
                             (response, status) => {
                                 if (status === "OK") {
                                     console.log("RESPONSE LOOK HERE:::", response)
+                                    // Set the directions on the map
                                     me.directionsRenderer.setDirections(response);
+                                    let returnableData = getInfoFromDirections(response);
+                                    // Send the relevant data to our backend so it can get model predictions
+                                    console.log(returnableData)
 
                                 } else {
                                     window.alert("Directions request failed due to " + status);
@@ -501,4 +505,50 @@ function loadDirUserInput() {
     console.log(current_time)
     time_input.setAttribute("min", current_time);
     time_input.setAttribute("value", current_time);
+}
+
+function getInfoFromDirections(response) {
+    // Function to pull all bus trips returned in a directions response from google maps api
+    // Returns data as an object with scheduled departure time, stop number and route number as keys
+    let returnable_data = {
+        "departure_times": [],
+        "stop_numbers": [],
+        "route_names": [],
+    }
+    for (let i = 0; i < response.routes.length; i++) {
+        let current_route = response.routes[i];
+        console.count("looping through routes. Current route:", current_route)
+        // Loop through all the legs of the current route
+        for (let j = 0; j < current_route.legs.length; j++) {
+            let current_leg = current_route.legs[j];
+            console.group("current_leg is:", current_leg)
+            // Loop through each step in this leg of the route
+            for (let k = 0; k < current_leg.steps.length; k++) {
+                let current_step = current_leg.steps[k];
+                console.group("current_step is:", current_step)
+                // Check if this step is using public transport and if so check if it's using the correct route
+                if (current_step.travel_mode === "TRANSIT") {
+                    console.log("step is in transit")
+                    let departure_time = current_step.transit.departure_time.text;
+                    let route_num = current_step.transit.line.short_name;
+                    let route_headsign = current_step.transit.headsign;
+                    let full_route_name = route_num + ": " + route_headsign;
+                    let departure_stop = current_step.transit.departure_stop.name
+                    // // pull just the number from departure stop and not stop name
+                    // let departure_stop_arr = departure_stop.split(" ")
+                    // let departure_stop_num = departure_stop_arr[departure_stop_arr.length - 1];
+
+
+                    // save data to object
+                    returnable_data.departure_times.push(departure_time);
+                    returnable_data.route_names.push(full_route_name);
+                    returnable_data.stop_numbers.push(departure_stop);
+                } else {
+                    console.log("step is not transit")
+                }
+            }
+        }
+    }
+    // Return our object
+    return returnable_data;
 }

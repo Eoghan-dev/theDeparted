@@ -564,6 +564,6 @@ function getInfoFromDirections(response) {
         }
     }
     // Return our object
-    returnable_json = JSON.stringify(returnable_data)
+    let returnable_json = JSON.stringify(returnable_data)
     return returnable_json;
 }

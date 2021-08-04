@@ -1,6 +1,7 @@
 import json
 import os
 import DublinBus_current_info
+from operator import itemgetter
 from django.conf import settings
 base = settings.BASE_DIR
 
@@ -167,7 +168,7 @@ def get_timetable_all(index):
                                     pass
                                 else:
                                     bus_times[route][direction][date[0]][stop].append([first_stop, time])
-                                    bus_times[route][direction][date[0]][stop] = bus_times[route][direction][date[0]][stop]
+                                    bus_times[route][direction][date[0]][stop] = (sorted(bus_times[route][direction][date[0]][stop], key=itemgetter(0)))
                             else:
                                 bus_times[route][direction][date[0]][stop] = [[first_stop, time]]
                         else:

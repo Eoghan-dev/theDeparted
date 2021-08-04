@@ -526,7 +526,8 @@ function getInfoFromDirections(response) {
     // Returns data as an object with scheduled departure time, stop number and route number as keys
     let returnable_data = {
         "departure_times": [],
-        "stop_numbers": [],
+        "departure_stops": [],
+        "arrival_stops": [],
         "route_names": [],
     }
     for (let i = 0; i < response.routes.length; i++) {
@@ -548,6 +549,7 @@ function getInfoFromDirections(response) {
                     let route_headsign = current_step.transit.headsign;
                     let full_route_name = route_num + ": " + route_headsign;
                     let departure_stop = current_step.transit.departure_stop.name
+                    let arrival_stop = current_step.transit.arrival_stop.name
                     // // pull just the number from departure stop and not stop name
                     // let departure_stop_arr = departure_stop.split(" ")
                     // let departure_stop_num = departure_stop_arr[departure_stop_arr.length - 1];
@@ -556,7 +558,8 @@ function getInfoFromDirections(response) {
                     // save data to object
                     returnable_data.departure_times.push(departure_time);
                     returnable_data.route_names.push(full_route_name);
-                    returnable_data.stop_numbers.push(departure_stop);
+                    returnable_data.departure_stops.push(departure_stop);
+                    returnable_data.arrival_stops.push(arrival_stop)
                 } else {
                     console.log("step is not transit")
                 }
@@ -564,6 +567,6 @@ function getInfoFromDirections(response) {
         }
     }
     // Return our object
-    let returnable_json = JSON.stringify(returnable_data)
+    let returnable_json = JSON.stringify(returnable_data);
     return returnable_json;
 }

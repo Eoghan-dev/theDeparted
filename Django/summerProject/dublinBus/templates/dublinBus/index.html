@@ -9,9 +9,9 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
-                <div class="container" id="directions_input">
+                <div class="container" id="directions_input_container" style="background: rgb(174,184,254);">
                     <div class="row">
-                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
+                        <div class="col-md-12"><input
                         id="origin-input"
                         class="controls"
                         type="text"
@@ -19,12 +19,19 @@
                 /><button id="dir_from_user_location">Use current location</button></div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12" style="background: rgb(174,184,254);"><input
+                        <div class="col-md-12"><input
                         id="destination-input"
                         class="controls"
                         type="text"
                         placeholder="Enter a destination location"
                 /></div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <input type="date" id="date_input">
+                             <input type="time" id="time_input">
+                        </div>
+                    <div><button id="user_input_directions_btn">Get directions and predictions</button></div>
                     </div>
                 </div>
             </div>

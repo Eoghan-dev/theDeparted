@@ -429,3 +429,35 @@ async function loadDataListsUser() {
     loadRoutesSearch(routes);
     loadStopsSearch(stops);
 }
+
+function loadDirUserInput() {
+    // Function to load necessary event listeners and values into our directions input from user (date/time etc)
+    let date_input = document.getElementById('date_input');
+    let time_input = document.getElementById('time_input');
+    let submit_button = document.getElementById('user_input_directions_btn');
+    // Set min and max values for date and time inputs
+    // get current date and set as min
+    let now = new Date();
+    let current_date = now.toISOString().split("T")[0]; // https://stackoverflow.com/a/49916376
+    date_input.setAttribute("min", current_date);
+    date_input.setAttribute("value", current_date);
+    // create new date object as five days later and set as max
+    let max_date = now;
+    max_date.setDate(now.getDay() + 5)
+    let max_date_formatted = max_date.toISOString().split("T")[0];
+    date_input.setAttribute("max", max_date_formatted);
+    console.log(current_date)
+    console.log(max_date)
+    let hour = now.getHours();
+    if (hour < 10) {
+        hour = "0" + hour;
+    }
+    let minutes = now.getMinutes();
+    if (minutes < 10) {
+        minutes = "0" + minutes;
+    }
+    let current_time = hour + ":" + minutes;
+    console.log(current_time)
+    time_input.setAttribute("min", current_time);
+    time_input.setAttribute("value", current_time);
+}

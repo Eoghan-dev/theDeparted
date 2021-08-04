@@ -4,8 +4,9 @@ async function initMap() {
     // The await keyword is used to make the javascript stop executing until the response is given
     // This is useful for things such as querying our db to get bus stop co-ordinates so that we can ensure that we have
     // these co-ordinates before trying to fill the map with markers based around them.
-
     // Make requests to get json object of all routes
+       // Load necessary event listeners and values into our directions input from user (date/time etc)
+    loadDirUserInput();
     let routes = await loadRoutes();
 
     // load map
@@ -40,6 +41,8 @@ async function initMap() {
         displayStop(markers_array, stopNum, directionsRenderer)
     };
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
+
+
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {

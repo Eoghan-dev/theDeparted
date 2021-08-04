@@ -1,8 +1,7 @@
 import json
 import os
-from . import DublinBus_current_info
+import DublinBus_current_info
 from django.conf import settings
-import time
 base = settings.BASE_DIR
 
 def main():
@@ -17,6 +16,7 @@ def main():
             return "No file for calendar.txt available at the minute"
     print("Index Created")
     get_timetable(index)
+    get_timetable_all(index)
 
 
 def get_index():
@@ -80,6 +80,9 @@ def get_timetable(index):
                     route = route[1]
                     direction = timetable[stop_time]["stop_headsign"]
                     time = timetable[stop_time]["departure_time"]
+                    check_time = list(time.split(":"))
+                    if int(check_time[0]) >= 24:
+                        time = str(int(check_time[0]) - 24) +":"+ str(check_time[1]) + ":"+ str(check_time[2])
                     stop = stops_dict[timetable[stop_time]["stop_id"]]
                     date = index[date]["Days"]
                     if route in bus_times:
@@ -118,3 +121,75 @@ def get_timetable(index):
     #Checks number of routes timetable has been created for
     print(count, "bus route timetables found.")
 
+def get_timetable_all(index):
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
+    stops_id = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    bus_times = {}
+    stops_dict = {}
+    count = 0
+    if os.path.exists(file_location)==False:
+        return False
+    else:
+        with open(stops_id, encoding="utf-8-sig") as out_file:
+            stop_id = json.loads(out_file.read())
+        for id in stop_id:
+            stops_dict[stop_id[id]["stop_id"]] = id
+        with open(file_location, encoding="utf-8-sig") as out_file:
+            timetable = json.loads(out_file.read())
+        for stop_time in timetable:
+            date_dict = {}
+            stop_dict_create = {}
+            dir_dict = {}
+            if timetable[stop_time]["stop_sequence"] == "1":
+                first_stop =  timetable[stop_time]["arrival_time"]
+            trip_id = timetable[stop_time]["trip_id"]
+            trip_id = list(trip_id.strip().split("."))
+            date = trip_id[1]
+            #****************************** NB- Hard coded needs to be fixed *****************************
+            if date in ["y1003","y1004","y1005"]:
+                route = list(trip_id[2].strip().split("-"))
+                route = route[1]
+                direction = timetable[stop_time]["stop_headsign"]
+                time = timetable[stop_time]["departure_time"]
+                check_time = list(first_stop.split(":"))
+                if int(check_time[0]) >= 24:
+                    first_stop = str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
+                    check_time = list(time.split(":"))
+                    time = str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
+                stop = stops_dict[timetable[stop_time]["stop_id"]]
+                date = index[date]["Days"]
+                if route in bus_times:
+                    success_dir = 0
+                    if direction in bus_times[route]:
+                        if date[0] in bus_times[route][direction]:
+                            if stop in bus_times[route][direction][date[0]]:
+                                if [first_stop, time] in bus_times[route][direction][date[0]][stop]:
+                                    pass
+                                else:
+                                    bus_times[route][direction][date[0]][stop].append([first_stop, time])
+                                    bus_times[route][direction][date[0]][stop] = bus_times[route][direction][date[0]][stop]
+                            else:
+                                bus_times[route][direction][date[0]][stop] = [[first_stop, time]]
+                        else:
+                            stop_dict_create[stop] = [[first_stop, time]]
+                            #date_dict[date[0]] = stop_dict_create
+                            bus_times[route][direction][date[0]] = stop_dict_create
+                    else:
+                        stop_dict_create[stop] = [[first_stop, time]]
+                        date_dict[date[0]] = stop_dict_create
+                        #dir_dict[direction] = date_dict
+                        bus_times[route][direction] = date_dict
+                else:
+                    count = count + 1
+                    stop_dict_create[stop] = [[first_stop, time]]
+                    date_dict[date[0]] = stop_dict_create
+                    dir_dict[direction] = date_dict
+                    bus_times[route] = dir_dict
+
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times")
+    #Writes Json file for bus timetable data
+    out_file = open(file_location+"_all.json", "w")
+    json.dump(bus_times, out_file, indent=4)
+    out_file.close()
+    #Checks number of routes timetable has been created for
+    print(count, "bus route timetables found.")

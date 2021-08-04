@@ -52,7 +52,6 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
         // Make request to get the next departure time for this route from the timetable
         let res = await fetch(`/get_next_bus_time/${routeNumberAndDir}`);
         let data = await res.json();
-        console.log("LOOK HERE FOR DATA", data)
         // Pull the departure time and coordinates for start and end stops on the route from the response
         let departure_time = data['time'];
         let route_start_end_coords = data['coords'];
@@ -130,12 +129,13 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
                 alert("Error with response from google directions API")
             }
         });
-    } catch(err) {
+    } catch (err) {
         // If we couldn't display the route and markers then just display the markers
         showCertainMarkers(markersArray, markersOnRoute);
         console.log("Error displaying route for this map from directions api. Err code:", err)
 
-    };
+    }
+    ;
 }
 
 function displayStop(markersArray, stopNumber, directionsRenderer) {
@@ -250,6 +250,7 @@ class AutocompleteDirectionsHandler {
     userLat;
     userLon;
     usingUserInput; // Boolean for whether the start location is the users geolocation or manually entered
+    clickedToSearch; // Boolean for whether the button was clicked to give the route instead of just searching after selecting a prediction
 
     constructor(map, markersArray, directionsService, directionsRenderer) {
         this.map = map;
@@ -268,10 +269,16 @@ class AutocompleteDirectionsHandler {
         // Specify just the place data fields that you need.
         destinationAutocomplete.setFields(["place_id"]);
         this.usingUserInput = false;
+        this.clickedToSearch = false;
 
         this.setupPlaceChangedListener(originAutocomplete, "ORIG");
         this.setupPlaceChangedListener(destinationAutocomplete, "DEST");
         this.setupUserStartListener();
+        // Add event listener to submit button from user to call route
+        document.getElementById('user_input_directions_btn').addEventListener('click', () => {
+            this.clickedToSearch = true;
+            this.route();
+        })
     }
 
     setupPlaceChangedListener(autocomplete, mode) {
@@ -289,40 +296,66 @@ class AutocompleteDirectionsHandler {
             } else {
                 this.destinationPlaceId = place.place_id;
             }
-            this.route(false);
+            this.route();
         });
 
     }
+
     setupUserStartListener() {
-            document.getElementById('dir_from_user_location').addEventListener('click', () => {
-                if (this.usingUserInput) {
-                    // If user input was previously true then they want to change to false
-                    // this means we should display the autocomplete search box and change to false
-                    document.getElementById('origin-input').style.display = "inline-block";
-                    this.usingUserInput = false;
-                    // Change the text of the button
-                    document.getElementById('dir_from_user_location').innerHTML = "Use current location"
-                }
-                else {
-                    // If user input was false then they want to change to true so we should hide the autocomplete box
-                    document.getElementById('origin-input').style.display = "none";
-                    this.usingUserInput = true;
-                    document.getElementById('dir_from_user_location').innerHTML = "Enter start location manually"
-                }
-            });
-        };
+        document.getElementById('dir_from_user_location').addEventListener('click', () => {
+            if (this.usingUserInput) {
+                // If user input was previously true then they want to change to false
+                // this means we should display the autocomplete search box and change to false
+                document.getElementById('origin-input').style.display = "inline-block";
+                this.usingUserInput = false;
+                // Change the text of the button
+                document.getElementById('dir_from_user_location').innerHTML = "Use current location"
+            } else {
+                // If user input was false then they want to change to true so we should hide the autocomplete box
+                document.getElementById('origin-input').style.display = "none";
+                this.usingUserInput = true;
+                document.getElementById('dir_from_user_location').innerHTML = "Enter start location manually"
+            }
+        });
+    };
 
     route() {
         // user_start is a boolean to indicate whether the start point was a user location(true) or place id
         console.log("in autocomplete route()")
 
-        // Clear all (if any) markers from the map before continuing with drawing the directions
-        showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
+
         const me = this;
+
+        // Get the time selected by the user/automatically generated as current time from the date/time input
+        let date = document.getElementById('date_input').value;
+        let time = document.getElementById('time_input').value;
+        console.log(time)
+        console.log(date)
+        let selectedDateTime = new Date();
+        let hours = time.split(":")[0];
+        let minutes = time.split(":")[1];
+        selectedDateTime.setHours(hours);
+        selectedDateTime.setMinutes(minutes);
+
+        let year = date.split("-")[0];
+        let month = date.split("-")[1];
+        let day = date.split("-")[2];
+        selectedDateTime.setFullYear(year);
+        selectedDateTime.setMonth(month);
+        selectedDateTime.setDate(day);
+
+        // Return early if the relevant fields haven't been filled out yet
         if (this.usingUserInput === false) {
             if (!this.originPlaceId || !this.destinationPlaceId) {
+                // If they clicked the button to get results give a message back to the user so they know they need to
+                // select one of the suggested locations from the autocomplete
+                if (this.clickedToSearch) {
+                    alert("Please select a suggested location from the dropdown to get results");
+                }
                 return;
             }
+            // Clear all (if any) markers from the map before continuing with drawing the directions
+            showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
             this.directionsService.route(
                 {
                     origin: {placeId: this.originPlaceId},
@@ -330,6 +363,7 @@ class AutocompleteDirectionsHandler {
                     travelMode: "TRANSIT",
                     transitOptions: {
                         modes: ["BUS"],
+                        departureTime: selectedDateTime,
                     },
                 },
                 (response, status) => {
@@ -347,8 +381,15 @@ class AutocompleteDirectionsHandler {
             if (navigator.geolocation) {
                 if (!this.destinationPlaceId) {
                     // return if they haven't entered a destination yet
+                    // If they clicked the button to get results give a message back to the user so they know they need to
+                    // select one of the suggested locations from the autocomplete
+                    if (this.clickedToSearch) {
+                        alert("Please select a suggested location from the dropdown to get results");
+                    }
                     return
                 }
+                // Clear all (if any) markers from the map before continuing with drawing the directions
+                showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
                 console.log("attempting routing from user location")
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -361,6 +402,7 @@ class AutocompleteDirectionsHandler {
                                 travelMode: "TRANSIT",
                                 transitOptions: {
                                     modes: ["BUS"],
+                                    departureTime: selectedDateTime,
                                 },
                             },
                             (response, status) => {
@@ -434,7 +476,6 @@ function loadDirUserInput() {
     // Function to load necessary event listeners and values into our directions input from user (date/time etc)
     let date_input = document.getElementById('date_input');
     let time_input = document.getElementById('time_input');
-    let submit_button = document.getElementById('user_input_directions_btn');
     // Set min and max values for date and time inputs
     // get current date and set as min
     let now = new Date();

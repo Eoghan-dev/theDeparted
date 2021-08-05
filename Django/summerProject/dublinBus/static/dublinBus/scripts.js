@@ -377,7 +377,7 @@ class AutocompleteDirectionsHandler {
                         let prediction_json = await prediction_res.json();
                         let prediction = JSON.parse(prediction_json)
                         // Get the html from this data that we want to show to the user and then display it to them
-                        let prediction_html = getPredictionHTML(prediction, trip_info,);
+                        let prediction_html = getPredictionHTML(prediction, trip_info);
                         let results_container = document.getElementById('results_container');
                         results_container.innerHTML = prediction_html;
                         results_container.style.display = "block";
@@ -453,7 +453,7 @@ class AutocompleteDirectionsHandler {
     }
 }
 
-function getPredictionHTML(prediction, trip_info, initial_departure_time) {
+function getPredictionHTML(prediction, trip_info) {
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
     let prediction_html = "<li>";

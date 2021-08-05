@@ -135,7 +135,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
         console.log("Error displaying route for this map from directions api. Err code:", err)
 
     }
-    ;
+
 }
 
 function displayStop(markersArray, stopNumber, directionsRenderer) {
@@ -362,22 +362,25 @@ class AutocompleteDirectionsHandler {
                         departureTime: selectedDateTime,
                     },
                 },
-                (response, status) => {
+                async (response, status) => {
                     if (status === "OK") {
                         console.log("RESPONSE LOOK HERE:::", response)
                         // Set the directions on the map
                         me.directionsRenderer.setDirections(response);
-                        let returnableData = getInfoFromDirections(response, selectedDateTime);
-
+                        // Get the info we need for our model from the directions response
+                        let dir_info = getInfoFromDirections(response, selectedDateTime);
+                        let data_for_model = dir_info[0];
+                        let trip_info = JSON.parse(dir_info[1]);
                         // Send the relevant data to our backend so it can get model predictions
-                        console.log(returnableData)
-                        fetch(`get_direction_bus/${returnableData}`).then(res => {
-                            if (res.status === 200) {
-                                console.log("data sent for predictions")
-                            } else {
-                                console.log("data for predictions could not send")
-                            }
-                        })
+                        console.log(data_for_model)
+                        let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
+                        let prediction_json = await prediction_res.json();
+                        let prediction = JSON.parse(prediction_json)
+                        // Get the html from this data that we want to show to the user and then display it to them
+                        let prediction_html = getPredictionHTML(prediction, trip_info);
+                        let results_container = document.getElementById('results_container');
+                        results_container.innerHTML = prediction_html;
+                        results_container.style.display = "block";
                     } else {
                         alert("Directions request failed due to " + status);
                     }
@@ -412,20 +415,24 @@ class AutocompleteDirectionsHandler {
                                     departureTime: selectedDateTime,
                                 },
                             },
-                            (response, status) => {
+                            async (response, status) => {
                                 if (status === "OK") {
                                     console.log("RESPONSE LOOK HERE:::", response)
                                     // Set the directions on the map
                                     me.directionsRenderer.setDirections(response);
-                                    let returnableData = getInfoFromDirections(response, selectedDateTime);
+                                    let dir_info = getInfoFromDirections(response, selectedDateTime);
+                                    let data_for_model = dir_info[0];
+                                    let trip_info = JSON.parse(dir_info[1]);
                                     // Send the relevant data to our backend so it can get model predictions
-                                    fetch(`get_direction_bus/${returnableData}`).then(res => {
-                                        if (res.status === 200) {
-                                            console.log("data sent for predictions")
-                                        } else {
-                                            console.log("data for predictions could not send")
-                                        }
-                                    })
+                                    console.log(data_for_model)
+                                    let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
+                                    let prediction_json = await prediction_res.json();
+                                    let prediction = JSON.parse(prediction_json)
+                                    // Get the html from this data that we want to show to the user and then display it to them
+                                    let prediction_html = getPredictionHTML(prediction, trip_info);
+                                    let results_container = document.getElementById('results_container');
+                                    results_container.innerHTML = prediction_html;
+                                    results_container.style.display = "block";
 
                                 } else {
                                     window.alert("Directions request failed due to " + status);
@@ -444,6 +451,37 @@ class AutocompleteDirectionsHandler {
 
         }
     }
+}
+
+function getPredictionHTML(prediction, trip_info) {
+    // first get the number of bus trips that we have in total as we have a prediction for each
+    let num_trips = trip_info.length;
+    let prediction_html = "<li>";
+    // Use the first for loop to get the indexes (index 0 first step, index 1 second step etc.)
+    for (let i = 0; i < num_trips; i++) {
+        prediction_html += "<ol>";
+        // Now loop through the keys from our data returned from backend and get the appropriate
+        // index from each of their respective arrays (the value to the key).
+        let trip_step = trip_info[i];
+        if (trip_step.step_type === "WALKING") {
+            prediction_html += trip_step.description + " ---- " + trip_info.duration;
+        } else {
+            let instructions_string_arr = trip_step.description.split(" ");
+            // remove first element from array and convert back to string
+            instructions_string_arr = instructions_string_arr.splice(0, 1, prediction.route[i]);
+            let instructions_string = instructions_string_arr.join(" ");
+            prediction_html += "Get route " + instructions_string + " ---- ";
+            // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
+            if (prediction.arrival_time[i] === "gmaps") {
+                prediction_html += trip_info.duration;
+            } else {
+                // calculate total time taken by step
+                let step_time = new Date(prediction.arrival_time[i]) - new Date(prediction.departure_time[i]);
+                prediction_html += step_time.getHours() + " " + step_time.getMinutes() + " mins";
+            }
+        }
+    }
+    return prediction_html
 }
 
 async function loadRoutes() {
@@ -523,8 +561,13 @@ function loadDirUserInput() {
 function getInfoFromDirections(response, selected_date_time) {
     // Function to pull all bus trips returned in a directions response from google maps api
     // Returns data as an object with scheduled departure time, stop number and route number as keys
+
+    // Trip description will hold info from our response not needed for model but for the front end
+    // Array of objects with each object being one step of the trip (walking or bus)
+    let trip_description = [];
+
     date_time_string = selected_date_time.toString();
-    let returnable_data = {
+    let data_for_model = {
         "departure_times": [],
         "departure_stops": [],
         "arrival_stops": [],
@@ -551,23 +594,37 @@ function getInfoFromDirections(response, selected_date_time) {
                     let full_route_name = route_num + ": " + route_headsign;
                     let departure_stop = current_step.transit.departure_stop.name
                     let arrival_stop = current_step.transit.arrival_stop.name
-                    // // pull just the number from departure stop and not stop name
-                    // let departure_stop_arr = departure_stop.split(" ")
-                    // let departure_stop_num = departure_stop_arr[departure_stop_arr.length - 1];
 
                     // save data to object
-                    returnable_data.departure_times.push(departure_time);
-                    returnable_data.route_names.push(full_route_name);
-                    returnable_data.departure_stops.push(departure_stop);
-                    returnable_data.arrival_stops.push(arrival_stop)
+                    data_for_model.departure_times.push(departure_time);
+                    data_for_model.route_names.push(full_route_name);
+                    data_for_model.departure_stops.push(departure_stop);
+                    data_for_model.arrival_stops.push(arrival_stop)
+
+                    let step_info = {
+                        "step_type": current_step.travel_mode,
+                        "distance": current_step.distance,
+                        "instructions": current_step.instructions,
+                        "duration": current_step.duration,
+                        "gmaps_prediction": current_step.transit.arrival_time.value,
+                    }
                 } else {
                     console.log("step is not transit")
+                    // save step info with no detail for gmaps prediction as this is only needed for bus times
+                    let step_info = {
+                        "step_type": current_step.travel_mode,
+                        "distance": current_step.distance,
+                        "instructions": current_step.instructions,
+                        "duration": current_step.duration,
+                        "gmaps_prediction": "n/a",
+                    }
                 }
             }
         }
     }
-    console.log(returnable_data);
-    // Return our object
-    let returnable_json = JSON.stringify(returnable_data);
-    return returnable_json;
+    console.log(data_for_model);
+    // Return our objects
+    trip_description_json = JSON.stringify(trip_description);
+    let data_for_model_json = JSON.stringify(data_for_model);
+    return [data_for_model_json, trip_description_json];
 }

@@ -480,7 +480,9 @@ function getPredictionHTML(prediction, trip_info) {
                 prediction_html += step_time.getHours() + " " + step_time.getMinutes() + " mins";
             }
         }
+        prediction_html += "</ol>";
     }
+    prediction_html += "</li>";
     return prediction_html
 }
 

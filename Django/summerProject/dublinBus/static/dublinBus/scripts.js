@@ -367,7 +367,7 @@ class AutocompleteDirectionsHandler {
                         console.log("RESPONSE LOOK HERE:::", response)
                         // Set the directions on the map
                         me.directionsRenderer.setDirections(response);
-                        let returnableData = getInfoFromDirections(response);
+                        let returnableData = getInfoFromDirections(response, selectedDateTime);
 
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(returnableData)
@@ -417,9 +417,8 @@ class AutocompleteDirectionsHandler {
                                     console.log("RESPONSE LOOK HERE:::", response)
                                     // Set the directions on the map
                                     me.directionsRenderer.setDirections(response);
-                                    let returnableData = getInfoFromDirections(response);
+                                    let returnableData = getInfoFromDirections(response, selectedDateTime);
                                     // Send the relevant data to our backend so it can get model predictions
-                                    console.log(returnableData)
                                     fetch(`get_direction_bus/${returnableData}`).then(res => {
                                         if (res.status === 200) {
                                             console.log("data sent for predictions")
@@ -521,14 +520,16 @@ function loadDirUserInput() {
     time_input.setAttribute("value", current_time);
 }
 
-function getInfoFromDirections(response) {
+function getInfoFromDirections(response, selected_date_time) {
     // Function to pull all bus trips returned in a directions response from google maps api
     // Returns data as an object with scheduled departure time, stop number and route number as keys
+    date_time_string = selected_date_time.toString();
     let returnable_data = {
         "departure_times": [],
         "departure_stops": [],
         "arrival_stops": [],
         "route_names": [],
+        "date_time": date_time_string,
     }
     for (let i = 0; i < response.routes.length; i++) {
         let current_route = response.routes[i];
@@ -554,7 +555,6 @@ function getInfoFromDirections(response) {
                     // let departure_stop_arr = departure_stop.split(" ")
                     // let departure_stop_num = departure_stop_arr[departure_stop_arr.length - 1];
 
-
                     // save data to object
                     returnable_data.departure_times.push(departure_time);
                     returnable_data.route_names.push(full_route_name);
@@ -566,6 +566,7 @@ function getInfoFromDirections(response) {
             }
         }
     }
+    console.log(returnable_data);
     // Return our object
     let returnable_json = JSON.stringify(returnable_data);
     return returnable_json;

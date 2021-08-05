@@ -14,6 +14,7 @@ class CurrentWeather(models.Model):
     weather_icon = models.CharField(max_length=256)
     weather_icon_url = models.CharField(max_length=256)
     main_temp = models.FloatField()
+    weather_id = models.IntegerField()
 
     def __str__(self):
         """String representation of the model, can be changed to anything"""
@@ -55,6 +56,7 @@ class WeatherForecast(models.Model):
     weather_icon = models.CharField(max_length=256)
     weather_icon_url = models.CharField(max_length=256)
     main_temp = models.FloatField()
+    weather_id = models.IntegerField()
 
     @classmethod
     def scrape(cls):

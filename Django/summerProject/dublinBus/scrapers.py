@@ -72,6 +72,8 @@ def write_weather_forecast(weather_json):
             weather_icon_url='http://openweathermap.org/img/wn/{}@2x.png'.format(forecast['weather'][0]['icon']),
 
             main_temp=forecast['main']['temp'],
+
+            weather_id=forecast['weather'][0]
         )
         entries.append(latestUpdate)
     # Store all our entries from the list to the db

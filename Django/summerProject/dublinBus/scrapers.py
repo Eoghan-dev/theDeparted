@@ -36,6 +36,7 @@ def write_current_weather(weather_json):
         weather_icon_url='http://openweathermap.org/img/wn/{}@2x.png'.format(weather_json['weather'][0]['icon']),
 
         main_temp=weather_json['main']['temp'],
+        weather_id=weather_json['weather'][0]['id'],
 
     )
     # Store the object which represents a row in our table into the database table
@@ -73,7 +74,7 @@ def write_weather_forecast(weather_json):
 
             main_temp=forecast['main']['temp'],
 
-            weather_id=forecast['weather'][0]
+            weather_id=forecast['weather'][0]['id']
         )
         entries.append(latestUpdate)
     # Store all our entries from the list to the db

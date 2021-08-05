@@ -370,7 +370,7 @@ class AutocompleteDirectionsHandler {
                         // Get the info we need for our model from the directions response
                         let dir_info = getInfoFromDirections(response, selectedDateTime);
                         let data_for_model = dir_info[0];
-                        let trip_info = JSON.parse(dir_info[1]);
+                        let trip_info = dir_info[1];
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(data_for_model)
                         let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
@@ -422,7 +422,7 @@ class AutocompleteDirectionsHandler {
                                     me.directionsRenderer.setDirections(response);
                                     let dir_info = getInfoFromDirections(response, selectedDateTime);
                                     let data_for_model = dir_info[0];
-                                    let trip_info = JSON.parse(dir_info[1]);
+                                    let trip_info = dir_info[1];
                                     // Send the relevant data to our backend so it can get model predictions
                                     console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
@@ -574,13 +574,13 @@ function getInfoFromDirections(response, selected_date_time) {
     // Array of objects with each object being one step of the trip (walking or bus)
     let trip_description = [];
 
-    date_time_string = selected_date_time.toString();
+    timestamp = selected_date_time.getTime() / 1000.0;
     let data_for_model = {
         "departure_times": [],
         "departure_stops": [],
         "arrival_stops": [],
         "route_names": [],
-        "date_time": date_time_string,
+        "date_time": timestamp,
     }
     for (let i = 0; i < response.routes.length; i++) {
         let current_route = response.routes[i];
@@ -632,7 +632,6 @@ function getInfoFromDirections(response, selected_date_time) {
     }
     console.log(data_for_model);
     // Return our objects
-    trip_description_json = JSON.stringify(trip_description);
     let data_for_model_json = JSON.stringify(data_for_model);
-    return [data_for_model_json, trip_description_json];
+    return [data_for_model_json, trip_description];
 }

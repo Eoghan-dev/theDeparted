@@ -574,7 +574,7 @@ function getInfoFromDirections(response, selected_date_time) {
     // Array of objects with each object being one step of the trip (walking or bus)
     let trip_description = [];
 
-    timestamp = selected_date_time.getTime() / 1000.0;
+    let timestamp = selected_date_time.getTime() / 1000.0;
     let data_for_model = {
         "departure_times": [],
         "departure_stops": [],

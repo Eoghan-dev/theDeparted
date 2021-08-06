@@ -459,6 +459,7 @@ class AutocompleteDirectionsHandler {
 }
 
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
+    console.log("Prediction", prediction)
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
     let prediction_html = "<li>";
@@ -480,13 +481,18 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             prediction_html += "Get route " + instructions_string + " ---- ";
             // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
             if (prediction.arrival_time[i] === "gmaps") {
-                prediction_html += trip_info.duration;
+                prediction_html += trip_info.duration[i];
                 gmaps_journey = true;
             } else {
                 // calculate total time taken by step
-                let step_time = new Date(prediction.arrival_time[i]) - new Date(prediction.departure_time[i]);
-                step_time_date = new Date(step_time);
-                prediction_html += step_time_date.getHours() + " " + step_time_date.getMinutes() + " mins";
+                let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
+                console.log("transit_count", transit_count)
+                console.log("prediction.arrival_time[i]", prediction["arrival_time"][transit_count])
+                console.log("prediction.departure_time[i]", prediction.departure_time[transit_count])
+                console.log("step_time", step_time)
+                step_time_date = new Date(step_time)
+                console.log("step_time_date",step_time_date)
+                prediction_html += ((step_time/1000000)/60) + " mins";
             }
             transit_count += 1;
         }

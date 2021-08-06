@@ -421,15 +421,21 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     f.close()
     data_return = {}
     # time is given in form of HH:MM am/pm checks if am or pm
-    if (dep_time)[-2:] == "pm":
+    if (dep_time)[-2:] == "pm" or dep_time[:2]>12:
         # Changes pm to HH:MM:SS format matches that in timetable
         depart_time = list(dep_time.split(":"))
-        hh = 12 + int(depart_time[0])
-        time = str(hh) + ":" + depart_time[1][:2] + ":00"
+        if int(depart_time[0]) > 12:
+            time = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
+        else:
+            hh = 12 + int(depart_time[0])
+            time =str(hh) + ":" + depart_time[1][:2] + ":00"
     elif (dep_time)[-2:] == "am":
         depart_time = list(dep_time.split(":"))
-        hh = 12 + int(depart_time[0])
-        time = str(hh) + ":" + depart_time[1][:2] + ":00"
+        hh =int(depart_time[0])
+        if hh < 10:
+            time = "0" + str(hh) + ":" + depart_time[1][:2] + ":00"
+        else:
+            time =str(hh) + ":" + depart_time[1][:2] + ":00"
     # Gets the stop number if available for departure and arrival if none available compares to stops.json
     if (list(dep_stop.split(" "))[-1]).isnumeric() == True:
         depart_stop = list(dep_stop.split(" "))[-1]

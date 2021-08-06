@@ -664,7 +664,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
-                    step_info["departure_time"] = current_step.departure_time;
+                    step_info["departure_time"] = current_step.departure_time; //
                 }
             trip_description.push(step_info);
             }

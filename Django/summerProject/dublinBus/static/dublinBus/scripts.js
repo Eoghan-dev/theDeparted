@@ -643,6 +643,7 @@ function getInfoFromDirections(response, selected_date_time) {
                         "gmaps_prediction": "n/a",
                     }
                 }
+            trip_description.push(step_info);
             }
         }
     }

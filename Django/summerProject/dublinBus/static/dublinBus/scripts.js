@@ -484,7 +484,8 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             } else {
                 // calculate total time taken by step
                 let step_time = new Date(prediction.arrival_time[i]) - new Date(prediction.departure_time[i]);
-                prediction_html += step_time.getHours() + " " + step_time.getMinutes() + " mins";
+                step_time_date = new Date(step_time)
+                prediction_html += step_time_date.getHours() + " " + step_time_date.getMinutes() + " mins";
             }
         }
         prediction_html += "</ol>";

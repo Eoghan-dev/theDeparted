@@ -374,9 +374,11 @@ class AutocompleteDirectionsHandler {
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(data_for_model)
                         let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
-                        console.log(prediction_res)
+                        console.log("raw result", prediction_res)
                         let prediction_json = await prediction_res.json();
+                        console.log("result after .json()", prediction_json)
                         let prediction = JSON.parse(prediction_json)
+                        console.log("result after json.parse", prediction)
                         // Get the html from this data that we want to show to the user and then display it to them
                         let prediction_html = getPredictionHTML(prediction, trip_info);
                         let results_container = document.getElementById('results_container');

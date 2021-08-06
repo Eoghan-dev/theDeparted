@@ -77,7 +77,9 @@ class CurrentBus(models.Model):
     timestamp = models.BigIntegerField() # timestamp of when the api call was made
     dt = models.DateTimeField() # datetime representation of the above timestamp
     trip_id = models.CharField(max_length=256)
+    direction = models.CharField(max_length=2)
     route_id = models.CharField(max_length=256)
+    route = models.CharField(max_length=6)
     schedule = models.CharField(max_length=256)
     start_t = models.CharField(max_length=256)
     start_d = models.CharField(max_length=256)

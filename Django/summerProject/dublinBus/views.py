@@ -392,12 +392,16 @@ def get_direction_bus(request, data):
         print(data["arrival_stops"][bus])
         print(data["route_names"][bus])
         print(data["date_time"])
-        temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
-        data_return["route"].append(temporary_dict["route"][0])
-        data_return["departure_time"].append(temporary_dict["departure_time"][0]*1000)
-        data_return["arrival_time"].append(temporary_dict["arrival_time"][0]*1000)
-        print("--------------------------")
-        print(data_return)
+        data_return = {}
+        #temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
+        #data_return["route"].append(temporary_dict["route"][0])
+        #data_return["departure_time"].append(temporary_dict["departure_time"][0]*1000)
+        #data_return["arrival_time"].append(temporary_dict["arrival_time"][0]*1000)
+        #print("--------------------------")
+        #print(data_return)
+        data_return["route"] = ["gmaps"]
+        data_return["departure_time"] = ["gmaps"]
+        data_return["arrival_time"] = ["gmaps"]
     return JsonResponse(data_return)
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):

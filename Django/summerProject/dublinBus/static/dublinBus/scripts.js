@@ -470,9 +470,9 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.description + " ---- " + trip_info.duration;
+            prediction_html += trip_step.instructions + " ---- " + trip_info.duration;
         } else {
-            let instructions_string_arr = trip_step.description.split(" ");
+            let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
             instructions_string_arr = instructions_string_arr.splice(0, 1, prediction.route[i]);
             let instructions_string = instructions_string_arr.join(" ");

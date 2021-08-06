@@ -491,9 +491,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 console.log("prediction.departure_time[i]", prediction.departure_time[transit_count])
                 console.log("step_time", step_time)
                 step_time_date = new Date(step_time)
-                var secDiff = hourDiff / 1000; //in s
-                var minDiff = hourDiff / 60 / 1000; //in minutes
-                var hDiff = hourDiff / 3600 / 1000; //in hours
+
                 console.log("step_time_date",step_time_date)
                 prediction_html += ((step_time/1000000)/60) + " mins";
             }
@@ -649,7 +647,8 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
-                    step_info["gmaps_prediction"] = current_step.transit.arrival_time.value
+                    step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
+                    step_info["departure_time"] = departure_time;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
@@ -665,6 +664,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
+                    step_info["departure_time"] = current_step.departure_time;
                 }
             trip_description.push(step_info);
             }

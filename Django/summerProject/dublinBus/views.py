@@ -397,11 +397,6 @@ def get_direction_bus(request, data):
         data_return["route"].append(temporary_dict["route"][0])
         data_return["departure_time"].append(temporary_dict["departure_time"][0]*1000)
         data_return["arrival_time"].append(temporary_dict["arrival_time"][0]*1000)
-        #print("--------------------------")
-        #print(data_return)
-        #data_return["route"] = ["gmaps"]
-        #data_return["departure_time"] = ["gmaps"]
-        #data_return["arrival_time"] = ["gmaps"]
     print(data_return)
     return JsonResponse(data_return)
 

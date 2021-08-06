@@ -94,7 +94,7 @@ def json_convertor(filename):
                     pass
                 else:
                     if filename == "routes.txt":
-                        dict1[description[2]] = dict2
+                        dict1[description[2].upper()] = dict2
                     elif filename == "stops.txt":
                         dict1[description[2].lstrip(" stop ")] = dict2
                     else:

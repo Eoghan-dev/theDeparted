@@ -402,7 +402,7 @@ def get_direction_bus(request, data):
         data_return["route"] = ["gmaps"]
         data_return["departure_time"] = ["gmaps"]
         data_return["arrival_time"] = ["gmaps"]
-        data_return = json.dumps(data_return)
+        #data_return = json.dumps(data_return)
     return JsonResponse(data_return)
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):

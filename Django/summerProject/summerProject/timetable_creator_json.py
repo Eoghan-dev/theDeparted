@@ -1,6 +1,6 @@
 import json
 import os
-import DublinBus_current_info
+from . import DublinBus_current_info
 from operator import itemgetter
 from django.conf import settings
 base = settings.BASE_DIR

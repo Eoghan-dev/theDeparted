@@ -395,8 +395,14 @@ def get_direction_bus(request, data):
         temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
         print(temporary_dict)
         data_return["route"].append(temporary_dict["route"][0])
-        data_return["departure_time"].append(temporary_dict["departure_time"][0]*1000)
-        data_return["arrival_time"].append(temporary_dict["arrival_time"][0]*1000)
+        if temporary_dict["departure_time"][0].isnumeric() == True:
+            data_return["departure_time"].append(temporary_dict["departure_time"][0] * 1000)
+        else:
+            data_return["departure_time"].append(temporary_dict["departure_time"][0])
+        if temporary_dict["arrival_time"][0].isnumeric() == True:
+            data_return["arrival_time"].append(temporary_dict["arrival_time"][0]*1000)
+        else:
+            data_return["arrival_time"].append(temporary_dict["arrival_time"][0])
     print(data_return)
     return JsonResponse(data_return)
 
@@ -421,7 +427,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     f.close()
     data_return = {}
     # time is given in form of HH:MM am/pm checks if am or pm
-    if (dep_time)[-2:] == "pm" or dep_time[:2]>12:
+    if (dep_time)[-2:] == "pm" or int(dep_time[:2])>12:
         # Changes pm to HH:MM:SS format matches that in timetable
         depart_time = list(dep_time.split(":"))
         if int(depart_time[0]) > 12:
@@ -527,13 +533,12 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
     timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
     timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
-    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,
-                                             timestamp__gt=timestamp_cur_bef).values()
+    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
+
     # change temp to celcius
     temp = results[0]["main_temp"] - 273.15
     weather_id = results[0]["weather_id"]
-    prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
-                         date=date, temp=temp, weather=weather_id)
+    prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month, date=date, temp=temp, weather=weather_id)
     if prediction == False:
         print("prediction failed")
         data_return["route"] = ["gmaps"]

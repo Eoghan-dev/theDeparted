@@ -464,6 +464,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     let prediction_html = "<li>";
     // Use the first for loop to get the indexes (index 0 first step, index 1 second step etc.)
     let gmaps_journey = false; //boolean for whether we're using gmaps predictions or our own
+    let transit_count = 0; //counter to differentiate number of transit steps from walking/transit (i)
     for (let i = 0; i < num_trips; i++) {
         prediction_html += "<ol>";
         // Now loop through the keys from our data returned from backend and get the appropriate
@@ -484,9 +485,10 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             } else {
                 // calculate total time taken by step
                 let step_time = new Date(prediction.arrival_time[i]) - new Date(prediction.departure_time[i]);
-                step_time_date = new Date(step_time)
+                step_time_date = new Date(step_time);
                 prediction_html += step_time_date.getHours() + " " + step_time_date.getMinutes() + " mins";
             }
+            transit_count += 1;
         }
         prediction_html += "</ol>";
     }

@@ -35,4 +35,6 @@ urlpatterns = [
     path('get_bus_json', views.get_bus_json, name='get_bus_json'),
     #ex: /get_next_bus_time/56A:+Ringsend+road
     path('get_next_bus_time/<str:route>', views.get_next_bus_time, name='get_next_bus_time'),
+    #ex: /get_direction_bus/
+    path('get_direction_bus/<str:data>', views.get_direction_bus, name='get_direction_bus'),
 ]

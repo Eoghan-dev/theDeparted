@@ -189,8 +189,9 @@ def get_timetable_all(index):
 
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times")
     #Writes Json file for bus timetable data
-    out_file = open(file_location+"_all.json", "w")
-    json.dump(bus_times, out_file, indent=4)
+    for i in bus_times:
+        out_file = open(file_location+"/" + i + "_timetable.json", "w")
+        json.dump(bus_times[i], out_file, indent=4)
     out_file.close()
     #Checks number of routes timetable has been created for
     print(count, "bus route timetables found.")

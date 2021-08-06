@@ -610,6 +610,7 @@ function getInfoFromDirections(response, selected_date_time) {
                 let current_step = current_leg.steps[k];
                 console.group("current_step is:", current_step)
                 // Check if this step is using public transport and if so check if it's using the correct route
+                let step_info = {}
                 if (current_step.travel_mode === "TRANSIT") {
                     console.log("step is in transit")
                     let departure_time = current_step.transit.departure_time.text;
@@ -625,23 +626,33 @@ function getInfoFromDirections(response, selected_date_time) {
                     data_for_model.departure_stops.push(departure_stop);
                     data_for_model.arrival_stops.push(arrival_stop)
 
-                    let step_info = {
-                        "step_type": current_step.travel_mode,
-                        "distance": current_step.distance,
-                        "instructions": current_step.instructions,
-                        "duration": current_step.duration,
-                        "gmaps_prediction": current_step.transit.arrival_time.value,
-                    }
+                    // let step_info = {
+                    //     "step_type": current_step.travel_mode,
+                    //     "distance": current_step.distance,
+                    //     "instructions": current_step.instructions,
+                    //     "duration": current_step.duration,
+                    //     "gmaps_prediction": current_step.transit.arrival_time.value,
+                    // }
+                    step_info["step_type"] = current_step.travel_mode;
+                    step_info["distance"] = current_step.distance;
+                    step_info["instructions"] = current_step.instructions;
+                    step_info["duration"] = current_step.duration;
+                    step_info["gmaps_prediction"] = current_step.transit.arrival_time.value
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
-                    let step_info = {
-                        "step_type": current_step.travel_mode,
-                        "distance": current_step.distance,
-                        "instructions": current_step.instructions,
-                        "duration": current_step.duration,
-                        "gmaps_prediction": "n/a",
-                    }
+                    // let step_info = {
+                    //     "step_type": current_step.travel_mode,
+                    //     "distance": current_step.distance,
+                    //     "instructions": current_step.instructions,
+                    //     "duration": current_step.duration,
+                    //     "gmaps_prediction": "n/a",
+                    // }
+                      step_info["step_type"] = current_step.travel_mode;
+                    step_info["distance"] = current_step.distance;
+                    step_info["instructions"] = current_step.instructions;
+                    step_info["duration"] = current_step.duration;
+                    step_info["gmaps_prediction"] = "n/a";
                 }
             trip_description.push(step_info);
             }

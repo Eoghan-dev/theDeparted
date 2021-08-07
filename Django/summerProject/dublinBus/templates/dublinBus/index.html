@@ -39,26 +39,27 @@
                     </div>
                     <div class="row" id="results_container" style="display: block">
 
-                    </div>
                 </div>
             </div>
-            <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
-        <input id="routes_num" list="routes" name="routes_num">
-        <datalist id="routes">
-        </datalist>
-                <button id="get_directions" onclick="displaySelectedRoute">Give route</button>
-            </div>
-            <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
-        <input id="stops_num" list="stops" name="stops_num">
-        <datalist id="stops">
-        </datalist>
-            <button id="get_stops">Give stops</button>
-            </div>
         </div>
-        <div id="map"></div>
+        <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
+            <input id="routes_num" list="routes" name="routes_num">
+            <datalist id="routes">
+            </datalist>
+            <button id="get_directions" onclick="displaySelectedRoute">Give route</button>
+        </div>
+        <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
+            <input id="stops_num" list="stops" name="stops_num">
+            <datalist id="stops">
+            </datalist>
+            <button id="get_stops">Give stops</button>
+        </div>
+    </div>
+    <div id="map"></div>
 
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly"
+            async></script>
 {% endblock %}

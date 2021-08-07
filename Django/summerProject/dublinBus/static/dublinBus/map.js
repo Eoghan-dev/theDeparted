@@ -57,7 +57,6 @@ async function initMap() {
             let routes_string = route[0] + ": " + route[1];
             station_routes.push(routes_string);
         })
-
         // Create content of window
         let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
             `<ul>` +
@@ -85,15 +84,30 @@ async function initMap() {
             routes: station_routes,
         });
         // Add an on-click event for each marker to open the associated info window
-        current_marker.addListener("click", () => {
+        current_marker.addListener("click", async () => {
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
             });
+            // Make a request to our backend to get the next several buses coming to this stop at time of click
+            let incoming_buses_res = await fetch("get_next_four_bus");
+            let incoming_buses = incoming_buses_res.json();
+            // Parse the buses into a string and add this to our info window
+            let info_window_text = current_info_window.getContent();
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" +
+                "<ul>";
+            for (let route of incoming_buses) {
+                let route_name = route[0];
+                let minutes_away = route[1];
+                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+            }
+            incoming_buses_text += "</ul>";
+            info_window_text += incoming_buses_text;
+            current_info_window.setContent(info_window_text);
             current_info_window.open({
                 anchor: current_marker,
                 map: map,
-                shouldFocus: false,
+                shouldFocus: true,
             });
         });
         //Now add each created marker to our array of markers to keep track of them

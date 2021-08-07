@@ -371,13 +371,17 @@ class AutocompleteDirectionsHandler {
                         let dir_info = getInfoFromDirections(response, selectedDateTime);
                         let data_for_model = dir_info[0];
                         let trip_info = dir_info[1];
+                        let gmaps_total_journey = dir_info[2];
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(data_for_model)
                         let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
-                        let prediction_json = await prediction_res.json();
-                        let prediction = JSON.parse(prediction_json)
+                        console.log("raw result", prediction_res)
+                        let prediction = await prediction_res.json();
+                        //console.log("result after .json()", prediction_json)
+                        //let prediction = JSON.parse(prediction_json)
+                        console.log("result after json.parse", prediction)
                         // Get the html from this data that we want to show to the user and then display it to them
-                        let prediction_html = getPredictionHTML(prediction, trip_info);
+                        let prediction_html = getPredictionHTML(prediction, trip_info, gmaps_total_journey);
                         let results_container = document.getElementById('results_container');
                         results_container.innerHTML = prediction_html;
                         results_container.style.display = "block";
@@ -423,13 +427,14 @@ class AutocompleteDirectionsHandler {
                                     let dir_info = getInfoFromDirections(response, selectedDateTime);
                                     let data_for_model = dir_info[0];
                                     let trip_info = dir_info[1];
+                                    let gmaps_total_journey = dir_info[2];
                                     // Send the relevant data to our backend so it can get model predictions
                                     console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
                                     let prediction_json = await prediction_res.json();
                                     let prediction = JSON.parse(prediction_json)
                                     // Get the html from this data that we want to show to the user and then display it to them
-                                    let prediction_html = getPredictionHTML(prediction, trip_info);
+                                    let prediction_html = getPredictionHTML(prediction, trip_info, gmaps_total_journey);
                                     let results_container = document.getElementById('results_container');
                                     results_container.innerHTML = prediction_html;
                                     results_container.style.display = "block";
@@ -453,42 +458,67 @@ class AutocompleteDirectionsHandler {
     }
 }
 
-function getPredictionHTML(prediction, trip_info) {
+function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
+    console.log("trip_info", trip_info)
+    var first_walking_time
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
-    let prediction_html = "<li>";
+    let prediction_html = "<ul class='list-group'>";
     // Use the first for loop to get the indexes (index 0 first step, index 1 second step etc.)
+    let gmaps_journey = false; //boolean for whether we're using gmaps predictions or our own
+    let transit_count = 0; //counter to differentiate number of transit steps from walking/transit (i)
     for (let i = 0; i < num_trips; i++) {
-        prediction_html += "<ol>";
+        prediction_html += "<li class='list-group-item'>";
         // Now loop through the keys from our data returned from backend and get the appropriate
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.description + " ---- " + trip_info.duration;
+            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
+            if (i == 0) {
+                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0])*1000*60
+                console.log(new Date(first_walking_time))
+            }
+
         } else {
-            let instructions_string_arr = trip_step.description.split(" ");
+            let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
             instructions_string_arr = instructions_string_arr.splice(0, 1, prediction.route[i]);
             let instructions_string = instructions_string_arr.join(" ");
             prediction_html += "Get route " + instructions_string + " ---- ";
             // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
             if (prediction.arrival_time[i] === "gmaps") {
-                prediction_html += trip_info.duration;
+                prediction_html += trip_info.duration[i];
+                gmaps_journey = true;
             } else {
                 // calculate total time taken by step
-                let step_time = new Date(prediction.arrival_time[i]) - new Date(prediction.departure_time[i]);
-                prediction_html += step_time.getHours() + " " + step_time.getMinutes() + " mins";
+                let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
+                step_time_date = new Date(step_time)
+                prediction_html += ((step_time/1000)/60) + " mins";
             }
+            transit_count += 1;
         }
-        prediction_html += "</ol>";
+        prediction_html += "</li>";
     }
-    prediction_html += "</li>";
+    if (trip_info[trip_info.length - 1].step_type === "WALKING")    {
+        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length -1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0])*1000*60
+    }
+    prediction_html += "</ul>";
     // Get total time of journey
-    let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips -1].getTime() - prediction.departure_time[0].getTime());
-    let hours_taken = new Date(time_taken_timestamp).getHours();
-    let minutes_taken = new Date(time_taken_timestamp).getMinutes();
+    let total_time_taken_str = "";
+    if (gmaps_journey) {
+        total_time_taken_str = "Total journey should take " + gmaps_total_journey;
+    }
+    else {
+        console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
+        console.log(prediction["departure_time"][0])
+        let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips - 1] - prediction.departure_time[0]);
+        console.log("time_taken_timestamp", time_taken_timestamp)
+        let hours_taken = (time_taken_timestamp/1000)/3600;
+        let minutes_taken = (time_taken_timestamp/1000)/60;
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time)/1000/60) + " minutes";
+    }
 
-    prediction_html += "Total journey should take " + hours_taken + " hours and " + minutes_taken + " minutes";
+    prediction_html += total_time_taken_str;
     return prediction_html
 }
 
@@ -573,7 +603,7 @@ function getInfoFromDirections(response, selected_date_time) {
     // Trip description will hold info from our response not needed for model but for the front end
     // Array of objects with each object being one step of the trip (walking or bus)
     let trip_description = [];
-
+    let gmaps_total_journey_time = "";
     let timestamp = selected_date_time.getTime() / 1000.0;
     let data_for_model = {
         "departure_times": [],
@@ -588,12 +618,15 @@ function getInfoFromDirections(response, selected_date_time) {
         // Loop through all the legs of the current route
         for (let j = 0; j < current_route.legs.length; j++) {
             let current_leg = current_route.legs[j];
+            console.log("GMAPS TOTAL JOURNEY TIME:", current_leg.duration.text)
+            gmaps_total_journey_time = current_leg.duration.text;
             console.group("current_leg is:", current_leg)
             // Loop through each step in this leg of the route
             for (let k = 0; k < current_leg.steps.length; k++) {
                 let current_step = current_leg.steps[k];
                 console.group("current_step is:", current_step)
                 // Check if this step is using public transport and if so check if it's using the correct route
+                let step_info = {}
                 if (current_step.travel_mode === "TRANSIT") {
                     console.log("step is in transit")
                     let departure_time = current_step.transit.departure_time.text;
@@ -609,29 +642,42 @@ function getInfoFromDirections(response, selected_date_time) {
                     data_for_model.departure_stops.push(departure_stop);
                     data_for_model.arrival_stops.push(arrival_stop)
 
-                    let step_info = {
-                        "step_type": current_step.travel_mode,
-                        "distance": current_step.distance,
-                        "instructions": current_step.instructions,
-                        "duration": current_step.duration,
-                        "gmaps_prediction": current_step.transit.arrival_time.value,
-                    }
+                    // let step_info = {
+                    //     "step_type": current_step.travel_mode,
+                    //     "distance": current_step.distance,
+                    //     "instructions": current_step.instructions,
+                    //     "duration": current_step.duration,
+                    //     "gmaps_prediction": current_step.transit.arrival_time.value,
+                    // }
+                    step_info["step_type"] = current_step.travel_mode;
+                    step_info["distance"] = current_step.distance;
+                    step_info["instructions"] = current_step.instructions;
+                    step_info["duration"] = current_step.duration.text;
+                    step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
+                    step_info["departure_time"] = departure_time;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
-                    let step_info = {
-                        "step_type": current_step.travel_mode,
-                        "distance": current_step.distance,
-                        "instructions": current_step.instructions,
-                        "duration": current_step.duration,
-                        "gmaps_prediction": "n/a",
-                    }
+                    // let step_info = {
+                    //     "step_type": current_step.travel_mode,
+                    //     "distance": current_step.distance,
+                    //     "instructions": current_step.instructions,
+                    //     "duration": current_step.duration,
+                    //     "gmaps_prediction": "n/a",
+                    // }
+                      step_info["step_type"] = current_step.travel_mode;
+                    step_info["distance"] = current_step.distance;
+                    step_info["instructions"] = current_step.instructions;
+                    step_info["duration"] = current_step.duration.text;
+                    step_info["gmaps_prediction"] = "n/a";
+                    step_info["departure_time"] = current_step.departure_time; //
                 }
+            trip_description.push(step_info);
             }
         }
     }
     console.log(data_for_model);
     // Return our objects
     let data_for_model_json = JSON.stringify(data_for_model);
-    return [data_for_model_json, trip_description];
+    return [data_for_model_json, trip_description, gmaps_total_journey_time];
 }

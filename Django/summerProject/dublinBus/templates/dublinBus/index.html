@@ -2,61 +2,118 @@
 {% block title %}Test home page{% endblock %}
 {% load static %}
 {% block content %}
-        <ul class="nav nav-tabs nav-fill" role="tablist">
-            <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-1" style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;">Directions</a></li>
-            <li class="nav-item" role="presentation" style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-2" style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;">Routes</a></li>
-            <li class="nav-item" role="presentation" style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;"><a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-3" style="border-color: var(--bs-dark);color: #f1f2f6;background: #819ca9;">Stops</a></li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
-                <div class="container" id="directions_input_container" style="background: rgb(174,184,254);">
-                    <div class="row">
-                        <div class="col-md-12"><input
-                        id="origin-input"
-                        class="controls"
-                        type="text"
-                        placeholder="Enter an origin location"
-                        style="width: 80%;background: rgb(241,242,246);margin-top: 6px;border-color: var(--bs-light);"
-                /><button id="dir_from_user_location"  style="width: 15%;">My location</button></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12"><input
-                        id="destination-input"
-                        class="controls"
-                        type="text"
-                        placeholder="Enter a destination"
-                        style="width: 80%;background: rgb(241,242,246);border-style: solid;border-color: var(--bs-light);margin-right: 15%;"
-                /></div>
-                    </div>
-                    <div class="row">
-                        <div>
-                            <input type="date" id="date_input">
-                             <input type="time" id="time_input">
-                        </div>
-                    <div><button id="user_input_directions_btn">Get directions and predictions</button></div>
-                    </div>
-                    <div class="row" id="results_container" style="display: block">
+    <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
+        <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab"
+                                                    href="#tab-1"
+                                                    style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;">Directions</a>
+        </li>
+        <li class="nav-item" role="presentation"
+            style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;"><a class="nav-link" role="tab"
+                                                                                        data-bs-toggle="tab"
+                                                                                        href="#tab-2"
+                                                                                        style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;">Routes</a>
+        </li>
+        <li class="nav-item" role="presentation"
+            style="border-color: var(--bs-dark);background: #819ca9;color: #f1f2f6;"><a class="nav-link" role="tab"
+                                                                                        data-bs-toggle="tab"
+                                                                                        href="#tab-3"
+                                                                                        style="border-color: var(--bs-dark);color: #f1f2f6;background: #819ca9;">Stops</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
+            <div class="container" id="directions_input_container" style="padding: 5px">
+                {#                    <div class="row">#}
+                {##}
+                {#                        <div class="input-group mb-3"><input#}
+                {#                        id="origin-input"#}
+                {#                        class="control"#}
+                {#                        type="text"#}
+                {#                        placeholder="Enter an origin location"#}
+                {#                        aria-describedby="button-addon2"#}
+                {##}
+                {#                    /><button id="dir_from_user_location" class="btn btn-outline-secondary" type="button"  >My location</button></div>#}
+                {#                    </div>#}
+                {#                    <div class="row">#}
+                {#                        <div class="col-mb-3"><input#}
+                {#                        id="destination-input"#}
+                {#                        class="controls"#}
+                {#                        type="text"#}
+                {#                        placeholder="Enter a destination"#}
+                {#                        style="width: 80%;background: rgb(241,242,246);border-style: solid;border-color: var(--bs-light);margin-right: 15%;"#}
+                {#                /></div>#}
+                {#                    </div>#}
 
+                <div class="input-group mb-3">
+                    <input type="text" id="origin-input" class="form-control" placeholder="Enter origin location"
+                           aria-label="origin input" aria-describedby="origin input">
+                    <div class="input-group-append">
+
+                        {#                        <span class="input-group-text" id="basic-addon1">@</span>#}
+                        <button id="dir_from_user_location" class="btn btn-outline-secondary" type="button">Use current
+                            location
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
-        <input id="routes_num" list="routes" name="routes_num">
-        <datalist id="routes">
-        </datalist>
-                <button id="get_directions" onclick="displaySelectedRoute">Give route</button>
-            </div>
-            <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
-        <input id="stops_num" list="stops" name="stops_num">
-        <datalist id="stops">
-        </datalist>
-            <button id="get_stops">Give stops</button>
+
+                <div class="input-group mb-3">
+                    <input type="text" id="destination-input" class="form-control"
+                           placeholder="Enter destination location"
+                           aria-label="destination input" aria-describedby="destination input">
+                </div>
+
+
+                <div>
+                    <input type="date" id="date_input">
+                    <input type="time" id="time_input">
+                </div>
+                <div style="margin-bottom: 2%; margin-top: 2%">
+                    <button class="btn btn-outline-secondary" id="user_input_directions_btn">Get directions and
+                        predictions
+                    </button>
+                    {#                    <button class ="btn btn-success btn-circle btn-sm" id="user_input_directions_btn">Go</button>#}
+                    {#                    <button type="button" class="btn btn-success btn-circle btn-sm">Green</button>#}
+                </div>
+                <div class="row" id="results_container" style="display: block">
+
+                </div>
             </div>
         </div>
-        <div id="map"></div>
+
+        <div class="tab-pane" role="tabpanel" id="tab-2">
+            <div id="route_input_container">
+                <div class="mb-3">
+                    <label for="routes_num">Please enter route number</label>
+                    <input id="routes_num" list="routes" name="routes_num" class="form-control">
+                    <datalist id="routes">
+                    </datalist>
+                </div>
+                <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
+                    route
+                </button>
+            </div>
+        </div>
+
+
+        <div class="tab-pane" role="tabpanel" id="tab-3">
+            <div id="stops_input_container">
+                <div class="mb-3">
+                    <label for="stops_num">Please enter Stop number</label>
+                    <input id="stops_num" list="stops" name="stops_num" class="form-control">
+                    <datalist id="stops">
+                    </datalist>
+                </div>
+                <button class="btn btn-outline-secondary" id="get_stops">Give stops</button>
+            </div>
+        </div>
+
+
+    </div>
+    <div id="map"></div>
 
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly"
+            async></script>
 {% endblock %}

@@ -63,32 +63,51 @@
                 </div>
 
 
-            <div class="row">
                 <div>
                     <input type="date" id="date_input">
                     <input type="time" id="time_input">
                 </div>
-                <div>
-                    <button id="user_input_directions_btn">Get directions and predictions</button>
+                <div style="margin-bottom: 2%; margin-top: 2%">
+                    <button class="btn btn-outline-secondary" id="user_input_directions_btn">Get directions and
+                        predictions
+                    </button>
+                    {#                    <button class ="btn btn-success btn-circle btn-sm" id="user_input_directions_btn">Go</button>#}
+                    {#                    <button type="button" class="btn btn-success btn-circle btn-sm">Green</button>#}
+                </div>
+                <div class="row" id="results_container" style="display: block">
+
                 </div>
             </div>
-            <div class="row" id="results_container" style="display: block">
+        </div>
 
+        <div class="tab-pane" role="tabpanel" id="tab-2">
+            <div id="route_input_container">
+                <div class="mb-3">
+                    <label for="routes_num">Please enter route number</label>
+                    <input id="routes_num" list="routes" name="routes_num" class="form-control">
+                    <datalist id="routes">
+                    </datalist>
+                </div>
+                <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
+                    route
+                </button>
             </div>
         </div>
-    </div>
-    <div class="tab-pane" role="tabpanel" id="tab-2"><label for="routes_num">Please enter route number</label>
-        <input id="routes_num" list="routes" name="routes_num">
-        <datalist id="routes">
-        </datalist>
-        <button id="get_directions" onclick="displaySelectedRoute">Give route</button>
-    </div>
-    <div class="tab-pane" role="tabpanel" id="tab-3"><label for="stops_num">Please enter Stop number</label>
-        <input id="stops_num" list="stops" name="stops_num">
-        <datalist id="stops">
-        </datalist>
-        <button id="get_stops">Give stops</button>
-    </div>
+
+
+        <div class="tab-pane" role="tabpanel" id="tab-3">
+            <div id="stops_input_container">
+                <div class="mb-3">
+                    <label for="stops_num">Please enter Stop number</label>
+                    <input id="stops_num" list="stops" name="stops_num" class="form-control">
+                    <datalist id="stops">
+                    </datalist>
+                </div>
+                <button class="btn btn-outline-secondary" id="get_stops">Give stops</button>
+            </div>
+        </div>
+
+
     </div>
     <div id="map"></div>
 

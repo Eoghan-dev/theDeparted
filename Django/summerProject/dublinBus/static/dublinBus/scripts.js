@@ -459,20 +459,26 @@ class AutocompleteDirectionsHandler {
 }
 
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
-    console.log("Prediction", prediction)
+    console.log("trip_info", trip_info)
+    var first_walking_time
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
-    let prediction_html = "<li>";
+    let prediction_html = "<ul class='list-group'>";
     // Use the first for loop to get the indexes (index 0 first step, index 1 second step etc.)
     let gmaps_journey = false; //boolean for whether we're using gmaps predictions or our own
     let transit_count = 0; //counter to differentiate number of transit steps from walking/transit (i)
     for (let i = 0; i < num_trips; i++) {
-        prediction_html += "<ol>";
+        prediction_html += "<li class='list-group-item'>";
         // Now loop through the keys from our data returned from backend and get the appropriate
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.instructions + " ---- " + trip_info.duration;
+            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
+            if (i == 0) {
+                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0])*1000*60
+                console.log(new Date(first_walking_time))
+            }
+
         } else {
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
@@ -486,30 +492,30 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             } else {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
-                console.log("transit_count", transit_count)
-                console.log("prediction.arrival_time[i]", prediction["arrival_time"][transit_count])
-                console.log("prediction.departure_time[i]", prediction.departure_time[transit_count])
-                console.log("step_time", step_time)
                 step_time_date = new Date(step_time)
-
-                console.log("step_time_date",step_time_date)
-                prediction_html += ((step_time/1000000)/60) + " mins";
+                prediction_html += ((step_time/1000)/60) + " mins";
             }
             transit_count += 1;
         }
-        prediction_html += "</ol>";
+        prediction_html += "</li>";
     }
-    prediction_html += "</li>";
+    if (trip_info[trip_info.length - 1].step_type === "WALKING")    {
+        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length -1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0])*1000*60
+    }
+    prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
         total_time_taken_str = "Total journey should take " + gmaps_total_journey;
     }
     else {
+        console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
+        console.log(prediction["departure_time"][0])
         let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips - 1] - prediction.departure_time[0]);
-        let hours_taken = new Date(time_taken_timestamp).getHours();
-        let minutes_taken = new Date(time_taken_timestamp).getMinutes();
-        total_time_taken_str = "Total journey should take " + hours_taken + " hours " + minutes_taken + " minutes";
+        console.log("time_taken_timestamp", time_taken_timestamp)
+        let hours_taken = (time_taken_timestamp/1000)/3600;
+        let minutes_taken = (time_taken_timestamp/1000)/60;
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time)/1000/60) + " minutes";
     }
 
     prediction_html += total_time_taken_str;

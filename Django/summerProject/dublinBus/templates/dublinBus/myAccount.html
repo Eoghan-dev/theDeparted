@@ -64,19 +64,23 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
 
-                        {# The form only begins here because all the above information is unchangeable by the user #}
-  <div class="container" id="user_settings">
+                    {# The form only begins here because all the above information is unchangeable by the user #}
+                    <div class="container" id="user_settings">
                         {# The form only begins here because all the above information is unchangeable by the user #}
                         <form action="update_user" method="post">
                             {% csrf_token %}
                             <div class="row">
-                                <div class="col-md-6" id="fare_status_radio">
+                                <div class="col-md-6">
+                                <div class="card">
+                                <div class="card-body" id="fare_status">
                                     {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
-                                    <h1>Fare Status</h1>
+                                    <h3 class="card-title">Fare Status</h3>
+                                    <div class="card-text">
                                     {#  Child radio  #}
                                     {% if user.fare_status == 'child' %}
                                         <div class="form-check"><input class="form-check-input" type="radio"
@@ -130,10 +134,28 @@
                                            for="free_radio">65+ /
                                         Disability / Free Travel</label></div>
                                     </div>
+                                </div>
+                                </div>
+                                    </div>
 
+
+
+
+
+                                    {#                    <div class="col-md-6">#}
+{#                        <div class="card">#}
+{#                            <div class="card-body" id="username">#}
+{#                                <h3 class="card-title">User Name</h3>#}
+{#                                <p class="card-text">{{ request.user.username }}</p>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
                                     {# Leap card section #}
-                                    <div class="col-md-6" id="leapcard">
-                                        <h1>Do You Own a LeapCard?</h1>
+                                    <div class="col-md-6">
+                                    <div class="card">
+                                    <div class="card-body" id="leapcard">
+                                        <h3 class="card-title">Do You Own a LeapCard?</h3>
+                                    <div class="card-text">
                                         {# leap card true radio #}
                                         {% if user.leap_card %}
                                             <div class="form-check"><input class="form-check-input" type="radio"
@@ -161,6 +183,9 @@
                                                for="leap_card_false">No</label>
                                         </div>
                                         </div>
+                                    </div>
+                                    </div>
+                                    </div>
                                         </div>
                                         <div><input type="submit" id="user_settings_button"></div>
                         </form>
@@ -171,7 +196,8 @@
                                 <h1>Update Password</h1>
                                 {% csrf_token %}
                                 {{ form|crispy }}
-                                <button id="password_change" value="password_change" type="submit">Update Password</button>
+                                <button id="password_change" value="password_change" type="submit">Update Password
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -205,12 +231,13 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                           {% for fav_route in fav_routes %}
-                                           <tr>
-                                                <td>{{fav_route}}</td>
-                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
-                                               <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
-                                            </tr>
+                                            {% for fav_route in fav_routes %}
+                                                <tr>
+                                                    <td>{{ fav_route }}</td>
+                                                    <td><a href="">timetable</a></td>
+                                                    {# need to add actual timetable link here #}
+                                                    <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
+                                                </tr>
                                             {% endfor %}
                                             </tbody>
                                         </table>
@@ -237,12 +264,13 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                           {% for fav_stop in fav_stops %}
-                                           <tr>
-                                                <td>{{fav_stop}}</td>
-                                               <td><a href="">timetable</a></td>  {# need to add actual timetable link here #}
-                                               <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
-                                            </tr>
+                                            {% for fav_stop in fav_stops %}
+                                                <tr>
+                                                    <td>{{ fav_stop }}</td>
+                                                    <td><a href="">timetable</a></td>
+                                                    {# need to add actual timetable link here #}
+                                                    <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
+                                                </tr>
                                             {% endfor %}
                                             </tbody>
                                         </table>

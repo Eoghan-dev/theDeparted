@@ -206,15 +206,22 @@
                                                     </div>
                         </form>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <form method="post">
-                                <h1>Update Password</h1>
-                                {% csrf_token %}
-                                {{ form|crispy }}
-                                <button id="password_change" value="password_change" type="submit">Update Password
+                    <div class="container">
+                        <div class="row justify-content-md-center">
+                            <div class="col col-lg-2">
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#hide" aria-expanded="false" aria-controls="hide">
+                                    Update Password
                                 </button>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="hide" class="collapse">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    {{ form|crispy }}
+                                    <button id="password_change" value="password_change" type="submit">Update Password</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
 

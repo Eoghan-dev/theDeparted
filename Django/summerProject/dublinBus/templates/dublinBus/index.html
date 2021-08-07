@@ -9,15 +9,17 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
-                <div class="container" id="directions_input_container" style="background: rgb(174,184,254);">
+                <div class="container" id="directions_input_container" style="padding: 5px">
                     <div class="row">
-                        <div class="col-md-12"><input
+
+                        <div class="input-group mb-3"><input
                         id="origin-input"
-                        class="controls"
+                        class="control"
                         type="text"
                         placeholder="Enter an origin location"
-                        style="width: 80%;background: rgb(241,242,246);margin-top: 6px;border-color: var(--bs-light);"
-                /><button id="dir_from_user_location"  style="width: 15%;">My location</button></div>
+                        aria-describedby="button-addon2"
+
+                    /><button id="dir_from_user_location" class="btn btn-outline-secondary" type="button"  >My location</button></div>
                     </div>
                     <div class="row">
                         <div class="col-md-12"><input

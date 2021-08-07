@@ -76,67 +76,75 @@
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-md-6">
-                                <div class="card">
-                                <div class="card-body" id="fare_status">
-                                    {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
-                                    <h3 class="card-title">Fare Status</h3>
-                                    <div class="card-text">
-                                    {#  Child radio  #}
-                                    {% if user.fare_status == 'child' %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="child_radio" checked="checked"
-                                                                       name="fare_status_radios" value="child">
-                                    {% else %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="child_radio" name="fare_status_radios"
-                                                                       value="child">
-                                    {% endif %}
-                                    <label class="form-check-label"
-                                           for="child_radio">Child</label>
-                                    </div>
-                                    {#  Student radio  #}
-                                    {% if user.fare_status == 'student' %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="student_radio" checked="checked"
-                                                                       name="fare_status_radios" value="student">
-                                    {% else %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="student_radio" name="fare_status_radios"
-                                                                       value="student">
-                                    {% endif %}
-                                    <label class="form-check-label"
-                                           for="student_radio">Student</label>
-                                    </div>
-                                    {#  Adult radio  #}
-                                    {% if user.fare_status == 'adult' %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="adult_radio" checked="checked"
-                                                                       name="fare_status_radios" value="adult">
-                                    {% else %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="adult_radio" name="fare_status_radios"
-                                                                       value="adult">
-                                    {% endif %}
-                                    <label class="form-check-label"
-                                           for="adult_radio">Adult</label>
-                                    </div>
-                                    {#  Free travel radio  #}
-                                    {% if user.fare_status == 'free' %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="free_radio" checked="checked"
-                                                                       name="fare_status_radios" value="fre">
-                                    {% else %}
-                                        <div class="form-check"><input class="form-check-input" type="radio"
-                                                                       id="free_radio" name="fare_status_radios"
-                                                                       value="free">
-                                    {% endif %}
-                                    <label class="form-check-label"
-                                           for="free_radio">65+ /
-                                        Disability / Free Travel</label></div>
-                                    </div>
-                                </div>
-                                </div>
-                                    </div>
+                                    <div class="card">
+                                        <div class="card-body" id="fare_status">
+                                            {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
+                                            <h3 class="card-title">Fare Status</h3>
+                                            <div class="card-text">
+                                                {#  Child radio  #}
+                                                {% if user.fare_status == 'child' %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="child_radio" checked="checked"
+                                                                                   name="fare_status_radios"
+                                                                                   value="child">
+                                                {% else %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="child_radio"
+                                                                                   name="fare_status_radios"
+                                                                                   value="child">
+                                                {% endif %}
+                                                <label class="form-check-label"
+                                                       for="child_radio">Child</label>
+                                                </div>
+                                                {#  Student radio  #}
+                                                {% if user.fare_status == 'student' %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="student_radio" checked="checked"
+                                                                                   name="fare_status_radios"
+                                                                                   value="student">
+                                                {% else %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="student_radio"
+                                                                                   name="fare_status_radios"
+                                                                                   value="student">
+                                                {% endif %}
+                                                <label class="form-check-label"
+                                                       for="student_radio">Student</label>
+                                                </div>
+                                                {#  Adult radio  #}
+                                                {% if user.fare_status == 'adult' %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="adult_radio" checked="checked"
+                                                                                   name="fare_status_radios"
+                                                                                   value="adult">
+                                                {% else %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="adult_radio"
+                                                                                   name="fare_status_radios"
+                                                                                   value="adult">
+                                                {% endif %}
+                                                <label class="form-check-label"
+                                                       for="adult_radio">Adult</label>
+                                                </div>
+                                                {#  Free travel radio  #}
+                                                {% if user.fare_status == 'free' %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="free_radio" checked="checked"
+                                                                                   name="fare_status_radios"
+                                                                                   value="fre">
+                                                {% else %}
+                                                    <div class="form-check"><input class="form-check-input" type="radio"
+                                                                                   id="free_radio"
+                                                                                   name="fare_status_radios"
+                                                                                   value="free">
+                                                {% endif %}
+                                                <label class="form-check-label"
+                                                       for="free_radio">65+ /
+                                                    Disability / Free Travel</label></div>
+                                                </div>
+                                                </div>
+                                                </div>
+                                                </div>
 
 
 
@@ -161,33 +169,41 @@
                                             <div class="form-check"><input class="form-check-input" type="radio"
                                                                            id="leap_card_true" checked="checked"
                                                                            name="leap_card_radios">
-                                        {% else %}
-                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                {% else %}
+                                                                    <div class="form-check">
+                                                                    <input class="form-check-input" type="radio"
                                                                            id="leap_card_true" name="leap_card_radios">
 
-                                        {% endif %}
-                                        <label class="form-check-label" for="leap_card_true">Yes</label>
-                                        </div>
-                                        {# leap card false radio #}
-                                        {% if not user.leap_card %}
-                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                {% endif %}
+                                                                <label class="form-check-label"
+                                                                       for="leap_card_true">Yes</label>
+                                                                </div>
+                                                                {# leap card false radio #}
+                                                                {% if not user.leap_card %}
+                                                                    <div class="form-check">
+                                                                    <input class="form-check-input" type="radio"
                                                                            id="leap_card_false" checked="checked"
                                                                            name="leap_card_radios">
-                                        {% else %}
-                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                                {% else %}
+                                                                    <div class="form-check">
+                                                                    <input class="form-check-input" type="radio"
                                                                            id="leap_card_false" name="leap_card_radios">
 
 
-                                        {% endif %}
-                                        <label class="form-check-label"
-                                               for="leap_card_false">No</label>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                    </div>
-                                        </div>
-                                        <div><input type="submit" id="user_settings_button"></div>
+                                                                {% endif %}
+                                                                <label class="form-check-label"
+                                                                       for="leap_card_false">No</label>
+                                                                </div>
+                                                                </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div style="text-align: center;" class="mt-4"><input type="submit"
+                                                                                                         id="user_settings_button">
+                                                    </div>
                         </form>
                     </div>
                     <div class="row">
@@ -208,17 +224,24 @@
                 {#  Tab 2 starts from here  #}
                 <div class="tab-pane active" role="tabpanel" id="tab-3">
                     <div>
-                        <div class="container">
+                        <div class="container text-center">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h1>Routes</h1>
                                     <div id="user_routes_container">
                                         <form method="post" action="add_user_route">
                                             {% csrf_token %}
-                                            <label for="user_routes_form">Please enter route number</label>
-                                            <input id="user_routes_form" list="user_routes" name="user_routes_form">
+                                            <label for="user_routes_form"></label>
+                                            <div class="input-group mb-3">
+                                                <input id="user_routes_form" list="user_routes" name="user_routes_form"
+                                                       placeholder="Add route to favourites" class="form-control">
+                                                <div class="input-group-append">
+
+                                                    <button class="btn btn-outline-secondary" type="submit">+</button>
+                                                </div>
+                                            </div>
                                             <datalist id="user_routes"></datalist>
-                                            <button type="submit">Add Route to Favourites</button>
+
                                         </form>
                                     </div>
                                     <div class="table-responsive">
@@ -248,10 +271,16 @@
                                     <div id="user_stops_container">
                                         <form method="post" action="add_user_stop">
                                             {% csrf_token %}
-                                            <label for="user_stops_form">Please enter stop number</label>
-                                            <input id="user_stops_form" list="user_stops" name="user_stops_form">
+                                            <label for="user_stops_form"></label>
+                                            <div class="input-group mb-3">
+                                                <input id="user_stops_form" list="user_stops" name="user_stops_form"
+                                                   placeholder="Add stop to favourites" class="form-control">
+                                                <div class="input-group-append">
+
+                                                    <button class="btn btn-outline-secondary" type="submit">+</button>
+                                                </div>
+                                            </div>
                                             <datalist id="user_stops"></datalist>
-                                            <button type="submit">Add Stop to Favourites</button>
                                         </form>
                                     </div>
                                     <div class="table-responsive">

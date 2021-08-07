@@ -138,7 +138,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
 
 }
 
-function displayStop(markersArray, stopNumber, directionsRenderer) {
+async function displayStop(markersArray, stopNumber, directionsRenderer) {
     console.log("In displayStop, stopNumber is", stopNumber)
     console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();
@@ -149,10 +149,25 @@ function displayStop(markersArray, stopNumber, directionsRenderer) {
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
+            let current_info_window = marker.infowindow;
+            // Make a request to our backend to get the next several buses coming to this stop at time of click
+            let incoming_buses_res = await fetch("get_next_four_bus");
+            let incoming_buses = await incoming_buses_res.json();
+            console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
+            let info_window_text = current_info_window.getContent();
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" +
+                "<ul>";
+            for (let route of incoming_buses) {
+                let route_name = route[0];
+                let minutes_away = route[1];
+                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+            }
+            incoming_buses_text += "</ul>";
+            info_window_text += incoming_buses_text;
+            current_info_window.setContent(info_window_text);
             // Make that marker visible
             marker.setVisible(true);
-            infoWindow = marker.infowindow;
-            infoWindow.open({
+            current_info_window.open({
                 anchor: marker,
                 map: map,
                 shouldFocus: true,
@@ -374,7 +389,7 @@ class AutocompleteDirectionsHandler {
                         let gmaps_total_journey = dir_info[2];
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(data_for_model)
-                        let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
+                        let prediction_res = await fetch(`/get_direction_bus/${data_for_model}`);
                         console.log("raw result", prediction_res)
                         let prediction = await prediction_res.json();
                         //console.log("result after .json()", prediction_json)

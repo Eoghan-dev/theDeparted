@@ -85,13 +85,14 @@ async function initMap() {
         });
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", async () => {
+            console.log("IN marker listener function")
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
             });
             // Make a request to our backend to get the next several buses coming to this stop at time of click
-            let incoming_buses_res = await fetch("get_next_four_bus");
-            let incoming_buses = incoming_buses_res.json();
+            let incoming_buses_res = await fetch("/get_next_four_bus");
+            let incoming_buses = await incoming_buses_res.json();
             // Parse the buses into a string and add this to our info window
             let info_window_text = current_info_window.getContent();
             let incoming_buses_text = "<h3>Incoming Buses</h3>" +

@@ -27,10 +27,7 @@ def index(request):
         route = 0
     return render(request, 'dublinBus/index.html', {'route':route})
 
-def get_next_four_bus(request):
-    buses = [["Sample bus1: imaginary", 5], ["Sample bus2: imaginary2", 10]]
-    print(buses)
-    return JsonResponse(buses, safe=False)
+
 
 
 def journey(request):
@@ -567,45 +564,45 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         data_return["arrival_time"] = [datetime.timestamp(timestamp_return_arr) * 1000]
     return data_return
 
-# def get_next_four_bus(request, stop):
-#     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
-#     file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
-#     file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times_all.json")
-#     # Open the file and load it as a dictionary
-#     f = open(file_path, encoding="utf-8-sig")
-#     stop_dict = json.load(f)
-#     f.close()
-#     f = open(file_path_route, encoding="utf-8-sig")
-#     routejson_dict = json.load(f)
-#     f.close()
-#     f = open(file_path_times, encoding="utf-8-sig")
-#     times_dict = json.load(f)
-#     f.close()
-#     route_dict = {}
-#     current = datetime.datetime.now().time()
-#     current_time = current.strftime("%H:%M:%S")
-#     Current_Day = datetime.datetime.now().strftime("%A")
-#     if Current_Day == "Saturday":
-#         Current_Day = "sat"
-#     elif Current_Day == "Sunday":
-#         Current_Day = "sun"
-#     else:
-#         Current_Day = "mon"
-#     #loops over list for a given stop of routes
-#     for i in range(0,len(stop_dict[stop]["routes"])):
-#         route_dict[stop_dict[stop]["routes"][i][4]] = stop_dict[stop]["routes"][0][i][0]
-#
-#         #loops over directions to get whether inbound or outbound
-#         for j in range (0,len(routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"])):
-#             if stop_dict[stop]["routes"][i][1] == routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]:
-#                 direction = routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]
-#                 bus_key = [stop_dict[stop]["routes"][i][0]][stop_dict[stop]["routes"][i][1]][Current_Day][stop_dict[stop]["routes"][i][5]]
-#                 for k in range (0, len(times_dict[bus_key])):
-#                     time = list(current_time.split(":"))
-#                     start = datetime.time(int(time[0]) - 1, int(time[1]), int(time[2]))
-#                     end = datetime.time(time[0], time[1] + 5, time[2])
-#                     if start < times_dict[bus_key][k][1] <current_time:
-#                         print(times_dict[bus_key][k][1])
+def get_next_four_bus(request, stop):
+    file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
+    file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times_all.json")
+    # Open the file and load it as a dictionary
+    f = open(file_path, encoding="utf-8-sig")
+    stop_dict = json.load(f)
+    f.close()
+    f = open(file_path_route, encoding="utf-8-sig")
+    routejson_dict = json.load(f)
+    f.close()
+    f = open(file_path_times, encoding="utf-8-sig")
+    times_dict = json.load(f)
+    f.close()
+    route_dict = {}
+    current = datetime.datetime.now().time()
+    current_time = current.strftime("%H:%M:%S")
+    Current_Day = datetime.datetime.now().strftime("%A")
+    if Current_Day == "Saturday":
+        Current_Day = "sat"
+    elif Current_Day == "Sunday":
+        Current_Day = "sun"
+    else:
+        Current_Day = "mon"
+    #loops over list for a given stop of routes
+    for i in range(0,len(stop_dict[stop]["routes"])):
+        route_dict[stop_dict[stop]["routes"][i][4]] = stop_dict[stop]["routes"][0][i][0]
+
+        #loops over directions to get whether inbound or outbound
+        for j in range (0,len(routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"])):
+            if stop_dict[stop]["routes"][i][1] == routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]:
+                direction = routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]
+                bus_key = [stop_dict[stop]["routes"][i][0]][stop_dict[stop]["routes"][i][1]][Current_Day][stop_dict[stop]["routes"][i][5]]
+                for k in range (0, len(times_dict[bus_key])):
+                    time = list(current_time.split(":"))
+                    start = datetime.time(int(time[0]) - 1, int(time[1]), int(time[2]))
+                    end = datetime.time(time[0], time[1] + 5, time[2])
+                    if start < times_dict[bus_key][k][1] <current_time:
+                        print(times_dict[bus_key][k][1])
 
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

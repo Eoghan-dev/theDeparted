@@ -740,6 +740,8 @@ function fillSidebar(content, type) {
     document.getElementById('sidebar').classList.toggle('active');
 }
 function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
+    // Function to get all buttons from the sidebar and add an event listener that will call
+    // a function which will then call either displayStops or displayRoutes depending on which is needed
     console.log("inside setup fav buttons")
     let fav_stops_buttons = document.getElementsByClassName("fav_stops_button_sb");
     for (let button of fav_stops_buttons) {

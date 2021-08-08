@@ -187,24 +187,28 @@ def route_to_stop():
         prev_route = list(prev_route[2].split("-"))
         prev_route = prev_route[1]
         prev_dist = stop_times[id]["shape_dist_traveled"]
-    """
     for id in bus_dict:
+        del_list = []
         for i in range(0, len(bus_dict[id])):
             save_route = bus_dict[id][i][0]
-            save_start = bus_dict[id][i][3]
-            save_end = bus_dict[id][i][4]
+            save_start = bus_dict[id][i][4]
+            save_end = bus_dict[id][i][1]
             save_seq = bus_dict[id][i][2]
             save_ele = i
-            del_list = []
             for ele in range(0, len(bus_dict[id])):
-                if bus_dict[id][ele][0] == save_route and bus_dict[id][ele][4] == save_start and bus_dict[id][ele][4] == save_end and i != ele:
+                if bus_dict[id][ele][0] == save_route and bus_dict[id][ele][4] == save_start and bus_dict[id][ele][1] == save_end and i != ele:
                     if bus_dict[id][ele][2] < save_seq and ele not in del_list:
                         del_list.append(ele)
                     elif bus_dict[id][ele][2] > save_seq and save_ele not in del_list:
                         del_list.append(save_ele)
+
+                #if (float(bus_dict[id][i][4]) - float(int(bus_dict[id][i][4]))) == 0.0 and (float(bus_dict[id][i][5]) - float(int(bus_dict[id][i][5]))) == 0.0:
+                #    pass
+                #elif ele not in del_list:
+                #    del_list.append(ele)
+                #    print("here")
         for j in sorted(del_list, reverse = True):
             del bus_dict[id][j]
-    """
     return bus_dict
 
 def route_destinations():

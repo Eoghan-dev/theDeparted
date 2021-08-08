@@ -745,11 +745,13 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     // a function which will then call either displayStops or displayRoutes depending on which is needed
     console.log("inside setup fav buttons")
     let fav_stops_buttons = document.getElementsByClassName("fav_stops_button_sb");
-    for (let button of fav_stops_buttons) {
-        button.addEventListener('click', displayStopFromFavs(button.value));
+    for (let i=0; i< fav_stops_buttons.lentgh; i++) {
+        let current_button = fav_stops_buttons[i];
+        current_button.addEventListener('click', displayStopFromFavs(button.value));
     }
     let fav_routes_buttons = document.getElementsByClassName("fav_routes_button_sb");
-    for (let button of fav_routes_buttons) {
-          button.addEventListener('click', displayRouteFromFavs(button.value));
+    for (let i=0; i< fav_routes_buttons.lentgh; i++) {
+        let current_button = fav_routes_buttons[i];
+          current_button.addEventListener('click', displayRouteFromFavs(button.value));
     }
     }

@@ -744,14 +744,23 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     // Function to get all buttons from the sidebar and add an event listener that will call
     // a function which will then call either displayStops or displayRoutes depending on which is needed
     console.log("inside setup fav buttons")
-    let fav_stops_buttons = document.getElementsByClassName("fav_stops_button_sb");
+    let fav_stops_buttons = document.querySelectorAll(".fav_stops_button_sb");
+    console.log({fav_stops_buttons})
     for (let i=0; i< fav_stops_buttons.lentgh; i++) {
         let current_button = fav_stops_buttons[i];
-        current_button.addEventListener('click', displayStopFromFavs(button.value));
+
+        current_button.addEventListener('click', () => {
+            console.log("in sidebar button event listener (stop)")
+            displayStopFromFavs(button.value)
+        });
     }
-    let fav_routes_buttons = document.getElementsByClassName("fav_routes_button_sb");
+    let fav_routes_buttons = document.querySelectorAll(".fav_routes_button_sb");
+    console.log({fav_routes_buttons})
     for (let i=0; i< fav_routes_buttons.lentgh; i++) {
         let current_button = fav_routes_buttons[i];
-          current_button.addEventListener('click', displayRouteFromFavs(button.value));
+          current_button.addEventListener('click', () => {
+              console.log("in sidebar button event listener (route)")
+              displayRouteFromFavs(button.value)
+          });
     }
     }

@@ -2,6 +2,8 @@
 {% block title %}Test home page{% endblock %}
 {% load static %}
 {% block content %}
+
+    <div id="content">
     <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
         <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab"
                                                     href="#tab-1"
@@ -44,6 +46,10 @@
                 {#                /></div>#}
                 {#                    </div>#}
 
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <i class="fas fa-align-left"></i>
+                    <span>Toggle Sidebar</span>
+                </button>
                 <div class="input-group mb-3">
                     <input type="text" id="origin-input" class="form-control" placeholder="Enter origin location"
                            aria-label="origin input" aria-describedby="origin input">
@@ -110,7 +116,7 @@
 
     </div>
     <div id="map"></div>
-
+</div>
 {% endblock %}
 
 {% block scripts %}

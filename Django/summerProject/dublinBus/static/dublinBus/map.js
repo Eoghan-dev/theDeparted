@@ -6,6 +6,10 @@ async function initMap() {
     // these co-ordinates before trying to fill the map with markers based around them.
     // Make requests to get json object of all routes
 
+    // Add event listener for sidebar button to make it appear or dissapear on click
+    document.getElementById('sidebarCollapse').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('active');
+    })
     // Load necessary event listeners and values into our directions input from user (date/time etc)
     loadDirUserInput();
     let routes = await loadRoutes();

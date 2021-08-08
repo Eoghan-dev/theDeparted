@@ -29,7 +29,56 @@
 </head>
 
 <body style="color: var(--bs-dark);background: var(--bs-light);">
+<!-- Sidebar -->
+<div class="wrapper">
+    <nav id="sidebar" class="active">
+        <div class="sidebar-header">
+            <h3>Bootstrap Sidebar</h3>
+        </div>
+
+        <ul class="list-unstyled components">
+            <p>Dummy Heading</p>
+            <li class="active">
+                <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+                <ul class="collapse list-unstyled" id="homeSubmenu">
+                    <li>
+                        <a href="#">Home 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">About</a>
+            </li>
+            <li>
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
+                <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <li>
+                        <a href="#">Page 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Portfolio</a>
+            </li>
+            <li>
+                <a href="#">Contact</a>
+            </li>
+        </ul>
+    </nav>
 {#  Basic Navbar should amend to toggle display on phone needs testing  #}
+<div id="content">
     <nav class="navbar sticky-top navbar-light navbar-expand-md" style="background: #546e7a;color: #6369d1;">
         <div class="container-fluid"><a class="navbar-brand" href="/" style="color: #f1f2f6;">The Departed</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1" style="border-color: #f1f2f6;border-top-color: rgba(0,;border-right-color: 0,;border-bottom-color: 0,;border-left-color: 0.55);"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
@@ -52,7 +101,9 @@
         {# This is where the main content of our page layout should go (map/login form etc. depends on the page) #}
         {# We can add more blocks for things such as header/footer/navbar etc. depending on our UX choices #}
     {% endblock %}
+</div>
 
+</div>
 </div>
 {% block scripts %}
     {#     This is where the google maps JS will be loaded when inherited in index.html #}

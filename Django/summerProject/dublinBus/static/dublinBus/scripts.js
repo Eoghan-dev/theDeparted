@@ -490,7 +490,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         if (trip_step.step_type === "WALKING") {
             prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
             if (i == 0) {
-                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0])*1000*60
+                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60
                 console.log(new Date(first_walking_time))
             }
 
@@ -508,29 +508,28 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
                 step_time_date = new Date(step_time)
-                prediction_html += ((step_time/1000)/60) + " mins";
+                prediction_html += ((step_time / 1000) / 60) + " mins";
             }
             transit_count += 1;
         }
         prediction_html += "</li>";
     }
-    if (trip_info[trip_info.length - 1].step_type === "WALKING")    {
-        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length -1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0])*1000*60
+    if (trip_info[trip_info.length - 1].step_type === "WALKING") {
+        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60
     }
     prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
         total_time_taken_str = "Total journey should take " + gmaps_total_journey;
-    }
-    else {
+    } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
         let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips - 1] - prediction.departure_time[0]);
         console.log("time_taken_timestamp", time_taken_timestamp)
-        let hours_taken = (time_taken_timestamp/1000)/3600;
-        let minutes_taken = (time_taken_timestamp/1000)/60;
-        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time)/1000/60) + " minutes";
+        let hours_taken = (time_taken_timestamp / 1000) / 3600;
+        let minutes_taken = (time_taken_timestamp / 1000) / 60;
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes";
     }
 
     prediction_html += total_time_taken_str;
@@ -587,12 +586,17 @@ function loadDirUserInput() {
     // Set min and max values for date and time inputs
     // get current date and set as min
     let now = new Date();
+    console.log({now})
     let current_date = now.toISOString().split("T")[0]; // https://stackoverflow.com/a/49916376
     date_input.setAttribute("min", current_date);
     date_input.setAttribute("value", current_date);
     // create new date object as five days later and set as max
     let max_date = now;
-    max_date.setDate(now.getDay() + 5)
+    let current_day = now.getDate();
+    let future_day = current_day + 5;
+
+    max_date.setDate(future_day)
+    console.log({max_date})
     let max_date_formatted = max_date.toISOString().split("T")[0];
     date_input.setAttribute("max", max_date_formatted);
     console.log(current_date)
@@ -680,14 +684,14 @@ function getInfoFromDirections(response, selected_date_time) {
                     //     "duration": current_step.duration,
                     //     "gmaps_prediction": "n/a",
                     // }
-                      step_info["step_type"] = current_step.travel_mode;
+                    step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
                     step_info["departure_time"] = current_step.departure_time; //
                 }
-            trip_description.push(step_info);
+                trip_description.push(step_info);
             }
         }
     }

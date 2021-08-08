@@ -138,7 +138,7 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
 
 }
 
-function displayStop(markersArray, stopNumber, directionsRenderer) {
+async function displayStop(markersArray, stopNumber, directionsRenderer) {
     console.log("In displayStop, stopNumber is", stopNumber)
     console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();
@@ -149,10 +149,25 @@ function displayStop(markersArray, stopNumber, directionsRenderer) {
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
+            let current_info_window = marker.infowindow;
+            // Make a request to our backend to get the next several buses coming to this stop at time of click
+            let incoming_buses_res = await fetch("get_next_four_bus");
+            let incoming_buses = await incoming_buses_res.json();
+            console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
+            let info_window_text = current_info_window.getContent();
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" +
+                "<ul>";
+            for (let route of incoming_buses) {
+                let route_name = route[0];
+                let minutes_away = route[1];
+                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+            }
+            incoming_buses_text += "</ul>";
+            info_window_text += incoming_buses_text;
+            current_info_window.setContent(info_window_text);
             // Make that marker visible
             marker.setVisible(true);
-            infoWindow = marker.infowindow;
-            infoWindow.open({
+            current_info_window.open({
                 anchor: marker,
                 map: map,
                 shouldFocus: true,
@@ -374,7 +389,7 @@ class AutocompleteDirectionsHandler {
                         let gmaps_total_journey = dir_info[2];
                         // Send the relevant data to our backend so it can get model predictions
                         console.log(data_for_model)
-                        let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
+                        let prediction_res = await fetch(`/get_direction_bus/${data_for_model}`);
                         console.log("raw result", prediction_res)
                         let prediction = await prediction_res.json();
                         //console.log("result after .json()", prediction_json)
@@ -475,7 +490,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         if (trip_step.step_type === "WALKING") {
             prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
             if (i == 0) {
-                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0])*1000*60
+                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60
                 console.log(new Date(first_walking_time))
             }
 
@@ -493,29 +508,28 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
                 step_time_date = new Date(step_time)
-                prediction_html += ((step_time/1000)/60) + " mins";
+                prediction_html += ((step_time / 1000) / 60) + " mins";
             }
             transit_count += 1;
         }
         prediction_html += "</li>";
     }
-    if (trip_info[trip_info.length - 1].step_type === "WALKING")    {
-        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length -1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0])*1000*60
+    if (trip_info[trip_info.length - 1].step_type === "WALKING") {
+        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60
     }
     prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
         total_time_taken_str = "Total journey should take " + gmaps_total_journey;
-    }
-    else {
+    } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
         let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips - 1] - prediction.departure_time[0]);
         console.log("time_taken_timestamp", time_taken_timestamp)
-        let hours_taken = (time_taken_timestamp/1000)/3600;
-        let minutes_taken = (time_taken_timestamp/1000)/60;
-        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time)/1000/60) + " minutes";
+        let hours_taken = (time_taken_timestamp / 1000) / 3600;
+        let minutes_taken = (time_taken_timestamp / 1000) / 60;
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes";
     }
 
     prediction_html += total_time_taken_str;
@@ -572,12 +586,17 @@ function loadDirUserInput() {
     // Set min and max values for date and time inputs
     // get current date and set as min
     let now = new Date();
+    console.log({now})
     let current_date = now.toISOString().split("T")[0]; // https://stackoverflow.com/a/49916376
     date_input.setAttribute("min", current_date);
     date_input.setAttribute("value", current_date);
     // create new date object as five days later and set as max
     let max_date = now;
-    max_date.setDate(now.getDay() + 5)
+    let current_day = now.getDate();
+    let future_day = current_day + 5;
+
+    max_date.setDate(future_day)
+    console.log({max_date})
     let max_date_formatted = max_date.toISOString().split("T")[0];
     date_input.setAttribute("max", max_date_formatted);
     console.log(current_date)
@@ -665,14 +684,14 @@ function getInfoFromDirections(response, selected_date_time) {
                     //     "duration": current_step.duration,
                     //     "gmaps_prediction": "n/a",
                     // }
-                      step_info["step_type"] = current_step.travel_mode;
+                    step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
                     step_info["departure_time"] = current_step.departure_time; //
                 }
-            trip_description.push(step_info);
+                trip_description.push(step_info);
             }
         }
     }

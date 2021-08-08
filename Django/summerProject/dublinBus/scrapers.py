@@ -127,11 +127,11 @@ def write_current_bus(transport_data):
     for i in transport_data['entity']:
         trip = i["trip_update"]["trip"]
         if trip["route_id"] in route_list:
-            temp_id = i["id"],
-            temp_route_id = trip["route_id"],
-            temp_schedule = trip["schedule_relationship"],
-            temp_start_t = trip["start_time"],
-            temp_start_d = trip["start_date"],
+            temp_id = i["id"]
+            temp_route_id = trip["route_id"]
+            temp_schedule = trip["schedule_relationship"]
+            temp_start_t = trip["start_time"]
+            temp_start_d = trip["start_date"]
             # Now loop through all trip updates within the current trip
             try:
                 for j in i["trip_update"]["stop_time_update"]:
@@ -248,3 +248,40 @@ def get_bus_timetable():
                     )
                     entries.append(latestUpdate)
     models.Current_timetable.objects.bulk_create(entries)
+
+def get_bus_timetable_all():
+    base = settings.BASE_DIR
+    file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times_all.json")
+    file_location_stops = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    with open(file_location, encoding="utf-8-sig") as out_file:
+        timetable = json.loads(out_file.read())
+    models.Current_timetable_all.objects.all().delete()
+    entries = []
+    for routes in timetable:
+        for directions in timetable[routes]:
+            for day in timetable[routes][directions]:
+                first_last = {}
+                for stop in timetable[routes][directions][day]:
+                    for time in range(0, len(timetable[routes][directions][day][stop])):
+                        if timetable[routes][directions][day][stop][time][0] in first_last and timetable[routes][directions][day][stop][time][1] > first_last[timetable[routes][directions][day][stop][time][0]]:
+                            first_last[timetable[routes][directions][day][stop][time][0]] = timetable[routes][directions][day][stop][time][1]
+                        elif timetable[routes][directions][day][stop][time][0] not in first_last:
+                            first_last[timetable[routes][directions][day][stop][time][0]] = timetable[routes][directions][day][stop][time][1]
+                        elif timetable[routes][directions][day][stop][time][1] <= first_last[timetable[routes][directions][day][stop][time][0]]:
+                            pass
+                        else:
+                            first_last[timetable[routes][directions][day][stop][time][0]] = timetable[routes][directions][day][stop][time][1]
+
+                for stop in timetable[routes][directions][day]:
+                    for time in range(0, len(timetable[routes][directions][day][stop])):
+                        latestUpdate = models.Current_timetable_all (
+                            route=routes,
+                            headsign=directions,
+                            day=day,
+                            stop = stop,
+                            leave_t=timetable[routes][directions][day][stop][time][0],
+                            stop_time=timetable[routes][directions][day][stop][time][1],
+                            end_t=first_last[timetable[routes][directions][day][stop][time][0]]
+                        )
+                        entries.append(latestUpdate)
+    models.Current_timetable_all.objects.bulk_create(entries)

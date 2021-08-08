@@ -73,10 +73,9 @@
                         <input id="routes_num" list="routes" name="routes_num" class="form-control"
                                placeholder="Please enter route number">
                         <div class="input-group-append">
-                            <button class="btn btn-warning" type="button" data-toggle="canvas"
+                            <button id="fav_routes_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                     data-target="#bs-canvas-left"
-                                    aria-expanded="false" aria-controls="bs-canvas-left">See favourite routes
-                            </button>
+                                    aria-expanded="false" aria-controls="bs-canvas-left"  onclick="fillSidebar( '{{user.favourite_routes}}', 'routes')">See favourite routes</button>
                         </div>
                         <datalist id="routes">
                         </datalist>
@@ -96,8 +95,8 @@
                     <input id="stops_num" list="stops" name="stops_num" class="form-control"
                            placeholder="Please enter stop number">
                     <div class="input-group-append">
-                        <button class="btn btn-warning" type="button" data-toggle="canvas" data-target="#bs-canvas-left"
-                                aria-expanded="false" aria-controls="bs-canvas-left">See favourite stops
+                        <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas" data-target="#bs-canvas-left"
+                                aria-expanded="false" aria-controls="bs-canvas-left" onclick="fillSidebar( '{{user.favourite_stops}}', 'stops')">See favourite stops
                         </button>
                     </div>
                     <datalist id="stops">

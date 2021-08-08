@@ -6,10 +6,6 @@ async function initMap() {
     // these co-ordinates before trying to fill the map with markers based around them.
     // Make requests to get json object of all routes
 
-    // Add event listener for sidebar button to make it appear or dissapear on click
-    document.getElementById('sidebarCollapse').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('active');
-    })
     // Load necessary event listeners and values into our directions input from user (date/time etc)
     loadDirUserInput();
     let routes = await loadRoutes();
@@ -46,6 +42,23 @@ async function initMap() {
         displayStop(markers_array, stopNum, directionsRenderer)
     };
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
+
+    const displayStopFromFavs = function(stopNum) {
+        console.log("Inside displayStopFromFavs")
+        displayStop(markers_array, stopNum, directionsRenderer);
+    }
+    const displayRouteFromFavs = function(route) {
+        console.log("Inside displayRouteFromFavs")
+        displayRoute(directionsService, directionsRenderer, markers_array, route);
+    }
+
+    // Every time either the fav routes or fav stops button is clicked run this function to add event listeners to all the buttons
+    document.getElementById('fav_stops_btn').addEventListener('click', () => {
+        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+    });
+        document.getElementById('fav_routes_btn').addEventListener('click', () => {
+        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+    })
 
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array

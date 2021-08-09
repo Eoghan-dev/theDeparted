@@ -102,16 +102,20 @@ async function initMap() {
         });
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", async () => {
+            document.getElementById('map').classList.toggle("spinner-border")
             console.log("IN marker listener function")
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
             });
             // Make a request to our backend to get the next several buses coming to this stop at time of click
-            let incoming_buses_res = await fetch("/get_next_four_bus");
+            let incoming_buses_res = await fetch(`/get_next_four_bus/${current_marker.number}`);
             let incoming_buses = await incoming_buses_res.json();
             // Parse the buses into a string and add this to our info window
-            let info_window_text = current_info_window.getContent();
+            let previous_info_window_text = current_info_window.getContent();
+            let previous_content = previous_info_window_text.split("<h3>")[0];
+            let info_window_text = previous_content;
+
             let incoming_buses_text = "<h3>Incoming Buses</h3>" +
                 "<ul>";
             for (let route of incoming_buses) {
@@ -127,6 +131,7 @@ async function initMap() {
                 map: map,
                 shouldFocus: true,
             });
+            document.getElementById('map').classList.toggle("spinner-border")
         });
         //Now add each created marker to our array of markers to keep track of them
         markers_array.push(current_marker);

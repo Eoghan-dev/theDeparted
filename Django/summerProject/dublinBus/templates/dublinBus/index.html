@@ -2,6 +2,12 @@
 {% block title %}Test home page{% endblock %}
 {% load static %}
 {% block content %}
+<div id="sidebar" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
+  <div class="overlay-content" id="sidebar_content">
+
+  </div>
+</div>
 
     <div id="content">
     <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
@@ -25,7 +31,7 @@
     <div class="tab-content">
         <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
             <div class="container" id="directions_input_container" style="padding: 5px">
-
+                <span style="font-size:30px;cursor:pointer" onclick="openSidebar()">&#9776; open</span>
                 <div class="input-group mb-3">
                     <input type="text" id="origin-input" class="form-control" placeholder="Enter origin location"
                            aria-label="origin input" aria-describedby="origin input">

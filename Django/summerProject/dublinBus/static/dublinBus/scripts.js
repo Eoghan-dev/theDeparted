@@ -154,9 +154,10 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             let incoming_buses_res = await fetch(`get_next_four_bus/${stopNumber}`);
             let incoming_buses = await incoming_buses_res.json();
             console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
-            let info_window_text = current_info_window.getContent();
-            let incoming_buses_text = "<h3>Incoming Buses</h3>" +
-                "<ul>";
+            let previous_info_window_text = current_info_window.getContent();
+            let previous_content = previous_info_window_text.split("<h3>")[0];
+            let info_window_text = previous_content;
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" + "<ul>";
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
@@ -719,10 +720,10 @@ function fillSidebar(content, type) {
         sidebar_content += `        <div class="sidebar-header">
             <h3>Favourite Stops</h3>
         </div>`;
-        sidebar_content += "<ul>";
+        sidebar_content += "<ul class='list-group'>";
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<li>${content} <button class="fav_stops_button_sb" value="${content}">See stop</button></li>`
+            sidebar_content += `<li class="list-group-item list-group-item-warning">${content} <button class="fav_stops_button_sb" value="${content}">See stop</button></li>`
         }
 
     } else {
@@ -736,8 +737,9 @@ function fillSidebar(content, type) {
     }
 
     sidebar_content += "</ul>";
-    document.getElementById('sidebar').innerHTML = sidebar_content;
-    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('sidebar_content').innerHTML = sidebar_content;
+    // document.getElementById('sidebar').classList.toggle('active');
+    openSidebar()
 }
 
 function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
@@ -764,3 +766,11 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
           });
     }
     }
+
+    function openSidebar() {
+  document.getElementById("sidebar").style.width = "100%";
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").style.width = "0%";
+}

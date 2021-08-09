@@ -6,13 +6,13 @@ import os
 import json
 import pandas as pd
 import pickle
-from datetime import timedelta
+import datetime
+from datetime import timedelta, datetime
 base = settings.BASE_DIR
 from summerProject import DublinBus_current_info
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import json
-import datetime
 import math
 import gzip
 
@@ -577,9 +577,9 @@ def get_next_four_bus(request, stop):
     f.close()
 
     #Gets current month/date in integer value and current time in HH:MM:SS and mins format for querying and feeding to prediction
-    current_month=datetime.datetime.now()
+    current_month=datetime.now()
     current_month =int(current_month.strftime("%m"))
-    current = datetime.datetime.now().time()
+    current = datetime.now().time()
     current_time = current.strftime("%H:%M:%S")
     current_time_mins = list(current_time.split(":"))
     current_time_mins = (int(current_time_mins[0])*60) +int(current_time_mins[1])
@@ -591,7 +591,7 @@ def get_next_four_bus(request, stop):
     else:
         future_time = "0" + str(future_time[0]) + ":" + future_time[1] + ":00"
 
-    Current_Day = datetime.datetime.now().strftime("%A")
+    Current_Day = datetime.now().strftime("%A")
     if Current_Day == "Saturday":
         Current_Day = "sat"
     elif Current_Day == "Sunday":
@@ -620,7 +620,6 @@ def get_next_four_bus(request, stop):
     print("distance",distance)
     print("headsign",headsign_list)
     print("headsign 2", headsign_list_2)
-    print(datetime.datetime.now().day)
     result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
     print(result)
     for bus_stop_time in result:

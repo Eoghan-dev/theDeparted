@@ -746,21 +746,21 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     console.log("inside setup fav buttons")
     let fav_stops_buttons = document.querySelectorAll(".fav_stops_button_sb");
     console.log({fav_stops_buttons})
-    for (let i=0; i< fav_stops_buttons.lentgh; i++) {
+    for (let i=0; i< fav_stops_buttons.length; i++) {
         let current_button = fav_stops_buttons[i];
 
         current_button.addEventListener('click', () => {
             console.log("in sidebar button event listener (stop)")
-            displayStopFromFavs(button.value)
+            displayStopFromFavs(current_button.value)
         });
     }
     let fav_routes_buttons = document.querySelectorAll(".fav_routes_button_sb");
     console.log({fav_routes_buttons})
-    for (let i=0; i< fav_routes_buttons.lentgh; i++) {
+    for (let i=0; i< fav_routes_buttons.length; i++) {
         let current_button = fav_routes_buttons[i];
           current_button.addEventListener('click', () => {
               console.log("in sidebar button event listener (route)")
-              displayRouteFromFavs(button.value)
+              displayRouteFromFavs(current_button.value)
           });
     }
     }

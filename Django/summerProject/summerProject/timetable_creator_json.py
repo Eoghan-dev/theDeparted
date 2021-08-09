@@ -43,21 +43,34 @@ def get_index():
                     count = 0
                     day = []
                     for dates in range(1,8):
-                        if description[dates] == "1":
+                        if description[dates] == "1" and (description[1]!="1" or description[7]!="1"):
                             count += 1
                             day.append(fields[dates][0:3])
                             dates_dict["Days"] = day
                             dates_dict["Start_dt"] = description[8]
                             dates_dict["end_dt"] = description[9]
+                        elif description[dates] == "1" and dates!= 1:
+                            print(dates)
+                            count += 1
+                            day.append(fields[dates][0:3])
+                            dates_dict["Days"] = day
+                            dates_dict["Start_dt"] = description[8]
+                            dates_dict["end_dt"] = description[9]
+                        else:
+                            count +=1
                     time_dict[description[0]] = dates_dict
+        print(time_dict)
         return time_dict
 
 def get_timetable(index):
+    #Opens paths to json files
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
     stops_id = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
+    #Initialises dictionaries and counter
     bus_times = {}
     stops_dict = {}
     count = 0
+    #Checks if stop_times.json exists
     if os.path.exists(file_location)==False:
         return False
     else:
@@ -71,12 +84,13 @@ def get_timetable(index):
             date_dict = {}
             stop_dict_create = {}
             dir_dict = {}
+            #If stop sequence is 1
             if timetable[stop_time]["stop_sequence"] == "1":
                 trip_id = timetable[stop_time]["trip_id"]
                 trip_id = list(trip_id.strip().split("."))
                 date = trip_id[1]
                 #****************************** NB- Hard coded needs to be fixed *****************************
-                if date in ["y1003","y1004","y1005"]:
+                if date in ["y1007","y1008","y1009"]:
                     route = list(trip_id[2].strip().split("-"))
                     route = route[1]
                     direction = timetable[stop_time]["stop_headsign"]

@@ -151,7 +151,7 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             console.log("Marker found", marker.number);
             let current_info_window = marker.infowindow;
             // Make a request to our backend to get the next several buses coming to this stop at time of click
-            let incoming_buses_res = await fetch("get_next_four_bus");
+            let incoming_buses_res = await fetch(`get_next_four_bus/${stopNumber}`);
             let incoming_buses = await incoming_buses_res.json();
             console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
             let info_window_text = current_info_window.getContent();

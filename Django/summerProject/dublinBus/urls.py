@@ -37,4 +37,10 @@ urlpatterns = [
     path('get_next_bus_time/<str:route>', views.get_next_bus_time, name='get_next_bus_time'),
     #ex: /get_direction_bus/
     path('get_direction_bus/<str:data>', views.get_direction_bus, name='get_direction_bus'),
+    #ex: /get_prediction_for_stop/
+    path('get_next_four_bus/<str:stop>', views.get_next_four_bus, name='get_next_four_bus'),
+    #ex: /dbTwitter/
+    path('dbTwitter', views.dbTwitter, name='dbTwitter'),
+    #ex: /aboutUs/
+    path('aboutUs', views.aboutUs, name='aboutUs'),
 ]

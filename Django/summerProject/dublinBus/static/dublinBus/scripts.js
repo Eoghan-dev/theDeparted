@@ -161,7 +161,12 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
-                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                if (minutes_away == 0) {
+                      incoming_buses_text += `<li>${route_name} is currently less than a minute away.</li>`;
+                }
+                else {
+                    incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                }
             }
             incoming_buses_text += "</ul>";
             info_window_text += incoming_buses_text;
@@ -703,15 +708,6 @@ function getInfoFromDirections(response, selected_date_time) {
     return [data_for_model_json, trip_description, gmaps_total_journey_time];
 }
 
-// function setupSidebarListeners() {
-//     let fav_routes_btn = document.getElementById('fav_routes_btn');
-//     let fav_stops_btn = document.getElementById('fav_stops_btn');
-//
-//     // fav_routes_btn.addEventListener('click', () => {
-//     //     let sidebar_content = "";
-//     // })
-// }
-
 function fillSidebar(content, type) {
     // takes a parameter of user's fav routes/stops
     console.log("in fill sidebar")
@@ -723,7 +719,7 @@ function fillSidebar(content, type) {
         sidebar_content += "<ul class='list-group'>";
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<li class="list-group-item list-group-item-warning">${content} <button class="fav_stops_button_sb" value="${content}">See stop</button></li>`
+            sidebar_content += `<li class="list-group-item list-group-item-warning">${content} <button class="fav_stops_button_sb" onclick="closeSidebar()" value="${content}">See stop</button></li>`
         }
 
     } else {
@@ -732,7 +728,7 @@ function fillSidebar(content, type) {
         </div>`;
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<li>${content} <button class="fav_routes_button_sb" value="${content}">See Route</button></li>`
+            sidebar_content += `<li>${content} <button class="fav_routes_button_sb" onclick="closeSidebar()" value="${content}">See Route</button></li>`
         }
     }
 

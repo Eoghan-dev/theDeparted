@@ -1,0 +1,14 @@
+{% extends "dublinBus/base.html" %}
+{% block title %}Test twitter page{% endblock %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-md-center">
+        <a class="twitter-timeline" href="https://twitter.com/dublinbusnews?ref_src=twsrc%5Etfw">Tweets by dublinbusnews</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+{% endblock %}

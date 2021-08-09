@@ -35,6 +35,10 @@ def dbTwitter(request):
     """View to load the Dublin bus twitter feed to our application"""
     return render(request, 'dublinBus/twitter.html')
 
+def aboutUs(request):
+    """View to load the about us page to our application"""
+    return render(request, 'dublinBus/aboutUs.html')
+
 def myAccount(request):
     """View to load the accounts page of our application"""
     # If request was posted then a change was made to the password reset form on the page

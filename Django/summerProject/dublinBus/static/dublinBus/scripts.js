@@ -155,8 +155,10 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             let incoming_buses = await incoming_buses_res.json();
             console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
             let previous_info_window_text = current_info_window.getContent();
+            // Get the static part of the info window before overwriting it
             let previous_content = previous_info_window_text.split("<h3>")[0];
             let info_window_text = previous_content;
+            // Loop over the incoming bus data and each of them to the info window
             let incoming_buses_text = "<h3>Incoming Buses</h3>" + "<ul>";
             for (let route of incoming_buses) {
                 let route_name = route[0];

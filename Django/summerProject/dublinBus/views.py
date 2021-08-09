@@ -254,7 +254,7 @@ def get_next_bus_time(request, route):
         print(stop_route)
         print(route_num, route_headsign, start_stop_num)
         if stop_route[0] == route_num and stop_route[1] == route_headsign and int(stop_route[4]) == int(start_stop_num):
-            end_route_num = stop_route[4]
+            end_route_num = stop_route[5]
     # Get the coordinates for the end stop
     end_stop_data = stops_dict[end_route_num]
     end_stop_coords = {'lat': end_stop_data['stop_lat'], 'lon': end_stop_data['stop_lon']}
@@ -434,17 +434,17 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         # Changes pm to HH:MM:SS format matches that in timetable
         depart_time = list(dep_time.split(":"))
         if int(depart_time[0]) > 12:
-            time = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
+            time_dir = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
         else:
             hh = 12 + int(depart_time[0])
-            time =str(hh) + ":" + depart_time[1][:2] + ":00"
+            time_dir =str(hh) + ":" + depart_time[1][:2] + ":00"
     elif (dep_time)[-2:] == "am":
         depart_time = list(dep_time.split(":"))
         hh =int(depart_time[0])
         if hh < 10:
-            time = "0" + str(hh) + ":" + depart_time[1][:2] + ":00"
+            time_dir = "0" + str(hh) + ":" + depart_time[1][:2] + ":00"
         else:
-            time =str(hh) + ":" + depart_time[1][:2] + ":00"
+            time_dir =str(hh) + ":" + depart_time[1][:2] + ":00"
     # Gets the stop number if available for departure and arrival if none available compares to stops.json
     if (list(dep_stop.split(" "))[-1]).isnumeric() == True:
         depart_stop = list(dep_stop.split(" "))[-1]
@@ -497,7 +497,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         # Gets the next time scheduled after given time
         print("here")
         for timetable_time in range(0, len(times_dict[route[1].strip(" ")]["mon"][depart_stop])):
-            if time < times_dict[route[1].strip(" ")]["mon"][depart_stop][timetable_time][1]:
+            if time_dir < times_dict[route[1].strip(" ")]["mon"][depart_stop][timetable_time][1]:
                 next_bus = times_dict[route[1].strip(" ")]["mon"][depart_stop][timetable_time][0]
                 break
     # Finds the headsign for bus route to check if inbound or outbound
@@ -661,7 +661,7 @@ def get_next_four_bus(request, stop):
         real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
         #print(real_time_check)
         #print(bus_stop_time.headsign)
-        prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.datetime.now().day)
+        prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])

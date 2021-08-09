@@ -505,12 +505,17 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         } else {
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
-            instructions_string_arr = instructions_string_arr.splice(0, 1, prediction.route[i]);
+            console.log({instructions_string_arr})
+            console.log({prediction})
+            console.log(prediction.route[transit_count])
+            instructions_string_arr = instructions_string_arr.slice(1);
+            console.log({instructions_string_arr})
             let instructions_string = instructions_string_arr.join(" ");
-            prediction_html += "Get route " + instructions_string + " ---- ";
+            console.log(instructions_string)
+            prediction_html += "Get route " + prediction.route[transit_count] + " " + instructions_string + " ---- ";
             // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
             if (prediction.arrival_time[i] === "gmaps") {
-                prediction_html += trip_info.duration[i];
+                prediction_html += trip_info.duration[transit_count];
                 gmaps_journey = true;
             } else {
                 // calculate total time taken by step
@@ -683,6 +688,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
                     step_info["departure_time"] = departure_time;
+                    step_info["route_num"] = current_step.transit.line.short_name;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
@@ -698,7 +704,8 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
-                    step_info["departure_time"] = current_step.departure_time; //
+                    step_info["departure_time"] = current_step.departure_time;
+                    step_info["route_num"] = "n/a";
                 }
                 trip_description.push(step_info);
             }

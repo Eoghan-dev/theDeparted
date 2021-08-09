@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from .models import CurrentWeather, CurrentBus, BusStops, WeatherForecast
+from .models import CurrentWeather, CurrentBus, BusStops, WeatherForecast, Current_timetable_all
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
 import json
@@ -12,7 +12,7 @@ from summerProject import DublinBus_current_info
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import json
-from datetime import datetime
+import datetime
 import math
 import gzip
 
@@ -560,14 +560,14 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         print(timestamp_return_dep)
         print(timestamp_return_arr)
         data_return["route"] = [route[0]]
-        data_return["departure_time"] = [datetime.timestamp(timestamp_return_dep) * 1000]
-        data_return["arrival_time"] = [datetime.timestamp(timestamp_return_arr) * 1000]
+        data_return["departure_time"] = [datetime.timestamp(timestamp_return_dep)]
+        data_return["arrival_time"] = [datetime.timestamp(timestamp_return_arr)]
     return data_return
 
 def get_next_four_bus(request, stop):
+    #Opens Path to stops.json / routes.json
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
     file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
-    file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times_all.json")
     # Open the file and load it as a dictionary
     f = open(file_path, encoding="utf-8-sig")
     stop_dict = json.load(f)
@@ -575,12 +575,22 @@ def get_next_four_bus(request, stop):
     f = open(file_path_route, encoding="utf-8-sig")
     routejson_dict = json.load(f)
     f.close()
-    f = open(file_path_times, encoding="utf-8-sig")
-    times_dict = json.load(f)
-    f.close()
-    route_dict = {}
+
+    #Gets current month/date in integer value and current time in HH:MM:SS and mins format for querying and feeding to prediction
+    current_month=datetime.datetime.now()
+    current_month =int(current_month.strftime("%m"))
     current = datetime.datetime.now().time()
     current_time = current.strftime("%H:%M:%S")
+    current_time_mins = list(current_time.split(":"))
+    current_time_mins = (int(current_time_mins[0])*60) +int(current_time_mins[1])
+    future_time = list(current_time.split(":"))
+    if int(future_time[0]) == 23:
+        future_time = "00:"+ future_time[1] + ":00"
+    elif int(future_time[0]) > 9:
+        future_time = str(future_time[0]) + ":" + future_time[1] + ":00"
+    else:
+        future_time = "0" + str(future_time[0]) + ":" + future_time[1] + ":00"
+
     Current_Day = datetime.datetime.now().strftime("%A")
     if Current_Day == "Saturday":
         Current_Day = "sat"
@@ -589,21 +599,78 @@ def get_next_four_bus(request, stop):
     else:
         Current_Day = "mon"
     #loops over list for a given stop of routes
-    for i in range(0,len(stop_dict[stop]["routes"])):
-        route_dict[stop_dict[stop]["routes"][i][4]] = stop_dict[stop]["routes"][0][i][0]
+    routes = []
+    distance = []
+    in_out = []
+    headsign_list =[]
+    headsign_list_2 = []
+    buses = []
+    for bus_route in range(0, len(stop_dict[stop]["routes"])):
+        routes.append(stop_dict[stop]["routes"][bus_route][0])
+        headsign_list.append(stop_dict[stop]["routes"][bus_route][1])
+        distance.append(stop_dict[stop]["routes"][bus_route][3])
+        for direction in range (0, len(routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"])):
+            if stop_dict[stop]["routes"][bus_route][1] == routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"][direction][0]:
+                in_out.append(routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"][direction][1])
+                headsign_list_2.append(routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"][direction][0])
+    results = Current_timetable_all.objects
+    real_time_bus = CurrentBus.objects
+    print("route", routes)
+    print("in_out", in_out)
+    print("distance",distance)
+    print("headsign",headsign_list)
+    print("headsign 2", headsign_list_2)
+    print(datetime.datetime.now().day)
+    result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
+    print(result)
+    for bus_stop_time in result:
+        leave_time = bus_stop_time.leave_t
+        leave_time_mins = list(leave_time.split(":"))
+        leave_time_mins = (int(leave_time_mins[0]) * 60) + int(leave_time_mins[1])
+        arr_time = bus_stop_time.end_t
+        arr_time_mins = list(arr_time.split(":"))
+        arr_time_mins = (int(arr_time_mins[0]) * 60) + int(arr_time_mins[1])
+        stop_time = bus_stop_time.stop_time
+        stop_time_mins = list(stop_time.split(":"))
+        stop_time_mins = (int(stop_time_mins[0]) * 60) + int(stop_time_mins[1])
+        real_time_check = real_time_bus.filter(route=bus_stop_time.route,start_t= leave_time)
+        print("here",bus_stop_time.route)
+        count=0
+        count_2=0
+        while (routes[count] !=bus_stop_time.route and headsign_list[count] != bus_stop_time.headsign):
+            predict_dis = distance[count]
+            count+=1
+        if count == 0:
+            predict_dis = distance[count]
+            count += 1
+        while headsign_list_2[count_2] !=bus_stop_time.headsign:
+            predict_in_out = in_out[count_2]
+            if predict_in_out == "I":
+                predict_in_out_num = 2
+            else:
+                predict_in_out = "O"
+                predict_in_out_num = 1
+            count_2 +=1
+        if count_2 ==0:
+            predict_in_out = in_out[count_2]
+            if predict_in_out == "I":
+                predict_in_out_num = 2
+            else:
+                predict_in_out = "O"
+                predict_in_out_num = 1
 
-        #loops over directions to get whether inbound or outbound
-        for j in range (0,len(routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"])):
-            if stop_dict[stop]["routes"][i][1] == routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]:
-                direction = routejson_dict[stop_dict[stop]["routes"][i][0]]["direction"][j][0]
-                bus_key = [stop_dict[stop]["routes"][i][0]][stop_dict[stop]["routes"][i][1]][Current_Day][stop_dict[stop]["routes"][i][5]]
-                for k in range (0, len(times_dict[bus_key])):
-                    time = list(current_time.split(":"))
-                    start = datetime.time(int(time[0]) - 1, int(time[1]), int(time[2]))
-                    end = datetime.time(time[0], time[1] + 5, time[2])
-                    if start < times_dict[bus_key][k][1] <current_time:
-                        print(times_dict[bus_key][k][1])
-
+        real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
+        #print(real_time_check)
+        #print(bus_stop_time.headsign)
+        prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.datetime.now().day)
+        if prediction == False:
+            mins_till = stop_time_mins - current_time_mins
+            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+        else:
+            prediction = int((prediction - arr_time_mins) * predict_dis)
+            mins_till = (prediction + stop_time_mins) - current_time_mins
+            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+    return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):
     """To feed in prediction from the pickle file"""

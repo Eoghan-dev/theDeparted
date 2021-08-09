@@ -27,12 +27,13 @@ def index(request):
         route = 0
     return render(request, 'dublinBus/index.html', {'route':route})
 
-
-
-
 def journey(request):
     """View to load the journey page of our application"""
     return render(request, 'dublinBus/journey.html')
+
+def dbTwitter(request):
+    """View to load the Dublin bus twitter feed to our application"""
+    return render(request, 'dublinBus/twitter.html')
 
 def myAccount(request):
     """View to load the accounts page of our application"""

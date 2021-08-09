@@ -587,9 +587,9 @@ def get_next_four_bus(request, stop):
     if int(future_time[0]) == 23:
         future_time = "00:"+ future_time[1] + ":00"
     elif int(future_time[0]) > 9:
-        future_time = str(future_time[0]) + ":" + future_time[1] + ":00"
+        future_time = str(int(future_time[0]) +1) + ":" + future_time[1] + ":00"
     else:
-        future_time = "0" + str(future_time[0]) + ":" + future_time[1] + ":00"
+        future_time = "0" + str(int(future_time[0]) +1) + ":" + future_time[1] + ":00"
 
     Current_Day = datetime.now().strftime("%A")
     if Current_Day == "Saturday":
@@ -621,6 +621,8 @@ def get_next_four_bus(request, stop):
     print("headsign",headsign_list)
     print("headsign 2", headsign_list_2)
     result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
+    print(future_time)
+    print(current_time)
     print(result)
     for bus_stop_time in result:
         leave_time = bus_stop_time.leave_t

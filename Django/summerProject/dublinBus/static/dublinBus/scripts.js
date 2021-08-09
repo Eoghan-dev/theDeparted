@@ -567,6 +567,7 @@ function loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displayS
     document.getElementById("get_stops").addEventListener("click", displaySelectedStop);
     document.getElementById('routes_num').addEventListener('change', displaySelectedRoute);
     document.getElementById('stops_num').addEventListener('change', displaySelectedStop);
+
 }
 
 async function loadDataListsUser() {
@@ -700,3 +701,66 @@ function getInfoFromDirections(response, selected_date_time) {
     let data_for_model_json = JSON.stringify(data_for_model);
     return [data_for_model_json, trip_description, gmaps_total_journey_time];
 }
+
+// function setupSidebarListeners() {
+//     let fav_routes_btn = document.getElementById('fav_routes_btn');
+//     let fav_stops_btn = document.getElementById('fav_stops_btn');
+//
+//     // fav_routes_btn.addEventListener('click', () => {
+//     //     let sidebar_content = "";
+//     // })
+// }
+
+function fillSidebar(content, type) {
+    // takes a parameter of user's fav routes/stops
+    console.log("in fill sidebar")
+    let sidebar_content = "";
+    if (type === "stops") {
+        sidebar_content += `        <div class="sidebar-header">
+            <h3>Favourite Stops</h3>
+        </div>`;
+        sidebar_content += "<ul>";
+        let content_arr = content.split(",")
+        for (let content of content_arr) {
+            sidebar_content += `<li>${content} <button class="fav_stops_button_sb" value="${content}">See stop</button></li>`
+        }
+
+    } else {
+        sidebar_content += `        <div class="sidebar-header">
+            <h3>Favourite Routes</h3>
+        </div>`;
+        let content_arr = content.split(",")
+        for (let content of content_arr) {
+            sidebar_content += `<li>${content} <button class="fav_routes_button_sb" value="${content}">See Route</button></li>`
+        }
+    }
+
+    sidebar_content += "</ul>";
+    document.getElementById('sidebar').innerHTML = sidebar_content;
+    document.getElementById('sidebar').classList.toggle('active');
+}
+
+function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
+    // Function to get all buttons from the sidebar and add an event listener that will call
+    // a function which will then call either displayStops or displayRoutes depending on which is needed
+    console.log("inside setup fav buttons")
+    let fav_stops_buttons = document.querySelectorAll(".fav_stops_button_sb");
+    console.log({fav_stops_buttons})
+    for (let i=0; i< fav_stops_buttons.lentgh; i++) {
+        let current_button = fav_stops_buttons[i];
+
+        current_button.addEventListener('click', () => {
+            console.log("in sidebar button event listener (stop)")
+            displayStopFromFavs(button.value)
+        });
+    }
+    let fav_routes_buttons = document.querySelectorAll(".fav_routes_button_sb");
+    console.log({fav_routes_buttons})
+    for (let i=0; i< fav_routes_buttons.lentgh; i++) {
+        let current_button = fav_routes_buttons[i];
+          current_button.addEventListener('click', () => {
+              console.log("in sidebar button event listener (route)")
+              displayRouteFromFavs(button.value)
+          });
+    }
+    }

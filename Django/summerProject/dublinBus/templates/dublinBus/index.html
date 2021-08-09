@@ -2,6 +2,8 @@
 {% block title %}Test home page{% endblock %}
 {% load static %}
 {% block content %}
+
+    <div id="content">
     <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
         <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab"
                                                     href="#tab-1"
@@ -23,7 +25,6 @@
     <div class="tab-content">
         <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
             <div class="container" id="directions_input_container" style="padding: 5px">
-
 
                 <div class="input-group mb-3">
                     <input type="text" id="origin-input" class="form-control" placeholder="Enter origin location"
@@ -59,26 +60,40 @@
             </div>
         </div>
 
-        <div class="tab-pane" role="tabpanel" id="tab-2">
-            <div id="route_input_container">
-                <div class="mb-3">
-                    <label for="routes_num">Please enter route number</label>
-                    <input id="routes_num" list="routes" name="routes_num" class="form-control">
-                    <datalist id="routes">
-                    </datalist>
+                <div class="tab-pane" role="tabpanel" id="tab-2">
+            {# Everything under this div will be the main content of the page (not the sidebar) #}
+                <div class="container" id="route_input_container">
+                    <div class="m-3 input-group">
+                        <label for="routes_num"></label>
+                        <input id="routes_num" list="routes" name="routes_num" class="form-control"
+                               placeholder="Please enter route number">
+                        <div class="input-group-append">
+                            <button id="fav_routes_btn" class="btn btn-warning" type="button" data-toggle="canvas"
+                                    data-target="#bs-canvas-left"
+                                    aria-expanded="false" aria-controls="bs-canvas-left"  onclick="fillSidebar( '{{user.favourite_routes}}', 'routes')">See favourite routes</button>
+                        </div>
+                        <datalist id="routes">
+                        </datalist>
+                    </div>
+
+                    <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
+                        route
+                    </button>
                 </div>
-                <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
-                    route
-                </button>
-            </div>
         </div>
 
 
         <div class="tab-pane" role="tabpanel" id="tab-3">
-            <div id="stops_input_container">
-                <div class="mb-3">
-                    <label for="stops_num">Please enter Stop number</label>
-                    <input id="stops_num" list="stops" name="stops_num" class="form-control">
+            <div class="container" id="stops_input_container">
+                <div class="m-3 input-group">
+                    <label for="stops_num"></label>
+                    <input id="stops_num" list="stops" name="stops_num" class="form-control"
+                           placeholder="Please enter stop number">
+                    <div class="input-group-append">
+                        <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas" data-target="#bs-canvas-left"
+                                aria-expanded="false" aria-controls="bs-canvas-left" onclick="fillSidebar( '{{user.favourite_stops}}', 'stops')">See favourite stops
+                        </button>
+                    </div>
                     <datalist id="stops">
                     </datalist>
                 </div>
@@ -89,7 +104,7 @@
 
     </div>
     <div id="map"></div>
-
+</div>
 {% endblock %}
 
 {% block scripts %}

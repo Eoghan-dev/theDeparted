@@ -43,6 +43,23 @@ async function initMap() {
     };
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
 
+    const displayStopFromFavs = function(stopNum) {
+        console.log("Inside displayStopFromFavs")
+        displayStop(markers_array, stopNum, directionsRenderer);
+    }
+    const displayRouteFromFavs = function(route) {
+        console.log("Inside displayRouteFromFavs")
+        displayRoute(directionsService, directionsRenderer, markers_array, route);
+    }
+
+    // Every time either the fav routes or fav stops button is clicked run this function to add event listeners to all the buttons
+    document.getElementById('fav_stops_btn').addEventListener('click', () => {
+        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+    });
+        document.getElementById('fav_routes_btn').addEventListener('click', () => {
+        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+    })
+
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
     for (let key in bus_stop_data) {

@@ -102,7 +102,7 @@ async function initMap() {
         });
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", async () => {
-            document.getElementById('map').classList.toggle("spinner-border")
+            // document.getElementById('map').classList.toggle("spinner-border")
             console.log("IN marker listener function")
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {

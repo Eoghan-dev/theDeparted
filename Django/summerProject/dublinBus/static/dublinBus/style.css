@@ -1,50 +1,22 @@
 /* Set the size of the div element that contains the map */
 /*Css for map adapted from google maps tutorial  https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html*/
 #map {
-  /*flex-basis: 0;*/
-  /*flex-grow: 4;*/
   height: 100%;
 }
-/*#container {*/
-/*  height: 100%;*/
-/*  display: flex;*/
-/*}*/
-/*#map {*/
-/*  flex: auto;*/
-/*}*/
 
-/*Sidebar layout for directions panel taken from https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html*/
-/*#sidebar {*/
-/*  flex-basis: 15rem;*/
-/*  flex-grow: 1;*/
-/*  padding: 1rem;*/
-/*  max-width: 30rem;*/
-/*  height: 100%;*/
-/*  box-sizing: border-box;*/
-/*  overflow: auto;*/
-/*}*/
-
-/*#sidebar {*/
-/*  flex: 0 1 auto;*/
-/*  padding: 0;*/
-/*}*/
-/*#sidebar > div {*/
-/*  padding: 0.5rem;*/
-/*}*/
-.overlay {
+.sidebar {
   height: 100%;
   width: 0;
   position: fixed;
   z-index: 999;
   top: 0;
   left: 0;
-  background-color: rgb(255,193,7);
-  background-color: rgba(255,193,7);
+  background-color: #29434E;
   overflow-x: hidden;
   transition: 0.5s;
 }
 
-.overlay-content {
+.sidebar-content {
   position: relative;
   top: 25%;
   width: 100%;
@@ -52,7 +24,7 @@
   margin-top: 30px;
 }
 
-.overlay a {
+.sidebar a {
   padding: 8px;
   text-decoration: none;
   font-size: 36px;
@@ -61,11 +33,11 @@
   transition: 0.3s;
 }
 
-.overlay a:hover, .overlay a:focus {
+.sidebar a:hover, .sidebar a:focus {
   color: #f1f1f1;
 }
 
-.overlay .closebtn {
+.sidebar .closebtn {
   position: absolute;
   top: 20px;
   right: 45px;
@@ -73,8 +45,8 @@
 }
 
 @media screen and (max-height: 450px) {
-  .overlay a {font-size: 20px}
-  .overlay .closebtn {
+  .sidebar a {font-size: 20px}
+  .sidebar .closebtn {
   font-size: 40px;
   top: 15px;
   right: 35px;

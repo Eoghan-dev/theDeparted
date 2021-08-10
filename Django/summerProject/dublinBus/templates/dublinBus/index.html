@@ -2,9 +2,9 @@
 {% block title %}Test home page{% endblock %}
 {% load static %}
 {% block content %}
-<div id="sidebar" class="overlay">
+<div id="sidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
-  <div class="overlay-content" id="sidebar_content">
+  <div class="sidebar-content" id="sidebar_content">
 
   </div>
 </div>
@@ -76,7 +76,7 @@
                         <div class="input-group-append">
                             <button id="fav_routes_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                     data-target="#bs-canvas-left"
-                                    aria-expanded="false" aria-controls="bs-canvas-left"  onclick="fillSidebar( '{{user.favourite_routes}}', 'routes')">See favourite routes</button>
+                                    aria-expanded="false" aria-controls="bs-canvas-left"  onclick='fillSidebar( "{{user.favourite_routes}}", "routes")'>See favourite routes</button>
                         </div>
                         <datalist id="routes">
                         </datalist>

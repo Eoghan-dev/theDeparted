@@ -547,7 +547,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 
     prediction_html += total_time_taken_str;
     return prediction_html
-}
+}//
 
 async function loadRoutes() {
     let routes = await fetch('/get_routes').then(res => {

@@ -1,0 +1,14 @@
+{% extends 'dublinBus/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    {#   Bootstrap styling can go here, I added some really basic bootstrap just following the guide I was using #}
+    <form method="post" class="form-group">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Register</button>
+        <p>Already have an account? <a href="/login">Login here</a></p>
+    </form>
+{% endblock %}

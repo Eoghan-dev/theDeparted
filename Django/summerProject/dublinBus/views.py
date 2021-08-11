@@ -671,11 +671,17 @@ def get_next_four_bus(request, stop):
         prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
-            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+            if mins_till <0:
+                pass
+            else:
+                buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
         else:
             prediction = int((prediction - arr_time_mins) * predict_dis)
             mins_till = (prediction + stop_time_mins) - current_time_mins
-            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+            if mins_till < 0:
+                pass
+            else:
+                buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
     return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

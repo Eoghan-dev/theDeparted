@@ -781,6 +781,7 @@ function closeSidebar() {
 function get_timetable_stops(result) {
     var result_1 = JSON.parse(result);
     var stop_list = [];
+    console.log("back again")
     var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
     for (let i = 0; i < result_1.length; i++) {
         if (stop_list.includes(result_1[i]["stop"]))   {
@@ -801,13 +802,13 @@ function get_timetable_stops(result) {
     var ordered_stop_list = stop_list.map((i) => Number(i));
     ordered_stop_list.sort((a, b) => a - b);
     for (let i = 0; i < ordered_stop_list.length; i++) {
-        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(\'{{result|safe}}\',"+ ordered_stop_list[i] +")\"><div class=\"col-xs-12 col-md-12 text-center \">"+ordered_stop_list[i]+"</div></span>"
+        console.log("back again")
+        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable("+ ordered_stop_list[i] +")\"><div class=\"col-xs-12 col-md-12 text-center \">"+ordered_stop_list[i]+"</div></span>"
     }
     document.getElementById('stop_list').innerHTML = stops;
 }
-function get_timetable(result,stop) {
-    console.log(result)
-    var stop_time_list = JSON.parse(result);
+function get_timetable(stop) {
+    var stop_time_list = parsedsched
     console.log(stop)
     let url = window.location.href
     const myArr = url.split("/");

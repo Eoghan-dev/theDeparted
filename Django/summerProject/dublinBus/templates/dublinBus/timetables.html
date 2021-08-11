@@ -42,7 +42,9 @@
         </div>
     </div>
 </div>
-<script>get_timetable('{{result|safe}}',"312")</script>
+<script>var parsedsched = JSON.parse('{{result|safe}}')</script>
 <script>get_timetable_stops('{{result|safe}}')</script>
+
+
 {% endblock %}
 

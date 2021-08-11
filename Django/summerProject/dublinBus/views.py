@@ -283,7 +283,6 @@ def get_next_bus_time(request, route):
     else:
         return HttpResponse("error")
 
-
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()
@@ -413,6 +412,15 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
     print(data_return)
     return JsonResponse(data_return)
+
+def timetable(request, route):
+    route_num = list(route.split(":"))[0]
+    headsign = list(route.split(":"))[1]
+    results = Current_timetable_all.objects
+    result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
+    result_list = json.dumps(result)
+    print(result_list)
+    return render(request, 'dublinBus/timetables.html', {"result" : result_list})
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     # Splits the route name as gives headsign with number--[number: headsign]
@@ -671,11 +679,17 @@ def get_next_four_bus(request, stop):
         prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
-            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+            if mins_till <0:
+                pass
+            else:
+                buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
         else:
             prediction = int((prediction - arr_time_mins) * predict_dis)
             mins_till = (prediction + stop_time_mins) - current_time_mins
-            buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+            if mins_till < 0:
+                pass
+            else:
+                buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
     return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

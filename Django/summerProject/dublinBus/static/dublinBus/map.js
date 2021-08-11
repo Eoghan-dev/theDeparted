@@ -102,22 +102,33 @@ async function initMap() {
         });
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", async () => {
+            // document.getElementById('map').classList.toggle("spinner-border")
             console.log("IN marker listener function")
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
             });
             // Make a request to our backend to get the next several buses coming to this stop at time of click
-            let incoming_buses_res = await fetch("/get_next_four_bus");
+            let incoming_buses_res = await fetch(`/get_next_four_bus/${current_marker.number}`);
             let incoming_buses = await incoming_buses_res.json();
             // Parse the buses into a string and add this to our info window
-            let info_window_text = current_info_window.getContent();
+            // Get the static part of the info window before overwriting it
+            let previous_info_window_text = current_info_window.getContent();
+            let previous_content = previous_info_window_text.split("<h3>")[0];
+            let info_window_text = previous_content;
+
             let incoming_buses_text = "<h3>Incoming Buses</h3>" +
                 "<ul>";
+            // Loop over the incoming bus data and each of them to the info window
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
-                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                if (minutes_away == 0) {
+                    incoming_buses_text += `<li>${route_name} is currently less than a minute away.</li>`;
+                }
+                else {
+                    incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                }
             }
             incoming_buses_text += "</ul>";
             info_window_text += incoming_buses_text;

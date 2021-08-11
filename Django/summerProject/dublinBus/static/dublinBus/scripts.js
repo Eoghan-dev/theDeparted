@@ -154,13 +154,21 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             let incoming_buses_res = await fetch(`get_next_four_bus/${stopNumber}`);
             let incoming_buses = await incoming_buses_res.json();
             console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
-            let info_window_text = current_info_window.getContent();
-            let incoming_buses_text = "<h3>Incoming Buses</h3>" +
-                "<ul>";
+            let previous_info_window_text = current_info_window.getContent();
+            // Get the static part of the info window before overwriting it
+            let previous_content = previous_info_window_text.split("<h3>")[0];
+            let info_window_text = previous_content;
+            // Loop over the incoming bus data and each of them to the info window
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" + "<ul>";
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
-                incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                if (minutes_away == 0) {
+                      incoming_buses_text += `<li>${route_name} is currently less than a minute away.</li>`;
+                }
+                else {
+                    incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                }
             }
             incoming_buses_text += "</ul>";
             info_window_text += incoming_buses_text;
@@ -497,12 +505,17 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         } else {
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
-            instructions_string_arr = instructions_string_arr.splice(0, 1, prediction.route[i]);
+            console.log({instructions_string_arr})
+            console.log({prediction})
+            console.log(prediction.route[transit_count])
+            instructions_string_arr = instructions_string_arr.slice(1);
+            console.log({instructions_string_arr})
             let instructions_string = instructions_string_arr.join(" ");
-            prediction_html += "Get route " + instructions_string + " ---- ";
+            console.log(instructions_string)
+            prediction_html += "Get route " + prediction.route[transit_count] + " " + instructions_string + " ---- ";
             // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
             if (prediction.arrival_time[i] === "gmaps") {
-                prediction_html += trip_info.duration[i];
+                prediction_html += trip_info.duration[transit_count];
                 gmaps_journey = true;
             } else {
                 // calculate total time taken by step
@@ -529,12 +542,12 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes";
+        total_time_taken_str = "<p>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €2.25 (adult leap card)</p>";
     }
 
     prediction_html += total_time_taken_str;
     return prediction_html
-}
+}//
 
 async function loadRoutes() {
     let routes = await fetch('/get_routes').then(res => {
@@ -675,6 +688,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
                     step_info["departure_time"] = departure_time;
+                    step_info["route_num"] = current_step.transit.line.short_name;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
@@ -690,7 +704,8 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
-                    step_info["departure_time"] = current_step.departure_time; //
+                    step_info["departure_time"] = current_step.departure_time;
+                    step_info["route_num"] = "n/a";
                 }
                 trip_description.push(step_info);
             }
@@ -702,65 +717,63 @@ function getInfoFromDirections(response, selected_date_time) {
     return [data_for_model_json, trip_description, gmaps_total_journey_time];
 }
 
-// function setupSidebarListeners() {
-//     let fav_routes_btn = document.getElementById('fav_routes_btn');
-//     let fav_stops_btn = document.getElementById('fav_stops_btn');
-//
-//     // fav_routes_btn.addEventListener('click', () => {
-//     //     let sidebar_content = "";
-//     // })
-// }
-
 function fillSidebar(content, type) {
     // takes a parameter of user's fav routes/stops
     console.log("in fill sidebar")
     let sidebar_content = "";
     if (type === "stops") {
-        sidebar_content += `        <div class="sidebar-header">
-            <h3>Favourite Stops</h3>
-        </div>`;
-        sidebar_content += "<ul>";
+
+        sidebar_content += "<h3 class='display-1' style='color:rgb(255,193,7)'>Favourite stops</h3>"
+    sidebar_content += "<div class='align-items-center'><ul class='list-group'>";
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<li>${content} <button class="fav_stops_button_sb" value="${content}">See stop</button></li>`
+            sidebar_content += `<a href='javascript:closeSidebar()'><li class="list-group-item fav_stops_button_sb"style="background-color:rgb(255,193,7)">${content}</li></a>`
         }
 
     } else {
-        sidebar_content += `        <div class="sidebar-header">
-            <h3>Favourite Routes</h3>
-        </div>`;
+        sidebar_content += "<h3 class='display-1' style='color:rgb(255,193,7)'>Favourite Routes</h3>";
+        sidebar_content += "<div class='align-items-center'><ul class='list-group'>"
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<li>${content} <button class="fav_routes_button_sb" value="${content}">See Route</button></li>`
+            sidebar_content += `<a href='javascript:closeSidebar()'><li class="list-group-item fav_routes_button_sb" style="background-color:rgb(255,193,7)">${content}</li></a>`
         }
     }
 
-    sidebar_content += "</ul>";
-    document.getElementById('sidebar').innerHTML = sidebar_content;
-    document.getElementById('sidebar').classList.toggle('active');
+    sidebar_content += "</ul></div>";
+    document.getElementById('sidebar_content').innerHTML = sidebar_content;
+    // document.getElementById('sidebar').classList.toggle('active');
+    openSidebar()
 }
 
 function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     // Function to get all buttons from the sidebar and add an event listener that will call
     // a function which will then call either displayStops or displayRoutes depending on which is needed
     console.log("inside setup fav buttons")
-    let fav_stops_buttons = document.querySelectorAll(".fav_stops_button_sb");
-    console.log({fav_stops_buttons})
-    for (let i=0; i< fav_stops_buttons.lentgh; i++) {
-        let current_button = fav_stops_buttons[i];
+    let fav_stops = document.querySelectorAll(".fav_stops_button_sb");
+    console.log({fav_stops_buttons: fav_stops})
+    for (let i=0; i< fav_stops.length; i++) {
+        let current_stop = fav_stops[i];
 
-        current_button.addEventListener('click', () => {
+        current_stop.addEventListener('click', () => {
             console.log("in sidebar button event listener (stop)")
-            displayStopFromFavs(button.value)
+            displayStopFromFavs(current_stop.innerHTML)
         });
     }
-    let fav_routes_buttons = document.querySelectorAll(".fav_routes_button_sb");
-    console.log({fav_routes_buttons})
-    for (let i=0; i< fav_routes_buttons.lentgh; i++) {
-        let current_button = fav_routes_buttons[i];
-          current_button.addEventListener('click', () => {
+    let fav_routes = document.querySelectorAll(".fav_routes_button_sb");
+    console.log({fav_routes_buttons: fav_routes})
+    for (let i=0; i< fav_routes.length; i++) {
+        let current_route = fav_routes[i];
+          current_route.addEventListener('click', () => {
               console.log("in sidebar button event listener (route)")
-              displayRouteFromFavs(button.value)
+              displayRouteFromFavs(current_route.innerHTML)
           });
     }
     }
+
+    function openSidebar() {
+  document.getElementById("sidebar").style.width = "100%";
+}
+
+function closeSidebar() {
+  document.getElementById("sidebar").style.width = "0%";
+}

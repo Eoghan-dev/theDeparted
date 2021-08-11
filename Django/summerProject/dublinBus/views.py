@@ -419,7 +419,6 @@ def timetable(request, route):
     results = Current_timetable_all.objects
     result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
     result_list = json.dumps(result)
-    print(result_list)
     return render(request, 'dublinBus/timetables.html', {"result" : result_list})
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):

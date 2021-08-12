@@ -1,0 +1,10 @@
+django-heroku
+Django==3.0
+requests
+pyodbc
+mssql-django
+django-crispy-forms
+pandas
+sklearn
+django-crontab
+gunicorn

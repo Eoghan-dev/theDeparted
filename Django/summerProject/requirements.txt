@@ -6,3 +6,4 @@ django-crispy-forms
 pandas
 sklearn
 django-crontab
+gunicorn

@@ -399,6 +399,7 @@ def get_direction_bus(request, data):
         print(data["arrival_stops"][bus])
         print(data["route_names"][bus])
         print(data["date_time"])
+        print("**************")
         temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
         print(temporary_dict)
         data_return["route"].append(temporary_dict["route"][0])
@@ -441,17 +442,16 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     stop_dict = json.load(f)
     f.close()
     data_return = {}
+    depart_time = list(dep_time.split(":"))
     # time is given in form of HH:MM am/pm checks if am or pm
-    if (dep_time)[-2:] == "pm" or int(dep_time[:2])>12:
+    if depart_time[-1][-2:] == "pm" or int(depart_time[0])>12:
         # Changes pm to HH:MM:SS format matches that in timetable
-        depart_time = list(dep_time.split(":"))
         if int(depart_time[0]) > 12:
             time_dir = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
         else:
             hh = 12 + int(depart_time[0])
             time_dir =str(hh) + ":" + depart_time[1][:2] + ":00"
-    elif (dep_time)[-2:] == "am":
-        depart_time = list(dep_time.split(":"))
+    elif depart_time[-1][-2:] == "am" or int(depart_time[0])<12:
         hh =int(depart_time[0])
         if hh < 10:
             time_dir = "0" + str(hh) + ":" + depart_time[1][:2] + ":00"
@@ -460,31 +460,39 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     # Gets the stop number if available for departure and arrival if none available compares to stops.json
     if (list(dep_stop.split(" "))[-1]).isnumeric() == True:
         depart_stop = list(dep_stop.split(" "))[-1]
+        print("depart_stop",depart_stop)
         for bus_route_stops in range(0, len(stop_dict[depart_stop]["routes"])):
             if route[1].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][1]:
                 # gets distance along route and last stop
                 distance_depart = stop_dict[depart_stop]["routes"][bus_route_stops][3]
                 last_stop = stop_dict[depart_stop]["routes"][bus_route_stops][5]
+                print("last_stop",last_stop)
                 break
     else:
-        # If no stop number was available for departure
+        # If no stop number was available for departure checks by name
         distance_depart = 0
+        dep_stop_list = []
+        depart_stop = None
         for i in stop_dict:
             # Checks for stop when stop name == departure name
             if stop_dict[i]["stop_name"] == dep_stop or stop_dict[i]["stop_name"] in dep_stop:
-                depart_stop = i
-                print(depart_stop)
                 # Acquires the distance percent and last stop when found
+                dep_stop_list.append(i)
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                    #print(route[1])
-                    #print(stop_dict[i]["routes"][bus_route_stops][1])
-
                     if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3]:
+                        depart_stop = i
                         distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                         last_stop = stop_dict[i]["routes"][bus_route_stops][5]
 
             else:
                 pass
+    #Catch for if the Name check couldn't find the correct stop departure and arrival
+    if depart_stop == None:
+        data_return["route"] = ["gmaps"]
+        data_return["departure_time"] = ["gmaps"]
+        data_return["arrival_time"] = ["gmaps"]
+        return data_return
+
     if (list(arr_stop.split(" "))[-1]).isnumeric() == True:
         arr_stop = list(arr_stop.split(" "))[-1]
         for bus_route_stops in range(0, len(stop_dict[arr_stop]["routes"])):
@@ -492,9 +500,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 distance_arr = stop_dict[arr_stop]["routes"][bus_route_stops][3]
     else:
         for i in stop_dict:
-            #print(stop_dict[i]["stop_name"])
-            #print(arr_stop)
-            #print("*******************")
             if stop_dict[i]["stop_name"] == arr_stop:
                 arr_stop = i
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
@@ -505,6 +510,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             else:
                 pass
     # if departure stop in timetable for route given
+    print("depart_stop",depart_stop)
     if depart_stop in times_dict[route[1].strip(" ")]["mon"]:
         # Gets the next time scheduled after given time
         print("here")

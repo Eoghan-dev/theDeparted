@@ -283,7 +283,6 @@ def get_next_bus_time(request, route):
     else:
         return HttpResponse("error")
 
-
 def scrapeCW(request):
     """View to call our scrape method in the CurrentWeather class"""
     CurrentWeather.scrape()
@@ -413,6 +412,14 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
     print(data_return)
     return JsonResponse(data_return)
+
+def timetable(request, route):
+    route_num = list(route.split(":"))[0]
+    headsign = list(route.split(":"))[1]
+    results = Current_timetable_all.objects
+    result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
+    result_list = json.dumps(result)
+    return render(request, 'dublinBus/timetables.html', {"result" : result_list})
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     # Splits the route name as gives headsign with number--[number: headsign]

@@ -776,4 +776,64 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
 
 function closeSidebar() {
   document.getElementById("sidebar").style.width = "0%";
+
+}
+
+function get_timetable_stops(result) {
+    var result_1 = JSON.parse(result);
+    var stop_list = [];
+    console.log("back again")
+    var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
+    for (let i = 0; i < result_1.length; i++) {
+        if (stop_list.includes(result_1[i]["stop"]))   {
+
+        }
+        else    {
+
+            //stops += "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center \">"+result_1[i]["stop"]+"</div></span>"
+            //var stop = result_1[i]["stop"];
+            //var entry = document.createElement('li');
+            //entry.hre
+            //entry.classList.add("list-group-item");
+            //entry.appendChild(document.createTextNode(stop));
+            //list.appendChild(entry);
+            stop_list.push(result_1[i]["stop"])
+        }
+    }
+    var ordered_stop_list = stop_list.map((i) => Number(i));
+    ordered_stop_list.sort((a, b) => a - b);
+    for (let i = 0; i < ordered_stop_list.length; i++) {
+        console.log("back again")
+        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable("+ ordered_stop_list[i] +")\"><div class=\"col-xs-12 col-md-12 text-center \">"+ordered_stop_list[i]+"</div></span>"
+    }
+    document.getElementById('stop_list').innerHTML = stops;
+}
+function get_timetable(stop) {
+    var stop_time_list = parsedsched
+    console.log(stop)
+    let url = window.location.href
+    const myArr = url.split("/");
+    document.getElementById('Title').innerHTML = myArr[myArr.length - 1] + " - Stop " + stop;
+    let mon_fri_content = "<div class=\"row\">";
+    let sat_content = "<div class=\"row\">";
+    let sun_content = "<div class=\"row\">";
+    for (let i = 0; i < stop_time_list.length; i++) {
+        if ((stop_time_list[i]["day"]=="mon")&&(stop_time_list[i]["stop"]==stop)   ) {
+            mon_fri_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning\">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+        else if ((stop_time_list[i]["day"]=="sat")&&(stop_time_list[i]["stop"]==stop))    {
+            sat_content += "<div class=\"col-4 col-xs-3 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+        else if ((stop_time_list[i]["day"]=="sun" )&&(stop_time_list[i]["stop"]==stop))    {
+            sun_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+    }
+    mon_fri_content += "</div>"
+    sat_content += "</div>"
+    sun_content += "</div>"
+    document.getElementById('mon_fri_content').innerHTML = mon_fri_content;
+    document.getElementById('sat_content').innerHTML = sat_content;
+    document.getElementById('sun_content').innerHTML = sun_content;
+    console.log(sun_content)
+
 }

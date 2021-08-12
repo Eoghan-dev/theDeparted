@@ -51,4 +51,30 @@
   top: 15px;
   right: 35px;
   }
+.sidebar2 {
+position: fixed;
+top: 51px;
+bottom: 0;
+left: 0;
+z-index: 1000;
+display: block;
+padding: 20px;
+overflow-x: hidden;
+overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+background-color: #f5f5f5;
+border-right: 1px solid #eee;
 }
+.list-group_2{
+    max-height: 500px;
+    margin-bottom: 10px;
+    overflow:scroll;
+    -webkit-overflow-scrolling: touch;
+}
+.scroll_bar_chrome::-webkit-scrollbar {
+  display: none;
+}
+.scroll_bar_fire {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+

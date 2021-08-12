@@ -51,7 +51,6 @@
   top: 15px;
   right: 35px;
   }
-}
 .sidebar2 {
 position: fixed;
 top: 51px;
@@ -78,3 +77,4 @@ border-right: 1px solid #eee;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+

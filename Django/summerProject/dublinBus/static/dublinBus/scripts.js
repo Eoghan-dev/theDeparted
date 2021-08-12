@@ -776,6 +776,7 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
 
 function closeSidebar() {
   document.getElementById("sidebar").style.width = "0%";
+
 }
 
 function get_timetable_stops(result) {

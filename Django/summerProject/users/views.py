@@ -11,6 +11,15 @@ def register(request):
         # save the new user in the database if the form is valid
         if form.is_valid():
             form.save()
+            #log in
+            username = request.POST['username']
+            password = request.POST['password1']
+            user = authenticate(username=username, password=password)
+
+            if user is not None and user.is_active:
+                # Correct password, and the user is marked "active"
+                login(request, user)
+
             # Redirect back to homepage after user is created
             return redirect("/")
     # If form was not posted then nothing was submitted by user so just load an empty form

@@ -604,7 +604,7 @@ def get_next_four_bus(request, stop):
     future_time = list(current_time.split(":"))
     if int(future_time[0]) == 23:
         future_time = "00:"+ future_time[1] + ":00"
-    elif int(future_time[0]) > 9:
+    elif int(future_time[0]) >= 9:
         future_time = str(int(future_time[0]) +1) + ":" + future_time[1] + ":00"
     else:
         future_time = "0" + str(int(future_time[0]) +1) + ":" + future_time[1] + ":00"
@@ -641,7 +641,7 @@ def get_next_four_bus(request, stop):
     result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
     print(future_time)
     print(current_time)
-    print(result)
+    print("result",result)
     for bus_stop_time in result:
         leave_time = bus_stop_time.leave_t
         leave_time_mins = list(leave_time.split(":"))
@@ -695,6 +695,7 @@ def get_next_four_bus(request, stop):
                 pass
             else:
                 buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
+    buses = sorted(buses, key=lambda x: x[0])
     return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

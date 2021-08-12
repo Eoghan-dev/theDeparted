@@ -537,7 +537,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             // check if route is xpresso (has an x in the route number)
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
             let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
-            console.log("fare is " + fare)
+            prediction_html += " ---- €" + fare.toFixed(2);
 
 
             transit_count += 1;

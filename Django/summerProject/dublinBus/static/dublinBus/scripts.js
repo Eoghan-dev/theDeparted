@@ -524,11 +524,15 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             // Get the total number of stops the bus passed for this stop
             let stops_passed = trip_info[i]["num_stops"];
             let fare_status = window.fare_status
+            // If the user is logged in but hasn't set a status yet set a default as adult
+            if (fare_status.length < 1) {
+                fare_status = "adult";
+            }
             let leap_card = window.leap_card
             console.log("num stops is " + stops_passed + " and fare status is " + fare_status + " and leap card is " + leap_card)
 
             // calculate cost of bus by first calculating whether the current departure time falls within a schooltime range
-            let departure_time = prediction.departure_time[transit_count];
+            let departure_time = trip_info[i].departure_time;
             let schooltime = determineSchoolRange(departure_time);
             // check if route is xpresso (has an x in the route number)
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
@@ -564,8 +568,12 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 function determineSchoolRange(departure_time) {
     let valid = false;
     // Function to determine if a bus departure time falls within a school range for our fare calculator
+    console.log("departure time", departure_time)
     let departure_hour = parseInt(departure_time.split(":")[0]);
     let departure_min = parseInt(departure_time.split(":")[1].substring(0,2));
+    if (departure_time.split(":")[1].substring(2,4) === "pm") {
+        departure_hour += 12;
+    }
     let date = new Date();
     // set the departure time to our date object
     date.setHours(departure_hour);
@@ -585,6 +593,7 @@ function determineSchoolRange(departure_time) {
     else {
         // For mon-fri it's valid if it's before 19:00
         if (date.getHours() < 19) {
+            console.log(date.getHours(), "is less than 19, valid")
             valid = true;
         }
     }
@@ -879,13 +888,14 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     let package;
     let cost;
     // First determine package (leap card and fare status combo)
+    console.log("fare status of user is", fareStatus)
     if (fareStatus === "adult") {
         if (leapcard === true) {
             package = "adultleap";
         } else {
             package = "adultcash";
         }
-    } else {
+    } else if (fareStatus === "child") {
         if (leapcard === true) {
             package = "childleap";
         } else {
@@ -904,28 +914,36 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     if (fareStatus === "adult") {
         if (xpresso === true) {
             cost = costs[package]['price4'];
+            console.log("found fare, cost is", cost, "and package is", package)
         }
         else {
             if (stages >= 1 && stages <= 3) {
                 cost = costs[package]['price1'];
+                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 3 && stages <= 13) {
                 cost = costs[package]['price2'];
+                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 13) {
                 cost = costs[package]['price3'];
+                console.log("found fare, cost is", cost, "and package is", package)
             }
         }
     }
     else {
         if (schoolchild === true) {
             cost = costs[package]['price1'];
+            console.log("found fare, cost is", cost, "and package is", package)
         } else if (xpresso === true) {
             cost = costs[package]['price4'];
+            console.log("found fare, cost is", cost, "and package is", package)
         }
         else {
             if (stages >= 1 && stages <= 7) {
                 cost = costs[package]['price2'];
+                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 7) {
                 cost = costs[package]['price3'];
+                console.log("found fare, cost is", cost, "and package is", package)
             }
         }
     }

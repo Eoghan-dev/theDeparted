@@ -485,6 +485,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     console.log("trip_info", trip_info)
     let first_walking_time;
     let last_walking_time
+
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
     let prediction_html = "<ul class='list-group'>";
@@ -520,6 +521,11 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 step_time_date = new Date(step_time)
                 prediction_html += ((step_time / 1000) / 60) + " mins";
             }
+            // Get the total number of stops the bus passed for this stop
+            let stops_passed = trip_info[i]["num_stops"];
+            let fare_status = window.fare_status
+            let leap_card = window.leap_card
+            console.log("num stops is " + stops_passed + " and fare status is " + fare_status + " and leap card is " + leap_card)
             transit_count += 1;
         }
         prediction_html += "</li>";
@@ -672,13 +678,6 @@ function getInfoFromDirections(response, selected_date_time) {
                     data_for_model.departure_stops.push(departure_stop);
                     data_for_model.arrival_stops.push(arrival_stop)
 
-                    // let step_info = {
-                    //     "step_type": current_step.travel_mode,
-                    //     "distance": current_step.distance,
-                    //     "instructions": current_step.instructions,
-                    //     "duration": current_step.duration,
-                    //     "gmaps_prediction": current_step.transit.arrival_time.value,
-                    // }
                     step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
@@ -686,16 +685,10 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
                     step_info["departure_time"] = departure_time;
                     step_info["route_num"] = current_step.transit.line.short_name;
+                    step_info["num_stops"] = current_step.transit.num_stops;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
-                    // let step_info = {
-                    //     "step_type": current_step.travel_mode,
-                    //     "distance": current_step.distance,
-                    //     "instructions": current_step.instructions,
-                    //     "duration": current_step.duration,
-                    //     "gmaps_prediction": "n/a",
-                    // }
                     step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
@@ -708,6 +701,7 @@ function getInfoFromDirections(response, selected_date_time) {
                         step_info["departure_time"] = "n/a";
                     }
                     step_info["route_num"] = "n/a";
+                    step_info["num_stops"] = "n/a";
                 }
                 trip_description.push(step_info);
             }

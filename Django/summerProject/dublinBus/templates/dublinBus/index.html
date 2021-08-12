@@ -116,4 +116,9 @@
 {% block scripts %}
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSRvxpJp1Hfw0kbaL0Ul_Zz81fzasE1sI&callback=initMap&libraries=places&v=weekly"
             async></script>
+    <script>
+        // Make global variables for the logged in user so it can be accessed from scripts.js
+        var fare_status = `{{ user.fare_status }}`
+        var leap_card = Boolean(`{{ user.leap_card }}`)
+    </script>
 {% endblock %}

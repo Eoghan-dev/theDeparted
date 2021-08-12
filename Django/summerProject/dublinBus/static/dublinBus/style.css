@@ -72,9 +72,9 @@ border-right: 1px solid #eee;
     -webkit-overflow-scrolling: touch;
 }
 .scroll_bar_chrome::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome - removes scrollbar timetable */
 }
 .scroll_bar_fire {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge - removes scrollbar timetable */
+  scrollbar-width: none;  /* Firefox - removes scrollbar timetable */
 }

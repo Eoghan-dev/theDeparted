@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import django_heroku
 from pathlib import Path
 from summerProject import logins
 import os
@@ -160,3 +160,7 @@ EMAIL_HOST_PASSWORD = logins.mail['password']
 CRONJOBS = [
     ('0 1 * * *', 'dublinBus.cron.run_scrapers')
 ]
+
+# Heroku stuff
+# configures the connection between django and heroku
+django_heroku.settings(locals())

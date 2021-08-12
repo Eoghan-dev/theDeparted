@@ -485,7 +485,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     console.log("trip_info", trip_info)
     let first_walking_time;
     let last_walking_time
-
+    let total_cost = 0.0;
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
     let prediction_html = "<ul class='list-group'>";
@@ -538,8 +538,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
             let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
             prediction_html += " ---- €" + fare.toFixed(2);
-
-
+            total_cost += fare;
             transit_count += 1;
         }
         prediction_html += "</li>";
@@ -551,7 +550,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
-        total_time_taken_str = "Total journey should take " + gmaps_total_journey;
+        total_time_taken_str = "Total journey should take " + gmaps_total_journey + "and should cost €" + total_cost.toFixed(2);
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
@@ -559,7 +558,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "<p>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €2.25 (adult leap card)</p>";
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2);
     }
 
     prediction_html += total_time_taken_str;

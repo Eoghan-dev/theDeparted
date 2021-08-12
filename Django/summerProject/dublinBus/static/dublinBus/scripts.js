@@ -526,6 +526,16 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             let fare_status = window.fare_status
             let leap_card = window.leap_card
             console.log("num stops is " + stops_passed + " and fare status is " + fare_status + " and leap card is " + leap_card)
+
+            // calculate cost of bus by first calculating whether the current departure time falls within a schooltime range
+            let departure_time = prediction.departure_time[transit_count];
+            let schooltime = determineSchoolRange(departure_time);
+            // check if route is xpresso (has an x in the route number)
+            let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
+            let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
+            console.log("fare is " + fare)
+
+
             transit_count += 1;
         }
         prediction_html += "</li>";
@@ -550,7 +560,36 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 
     prediction_html += total_time_taken_str;
     return prediction_html
-}//
+}
+function determineSchoolRange(departure_time) {
+    let valid = false;
+    // Function to determine if a bus departure time falls within a school range for our fare calculator
+    let departure_hour = parseInt(departure_time.split(":")[0]);
+    let departure_min = parseInt(departure_time.split(":")[1].substring(0,2));
+    let date = new Date();
+    // set the departure time to our date object
+    date.setHours(departure_hour);
+    date.setMinutes(departure_min);
+    // get the day of the week (sunday is 0)
+    let weekday = date.getDay();
+    // valid until 19:00 mon-fri and until 13:30 on saturday. Never valid on sunday
+    if (weekday === 7) {
+        // If it's before 1pm or after 1pm but before 1.30pm then it's valid
+        if ((date.getHours() < 13 ) || (date.getHours() < 14 && date.getHours() >= 13 && date.getMinutes() < 30)) {
+            valid = true;
+        }
+    }
+    else if (weekday === 0) {
+        // Do nothing if it's sunday since it's never valid
+    }
+    else {
+        // For mon-fri it's valid if it's before 19:00
+        if (date.getHours() < 19) {
+            valid = true;
+        }
+    }
+    return valid;
+}
 
 async function loadRoutes() {
     let routes = await fetch('/get_routes').then(res => {
@@ -832,4 +871,153 @@ function get_timetable(stop) {
     document.getElementById('sun_content').innerHTML = sun_content;
     console.log(sun_content)
 
+}
+
+function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
+    // Function that takes the number of stops passed (stages), fare status and leap card, xpresso and schoolchild booleans
+    // as parameters and returns a fare estimation based on this
+    let package;
+    let cost;
+    // First determine package (leap card and fare status combo)
+    if (fareStatus === "adult") {
+        if (leapcard === true) {
+            package = "adultleap";
+        } else {
+            package = "adultcash";
+        }
+    } else {
+        if (leapcard === true) {
+            package = "childleap";
+        } else {
+            package = "childcash";
+        }
+    }
+
+    //Data structure for costs as per Transport for Ireland website
+    var costs = {
+        'adultleap': {'price1': 1.55, 'price2' : 2.25, 'price3': 2.50, 'price4': 3.00},
+        'adultcash': {'price1': 2.15, 'price2' : 3.00, 'price3': 3.30, 'price4': 3.80},
+        'childleap': {'price1': .80, 'price2' : 1.00, 'price3': 1.00, 'price4': 1.26},
+        'childcash': {'price1': 1.00, 'price2' : 1.30, 'price3': 1.30, 'price4': 1.60}
+    };
+
+    if (fareStatus === "adult") {
+        if (xpresso === true) {
+            cost = costs[package]['price4'];
+        }
+        else {
+            if (stages >= 1 && stages <= 3) {
+                cost = costs[package]['price1'];
+            } else if (stages > 3 && stages <= 13) {
+                cost = costs[package]['price2'];
+            } else if (stages > 13) {
+                cost = costs[package]['price3'];
+            }
+        }
+    }
+    else {
+        if (schoolchild === true) {
+            cost = costs[package]['price1'];
+        } else if (xpresso === true) {
+            cost = costs[package]['price4'];
+        }
+        else {
+            if (stages >= 1 && stages <= 7) {
+                cost = costs[package]['price2'];
+            } else if (stages > 7) {
+                cost = costs[package]['price3'];
+            }
+        }
+    }
+
+
+
+
+    //if else statements to return price based on dropdown selection
+  //   if(stages == 1 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price1);
+  //       var price = costs['adultleap'].price1;
+  //   }
+  //   else if(stages == 1 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price1);
+  //       var price = costs['adultcash'].price1;
+  //   }
+  //   else if(stages == 2 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price2);
+  //       var price = costs['adultleap'].price2;
+  //   }
+  //   else if(stages == 2 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price2);
+  //       var price = costs['adultcash'].price2;
+  //   }
+  //   else if(stages == 3 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price3);
+  //       var price = costs['adultleap'].price3;
+  //   }
+  //   else if(stages == 3 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price3);
+  //       var price = costs['adultcash'].price3;
+  //   }
+  //   else if(stages == 4 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price4);
+  //       var price = costs['adultleap'].price4;
+  //   }
+  //   else if(stages == 4 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price4);
+  //       var price = costs['adultcash'].price4;
+  //   }
+  //   else if(stages == 5 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price1);
+  //       var price = costs['childleap'].price1;
+  //   }
+  //   else if(stages == 5 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price1);
+  //       var price = costs['childcash'].price1;
+  //   }
+  //   else if(stages == 6 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price2);
+  //       var price = costs['childleap'].price2;
+  //   }
+  //   else if(stages == 6 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price2);
+  //       var price = costs['childcash'].price2;
+  //   }
+  //   else if(stages == 7 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price3);
+  //       var price = costs['childleap'].price3;
+  //   }
+  //   else if(stages == 7 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price3);
+  //       var price = costs['childleap'].price3;
+  //   }
+  //   else if(stages == 8 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price4);
+  //       var price = costs['childleap'].price4;
+  //   }
+  //   else if(stages == 8 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price4);
+  //       var price = costs['childleap'].price4;
+  //   }
+  //   else {
+  //     var price = 'Invalid Selction';
+  //   }
+  //
+  // document.getElementById('price').innerHTML = price;
+        return cost;
 }

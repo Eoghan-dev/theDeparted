@@ -570,10 +570,17 @@ function determineSchoolRange(departure_time) {
     // Function to determine if a bus departure time falls within a school range for our fare calculator
     console.log("departure time", departure_time)
     let departure_hour = parseInt(departure_time.split(":")[0]);
-    let departure_min = parseInt(departure_time.split(":")[1].substring(0,2));
-    if (departure_time.split(":")[1].substring(2,4) === "pm") {
-        departure_hour += 12;
+    // Parse the departure time minutes differently depending on if response includes pm/am
+    if (departure_time.split(":")[1].includes("pm") || departure_time.split(":")[1].includes("am")) {
+        let departure_min = parseInt(departure_time.split(":")[1].substring(0, 2));
+        if (departure_time.split(":")[1].substring(2,4) === "pm") {
+            departure_hour += 12;
+        }
     }
+    else {
+        let departure_min = parseInt(departure_time.split(":")[1])
+    }
+
     let date = new Date();
     // set the departure time to our date object
     date.setHours(departure_hour);

@@ -535,6 +535,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             let departure_time = trip_info[i].departure_time;
             let schooltime = determineSchoolRange(departure_time);
             // check if route is xpresso (has an x in the route number)
+            console.log({trip_step})
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
             let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
             prediction_html += " ---- €" + fare.toFixed(2);

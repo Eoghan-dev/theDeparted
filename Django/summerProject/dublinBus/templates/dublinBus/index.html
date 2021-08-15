@@ -77,6 +77,7 @@
                         <label for="routes_num"></label>
                         <input id="routes_num" list="routes" name="routes_num" class="form-control"
                                placeholder="Please enter route number">
+                        {% if user.is_authenticated %}
                         <div class="input-group-append">
                             <button id="fav_routes_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                     data-target="#bs-canvas-left"
@@ -84,6 +85,7 @@
                                     onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See favourite routes
                             </button>
                         </div>
+                        {% endif %}
                         <datalist id="routes">
                         </datalist>
                     </div>
@@ -101,6 +103,7 @@
                         <label for="stops_num"></label>
                         <input id="stops_num" list="stops" name="stops_num" class="form-control"
                                placeholder="Please enter stop number">
+                        {% if user.is_authenticated %}
                         <div class="input-group-append">
                             <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                     data-target="#bs-canvas-left"
@@ -108,6 +111,7 @@
                                     onclick="fillSidebar( '{{ user.favourite_stops }}', 'stops')">See favourite stops
                             </button>
                         </div>
+                        {% endif %}
                         <datalist id="stops">
                         </datalist>
                     </div>

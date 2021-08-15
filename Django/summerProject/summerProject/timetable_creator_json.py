@@ -1,6 +1,6 @@
 import json
 import os
-from . import DublinBus_current_info
+import DublinBus_current_info
 from operator import itemgetter
 from django.conf import settings
 base = settings.BASE_DIR
@@ -157,6 +157,9 @@ def get_timetable_all(index):
             dir_dict = {}
             if timetable[stop_time]["stop_sequence"] == "1":
                 first_stop =  timetable[stop_time]["arrival_time"]
+                check_first_time = list(first_stop.split(":"))
+                if int(check_first_time[0]) >= 24:
+                    first_stop = str(int(check_first_time[0]) - 24) + ":" + str(check_first_time[1]) + ":" + str(check_first_time[2])
             trip_id = timetable[stop_time]["trip_id"]
             trip_id = list(trip_id.strip().split("."))
             date = trip_id[1]
@@ -166,10 +169,8 @@ def get_timetable_all(index):
                 route = route[1]
                 direction = timetable[stop_time]["stop_headsign"]
                 time = timetable[stop_time]["departure_time"]
-                check_time = list(first_stop.split(":"))
+                check_time = list(time.split(":"))
                 if int(check_time[0]) >= 24:
-                    first_stop = str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
-                    check_time = list(time.split(":"))
                     time = str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
                 stop = stops_dict[timetable[stop_time]["stop_id"]]
                 date = index[date]["Days"]
@@ -186,6 +187,8 @@ def get_timetable_all(index):
                             else:
                                 bus_times[route][direction][date[0]][stop] = [[first_stop, time]]
                         else:
+                            if time > "24:00:00":
+                                print(time)
                             stop_dict_create[stop] = [[first_stop, time]]
                             #date_dict[date[0]] = stop_dict_create
                             bus_times[route][direction][date[0]] = stop_dict_create

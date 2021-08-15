@@ -31,9 +31,5 @@ class AppPageTests(SimpleTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'dublinBus/index.html')
 
-    def test_journey_view_uses_correct_template(self):
-        response = self.client.get(reverse('journey'))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'dublinBus/journey.html')
 
 # Create your tests here.

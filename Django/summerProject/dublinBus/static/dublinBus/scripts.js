@@ -567,22 +567,24 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 }
 function determineSchoolRange(departure_time) {
     let valid = false;
+    let departure_min;
     // Function to determine if a bus departure time falls within a school range for our fare calculator
     console.log("departure time", departure_time)
     let departure_hour = parseInt(departure_time.split(":")[0]);
     // Parse the departure time minutes differently depending on if response includes pm/am
     if (departure_time.split(":")[1].includes("pm") || departure_time.split(":")[1].includes("am")) {
-        let departure_min = parseInt(departure_time.split(":")[1].substring(0, 2));
+        departure_min = parseInt(departure_time.split(":")[1].substring(0, 2));
         if (departure_time.split(":")[1].substring(2,4) === "pm") {
             departure_hour += 12;
         }
     }
     else {
-        let departure_min = parseInt(departure_time.split(":")[1])
+        departure_min = parseInt(departure_time.split(":")[1])
     }
 
     let date = new Date();
     // set the departure time to our date object
+    console.log(departure_min)
     date.setHours(departure_hour);
     date.setMinutes(departure_min);
     // get the day of the week (sunday is 0)

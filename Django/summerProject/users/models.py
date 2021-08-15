@@ -6,7 +6,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(max_length=500)
     first_name = models.CharField(max_length=500)
     last_name = models.CharField(max_length=500)
-    fare_status = models.CharField(max_length=500, blank=True) # Student/Adult/Free travel etc.
+    fare_status = models.CharField(max_length=500, blank=True, default="adult") # Student/Adult/Free travel etc.
     leap_card = models.BooleanField(default=False) # Whether they have a leap card or not
     favourite_routes = models.TextField(blank=True) # store favourite route/routes as a comma seperated string
     favourite_stops = models.TextField(blank=True)

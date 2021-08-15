@@ -519,7 +519,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
                 step_time_date = new Date(step_time)
-                prediction_html += ((step_time / 1000) / 60) + " mins";
+                prediction_html += ((step_time / 1000) / 60) + " mins ";
             }
             // Get the total number of stops the bus passed for this stop
             let stops_passed = trip_info[i]["num_stops"];

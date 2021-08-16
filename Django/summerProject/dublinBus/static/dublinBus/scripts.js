@@ -865,6 +865,8 @@ function get_timetable(stop) {
     var stop_time_list = parsedsched
     console.log(stop)
     let url = window.location.href
+    url = url.replace("%20", " ");
+    url = url.replace("%27", "'");
     const myArr = url.split("/");
     document.getElementById('Title').innerHTML = myArr[myArr.length - 1] + " - Stop " + stop;
     let mon_fri_content = "<div class=\"row\">";
@@ -887,7 +889,6 @@ function get_timetable(stop) {
     document.getElementById('mon_fri_content').innerHTML = mon_fri_content;
     document.getElementById('sat_content').innerHTML = sat_content;
     document.getElementById('sun_content').innerHTML = sun_content;
-    console.log(sun_content)
 
 }
 

@@ -20,14 +20,7 @@ import time
 
 def index(request):
     """View to load the homepage of our application"""
-    if request.method == 'POST':
-        route = request.POST.get("route")
-        time = request.POST.get("time")
-        route = predict_linear("56A",DIRECTION=1,PLANNEDTIME_ARR=30113.0,PLANNEDTIME_DEP=26400.0,ACTUALTIME_DEP=26365.0,temp=2.32,MONTH=2,weather_main='Clouds')
-        route = timedelta(seconds=route)
-    else:
-        route = 0
-    return render(request, 'dublinBus/index.html', {'route':route})
+    return render(request, 'dublinBus/index.html')
 
 
 def dbTwitter(request):
@@ -398,7 +391,23 @@ def get_direction_bus(request, data):
     print(data_return)
     return JsonResponse(data_return)
 
+def timetable_main(request):
+    """ list of all timetables """
+    file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
+                                   "routes.json")
+    routes_dict = open(file_path_route, encoding="utf-8-sig")
+    return render(request, 'dublinBus/Timetable_main.html', {"routes" : routes_dict})
+
+def timetable_route(request):
+    file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
+                                   "routes.json")
+    f = open(file_path_route, encoding="utf-8-sig")
+    routes_dict = json.load(f)
+    f.close()
+    return JsonResponse(routes_dict)
+
 def timetable(request, route):
+    print(route)
     route_num = list(route.split(":"))[0]
     headsign = list(route.split(":"))[1]
     results = Current_timetable_all.objects

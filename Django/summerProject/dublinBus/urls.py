@@ -39,7 +39,7 @@ urlpatterns = [
     #ex: /get_prediction_for_stop/
     path('get_next_four_bus/<str:stop>', views.get_next_four_bus, name='get_next_four_bus'),
     # ex: /timetable/
-    path('timetable/', views.timetable_main, name='timetable_main'),
+    path('timetable', views.timetable_main, name='timetable_main'),
     # ex: /timetable/
     path('timetable_route/', views.timetable_route, name='timetable_route'),
     #ex: /timetable/

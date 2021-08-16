@@ -160,5 +160,5 @@ EMAIL_HOST_PASSWORD = logins.mail['password']
 # Runs the weather forecast scraper every hour and current bus scraper every minute
 CRONJOBS = [
     ('0 * * * *', 'dublinBus.cron.weather_forecast'),
-    ('* * * * *', 'dublinBus.cron.current_bus'),
+    ('*/5 * * * *', 'dublinBus.cron.current_bus'),
 ]

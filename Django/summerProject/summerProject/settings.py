@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
 from pathlib import Path
 from summerProject import logins
 import os
@@ -27,7 +26,9 @@ SECRET_KEY = 'django-insecure-^30c9hrd8_rd3@zmzu0#i^qccnlf&s8ds6!_q*jpq0gf--_@ub
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['137.43.49.56', 'localhost', '127.0.0.1', 'www.thedeparted.games']
+
+ALLOWED_HOSTS = ['137.43.49.56', 'localhost', '127.0.0.1','www.thedeparted.games', 'thedeparted.games']
+
 
 
 # Application definition

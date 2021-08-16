@@ -1,0 +1,12 @@
+{% extends "dublinBus/base.html" %}
+{% block title %}Test home page{% endblock %}
+{% load static %}
+{% block content %}
+<script type="text/javascript" src="{% static 'dublinBus/timetables.js' %}"></script>
+<div class="search">
+  <input type="text" id="userInput" onkeyup="filterSearch()" placeholder="Search for stations..." title="Type in a name">
+</div>
+<div id ="searchresults">
+    <h1>Loading...</h1>
+</div>
+{% endblock %}

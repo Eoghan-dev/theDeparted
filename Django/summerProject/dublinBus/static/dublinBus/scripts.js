@@ -483,7 +483,9 @@ class AutocompleteDirectionsHandler {
 
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     console.log("trip_info", trip_info)
-    var first_walking_time
+    let first_walking_time;
+    let last_walking_time
+    let total_cost = 0.0;
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
     let prediction_html = "<ul class='list-group'>";
@@ -505,24 +507,39 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         } else {
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
-            console.log({instructions_string_arr})
             console.log({prediction})
-            console.log(prediction.route[transit_count])
             instructions_string_arr = instructions_string_arr.slice(1);
-            console.log({instructions_string_arr})
             let instructions_string = instructions_string_arr.join(" ");
-            console.log(instructions_string)
-            prediction_html += "Get route " + prediction.route[transit_count] + " " + instructions_string + " ---- ";
+            prediction_html += "Get route " + trip_step.route_num + " " + instructions_string + " ---- ";
             // if "gmaps" was returned by backend instead of a time we can use the built in google maps prediction
-            if (prediction.arrival_time[i] === "gmaps") {
-                prediction_html += trip_info.duration[transit_count];
+            if (prediction.arrival_time[transit_count] === "gmaps") {
+                prediction_html += trip_info[i]["duration"];
                 gmaps_journey = true;
             } else {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
                 step_time_date = new Date(step_time)
-                prediction_html += ((step_time / 1000) / 60) + " mins";
+                prediction_html += ((step_time / 1000) / 60) + " mins ";
             }
+            // Get the total number of stops the bus passed for this stop
+            let stops_passed = trip_info[i]["num_stops"];
+            let fare_status = window.fare_status
+            // If the user is logged in but hasn't set a status yet set a default as adult
+            if (fare_status.length < 1) {
+                fare_status = "adult";
+            }
+            let leap_card = window.leap_card
+            console.log("num stops is " + stops_passed + " and fare status is " + fare_status + " and leap card is " + leap_card)
+
+            // calculate cost of bus by first calculating whether the current departure time falls within a schooltime range
+            let departure_time = trip_info[i].departure_time;
+            let schooltime = determineSchoolRange(departure_time);
+            // check if route is xpresso (has an x in the route number)
+            console.log({trip_step})
+            let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
+            let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
+            prediction_html += " ---- €" + fare.toFixed(2);
+            total_cost += fare;
             transit_count += 1;
         }
         prediction_html += "</li>";
@@ -534,7 +551,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
-        total_time_taken_str = "Total journey should take " + gmaps_total_journey;
+        total_time_taken_str = "Total journey should take " + gmaps_total_journey + "and should cost €" + total_cost.toFixed(2);
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
@@ -542,12 +559,55 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "<p>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €2.25 (adult leap card)</p>";
+        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2);
     }
 
     prediction_html += total_time_taken_str;
     return prediction_html
-}//
+}
+function determineSchoolRange(departure_time) {
+    let valid = false;
+    let departure_min;
+    // Function to determine if a bus departure time falls within a school range for our fare calculator
+    console.log("departure time", departure_time)
+    let departure_hour = parseInt(departure_time.split(":")[0]);
+    // Parse the departure time minutes differently depending on if response includes pm/am
+    if (departure_time.split(":")[1].includes("pm") || departure_time.split(":")[1].includes("am")) {
+        departure_min = parseInt(departure_time.split(":")[1].substring(0, 2));
+        if (departure_time.split(":")[1].substring(2,4) === "pm") {
+            departure_hour += 12;
+        }
+    }
+    else {
+        departure_min = parseInt(departure_time.split(":")[1])
+    }
+
+    let date = new Date();
+    // set the departure time to our date object
+    console.log(departure_min)
+    date.setHours(departure_hour);
+    date.setMinutes(departure_min);
+    // get the day of the week (sunday is 0)
+    let weekday = date.getDay();
+    // valid until 19:00 mon-fri and until 13:30 on saturday. Never valid on sunday
+    if (weekday === 7) {
+        // If it's before 1pm or after 1pm but before 1.30pm then it's valid
+        if ((date.getHours() < 13 ) || (date.getHours() < 14 && date.getHours() >= 13 && date.getMinutes() < 30)) {
+            valid = true;
+        }
+    }
+    else if (weekday === 0) {
+        // Do nothing if it's sunday since it's never valid
+    }
+    else {
+        // For mon-fri it's valid if it's before 19:00
+        if (date.getHours() < 19) {
+            console.log(date.getHours(), "is less than 19, valid")
+            valid = true;
+        }
+    }
+    return valid;
+}
 
 async function loadRoutes() {
     let routes = await fetch('/get_routes').then(res => {
@@ -675,13 +735,6 @@ function getInfoFromDirections(response, selected_date_time) {
                     data_for_model.departure_stops.push(departure_stop);
                     data_for_model.arrival_stops.push(arrival_stop)
 
-                    // let step_info = {
-                    //     "step_type": current_step.travel_mode,
-                    //     "distance": current_step.distance,
-                    //     "instructions": current_step.instructions,
-                    //     "duration": current_step.duration,
-                    //     "gmaps_prediction": current_step.transit.arrival_time.value,
-                    // }
                     step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
@@ -689,23 +742,23 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
                     step_info["departure_time"] = departure_time;
                     step_info["route_num"] = current_step.transit.line.short_name;
+                    step_info["num_stops"] = current_step.transit.num_stops;
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
-                    // let step_info = {
-                    //     "step_type": current_step.travel_mode,
-                    //     "distance": current_step.distance,
-                    //     "instructions": current_step.instructions,
-                    //     "duration": current_step.duration,
-                    //     "gmaps_prediction": "n/a",
-                    // }
                     step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
-                    step_info["departure_time"] = current_step.departure_time;
+                    if (k === 0) {
+                        step_info["departure_time"] = current_leg.departure_time;
+                    }
+                    else {
+                        step_info["departure_time"] = "n/a";
+                    }
                     step_info["route_num"] = "n/a";
+                    step_info["num_stops"] = "n/a";
                 }
                 trip_description.push(step_info);
             }
@@ -776,4 +829,223 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
 
 function closeSidebar() {
   document.getElementById("sidebar").style.width = "0%";
+
+}
+
+function get_timetable_stops(result) {
+    var result_1 = JSON.parse(result);
+    var stop_list = [];
+    console.log("back again")
+    var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
+    for (let i = 0; i < result_1.length; i++) {
+        if (stop_list.includes(result_1[i]["stop"]))   {
+
+        }
+        else    {
+
+            //stops += "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center \">"+result_1[i]["stop"]+"</div></span>"
+            //var stop = result_1[i]["stop"];
+            //var entry = document.createElement('li');
+            //entry.hre
+            //entry.classList.add("list-group-item");
+            //entry.appendChild(document.createTextNode(stop));
+            //list.appendChild(entry);
+            stop_list.push(result_1[i]["stop"])
+        }
+    }
+    var ordered_stop_list = stop_list.map((i) => Number(i));
+    ordered_stop_list.sort((a, b) => a - b);
+    for (let i = 0; i < ordered_stop_list.length; i++) {
+        console.log("back again")
+        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable("+ ordered_stop_list[i] +")\"><div class=\"col-xs-12 col-md-12 text-center \">"+ordered_stop_list[i]+"</div></span>"
+    }
+    document.getElementById('stop_list').innerHTML = stops;
+}
+function get_timetable(stop) {
+    var stop_time_list = parsedsched
+    console.log(stop)
+    let url = window.location.href
+    url = url.replace("%20", " ");
+    url = url.replace("%27", "'");
+    const myArr = url.split("/");
+    document.getElementById('Title').innerHTML = myArr[myArr.length - 1] + " - Stop " + stop;
+    let mon_fri_content = "<div class=\"row\">";
+    let sat_content = "<div class=\"row\">";
+    let sun_content = "<div class=\"row\">";
+    for (let i = 0; i < stop_time_list.length; i++) {
+        if ((stop_time_list[i]["day"]=="mon")&&(stop_time_list[i]["stop"]==stop)   ) {
+            mon_fri_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning\">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+        else if ((stop_time_list[i]["day"]=="sat")&&(stop_time_list[i]["stop"]==stop))    {
+            sat_content += "<div class=\"col-4 col-xs-3 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+        else if ((stop_time_list[i]["day"]=="sun" )&&(stop_time_list[i]["stop"]==stop))    {
+            sun_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
+        }
+    }
+    mon_fri_content += "</div>"
+    sat_content += "</div>"
+    sun_content += "</div>"
+    document.getElementById('mon_fri_content').innerHTML = mon_fri_content;
+    document.getElementById('sat_content').innerHTML = sat_content;
+    document.getElementById('sun_content').innerHTML = sun_content;
+
+}
+
+function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
+    // Function that takes the number of stops passed (stages), fare status and leap card, xpresso and schoolchild booleans
+    // as parameters and returns a fare estimation based on this
+    let package;
+    let cost;
+    // First determine package (leap card and fare status combo)
+    console.log("fare status of user is", fareStatus)
+    if (fareStatus === "adult") {
+        if (leapcard === true) {
+            package = "adultleap";
+        } else {
+            package = "adultcash";
+        }
+    } else if (fareStatus === "child") {
+        if (leapcard === true) {
+            package = "childleap";
+        } else {
+            package = "childcash";
+        }
+    }
+
+    //Data structure for costs as per Transport for Ireland website
+    var costs = {
+        'adultleap': {'price1': 1.55, 'price2' : 2.25, 'price3': 2.50, 'price4': 3.00},
+        'adultcash': {'price1': 2.15, 'price2' : 3.00, 'price3': 3.30, 'price4': 3.80},
+        'childleap': {'price1': .80, 'price2' : 1.00, 'price3': 1.00, 'price4': 1.26},
+        'childcash': {'price1': 1.00, 'price2' : 1.30, 'price3': 1.30, 'price4': 1.60}
+    };
+
+    if (fareStatus === "adult") {
+        if (xpresso === true) {
+            cost = costs[package]['price4'];
+            console.log("found fare, cost is", cost, "and package is", package)
+        }
+        else {
+            if (stages >= 1 && stages <= 3) {
+                cost = costs[package]['price1'];
+                console.log("found fare, cost is", cost, "and package is", package)
+            } else if (stages > 3 && stages <= 13) {
+                cost = costs[package]['price2'];
+                console.log("found fare, cost is", cost, "and package is", package)
+            } else if (stages > 13) {
+                cost = costs[package]['price3'];
+                console.log("found fare, cost is", cost, "and package is", package)
+            }
+        }
+    }
+    else {
+        if (schoolchild === true) {
+            cost = costs[package]['price1'];
+            console.log("found fare, cost is", cost, "and package is", package)
+        } else if (xpresso === true) {
+            cost = costs[package]['price4'];
+            console.log("found fare, cost is", cost, "and package is", package)
+        }
+        else {
+            if (stages >= 1 && stages <= 7) {
+                cost = costs[package]['price2'];
+                console.log("found fare, cost is", cost, "and package is", package)
+            } else if (stages > 7) {
+                cost = costs[package]['price3'];
+                console.log("found fare, cost is", cost, "and package is", package)
+            }
+        }
+    }
+
+
+
+
+    //if else statements to return price based on dropdown selection
+  //   if(stages == 1 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price1);
+  //       var price = costs['adultleap'].price1;
+  //   }
+  //   else if(stages == 1 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price1);
+  //       var price = costs['adultcash'].price1;
+  //   }
+  //   else if(stages == 2 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price2);
+  //       var price = costs['adultleap'].price2;
+  //   }
+  //   else if(stages == 2 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price2);
+  //       var price = costs['adultcash'].price2;
+  //   }
+  //   else if(stages == 3 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price3);
+  //       var price = costs['adultleap'].price3;
+  //   }
+  //   else if(stages == 3 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price3);
+  //       var price = costs['adultcash'].price3;
+  //   }
+  //   else if(stages == 4 && package =='adultleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultleap'].price4);
+  //       var price = costs['adultleap'].price4;
+  //   }
+  //   else if(stages == 4 && package =='adultcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['adultcash'].price4);
+  //       var price = costs['adultcash'].price4;
+  //   }
+  //   else if(stages == 5 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price1);
+  //       var price = costs['childleap'].price1;
+  //   }
+  //   else if(stages == 5 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price1);
+  //       var price = costs['childcash'].price1;
+  //   }
+  //   else if(stages == 6 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price2);
+  //       var price = costs['childleap'].price2;
+  //   }
+  //   else if(stages == 6 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price2);
+  //       var price = costs['childcash'].price2;
+  //   }
+  //   else if(stages == 7 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price3);
+  //       var price = costs['childleap'].price3;
+  //   }
+  //   else if(stages == 7 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price3);
+  //       var price = costs['childleap'].price3;
+  //   }
+  //   else if(stages == 8 && package =='childleap') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childleap'].price4);
+  //       var price = costs['childleap'].price4;
+  //   }
+  //   else if(stages == 8 && package =='childcash') {
+  //       console.log('stage', stages);
+  //       console.log(costs['childcash'].price4);
+  //       var price = costs['childleap'].price4;
+  //   }
+  //   else {
+  //     var price = 'Invalid Selction';
+  //   }
+  //
+  // document.getElementById('price').innerHTML = price;
+        return cost;
 }

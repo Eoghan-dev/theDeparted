@@ -77,6 +77,7 @@ def updateUser(request):
         fare_status = request.POST.get('fare_status_radios')
         leap_card_str = request.POST.get('leap_card_radios')
         # Parse the leap card string returned to get boolean
+        print("leap card str", leap_card_str)
         if leap_card_str == "true":
             leap_card = True
         else:

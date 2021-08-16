@@ -38,6 +38,10 @@ urlpatterns = [
     path('get_direction_bus/<str:data>', views.get_direction_bus, name='get_direction_bus'),
     #ex: /get_prediction_for_stop/
     path('get_next_four_bus/<str:stop>', views.get_next_four_bus, name='get_next_four_bus'),
+    # ex: /timetable/
+    path('timetable/', views.timetable_main, name='timetable_main'),
+    # ex: /timetable/
+    path('timetable_route/', views.timetable_route, name='timetable_route'),
     #ex: /timetable/
     path('timetable/<str:route>', views.timetable, name='timetable'),
     #ex: /dbTwitter/

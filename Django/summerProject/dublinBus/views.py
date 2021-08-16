@@ -3,14 +3,12 @@ from django.shortcuts import render, redirect
 from .models import CurrentWeather, CurrentBus, BusStops, WeatherForecast, Current_timetable_all
 from django.conf import settings # This allows us to import base directory which we can use for read/write operations
 import os
-import json
 import pandas as pd
 import pickle
 import datetime
 from dateutil.relativedelta import *
 from datetime import timedelta, datetime
 base = settings.BASE_DIR
-from summerProject import DublinBus_current_info
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import json
@@ -77,6 +75,7 @@ def updateUser(request):
         fare_status = request.POST.get('fare_status_radios')
         leap_card_str = request.POST.get('leap_card_radios')
         # Parse the leap card string returned to get boolean
+        print("leap card str", leap_card_str)
         if leap_card_str == "true":
             leap_card = True
         else:
@@ -275,21 +274,6 @@ def get_next_bus_time(request, route):
     else:
         return HttpResponse("error")
 
-def scrapeCW(request):
-    """View to call our scrape method in the CurrentWeather class"""
-    CurrentWeather.scrape()
-    return HttpResponse("Finished scraping CurrentWeather, results saved to database!")
-
-def scrapeCB(request):
-    """View to call our scrape method in the CurrentBus class"""
-    CurrentBus.scrape()
-    return HttpResponse("Finished scraping CurrentBus, results saved to database!")
-
-def scrape_bus_stops(request):
-    """View to call our scrape method in the bus_stops class"""
-    BusStops.scrape()
-    return HttpResponse("Finished scraping bus_stops, results saved to database!")
-
 def get_bus_stops(request):
     """View to get all bus stops from our json file and return it as a json object"""
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
@@ -326,38 +310,6 @@ def get_shapes_by_route(request, route_id):
         if data["shape_id"].split(".")[0] == route_id:
             returnable_data[id] = data
     return JsonResponse(returnable_data)
-
-def predict_linear(ROUTEID,DIRECTION,PLANNEDTIME_ARR,PLANNEDTIME_DEP,ACTUALTIME_DEP,temp=10,MONTH=1,weather_main='Rain'):
-    """
-        View that returns an json object containing all objects from the shapes.json file where it matches our given route_id
-        """
-    base = settings.BASE_DIR
-    # Save the path of shapes.json as a variable
-    file_path = os.path.join(base, "dublinBus", "static","dublinBus", "predictive_model")
-    weather = {'Clear': 0, 'Clouds': 1, 'Rain': 2, 'Mist': 3, 'Drizzle': 4, 'Snow': 5, 'Fog': 6}
-    # features
-    data = {
-        'PLANNEDTIME_ARR': [PLANNEDTIME_ARR],
-        'PLANNEDTIME_DEP': [PLANNEDTIME_DEP],
-        'ACTUALTIME_DEP': [ACTUALTIME_DEP],
-        'temp': [temp],
-        'MONTH': [MONTH],
-        'weather_main': [weather[weather_main]]
-    }
-    # create dataframe
-    X = pd.DataFrame.from_dict(data)
-    # load model from file
-    with open(file_path+"\\" + str(ROUTEID) + '_' + str(DIRECTION) + '.pkl', 'rb') as file:
-        model = pickle.load(file)
-        # get prediction from model
-    y = model.predict(X)
-    # return the prediction
-    return round(y[0][0])
-
-def get_bus_json(request):
-    """View to run the DublinBus_current_info scraper which gets json versions of our txt files for static bus"""
-    DublinBus_current_info.main()
-    return HttpResponse("Finished scraping bus_stops, results saved to database!")
 
 def get_direction_bus(request, data):
     #Loads json data passed from the request - obtained from google maps api

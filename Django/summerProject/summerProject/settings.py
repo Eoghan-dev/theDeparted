@@ -157,7 +157,8 @@ EMAIL_HOST_USER = logins.mail['username']
 EMAIL_HOST_PASSWORD = logins.mail['password']
 
 # Crontab stuff
-# Runs the run_scrapers method in cron.py every day at 1 am
+# Runs the weather forecast scraper every hour and current bus scraper every minute
 CRONJOBS = [
-    ('0 1 * * *', 'dublinBus.cron.run_scrapers')
+    ('0 * * * *', 'dublinBus.cron.weather_forecast'),
+    ('*/5 * * * *', 'dublinBus.cron.current_bus'),
 ]

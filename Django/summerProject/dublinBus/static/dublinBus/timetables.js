@@ -1,8 +1,30 @@
+function filterSearch() {
+    var input, filter, table, th, a, i, txtValue;
+    input = document.getElementById("userInput");
+    table = document.getElementById("resultsTable");
+
+    //Search won't be case sensitive.
+    filter = input.value.toUpperCase();
+    th = table.getElementsByClassName("routename");
+
+    //Anything not matching user query is hidden.
+    for (i = 0; i < th.length; i++) {
+        a = th[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            th[i].style.display = "";
+        } else {
+            th[i].style.display = "none";
+        }
+    }
+
+}
+
 fetch("/timetable_route").then(response => {
     return response.json();
 }).then(data => {
     console.log(data)
-    results_output = "<div id='resultslist'>"
+    results_output = "<div id='resultsTable'>"
     results_output += "<div class='row'><div class='col-xs-6 offset-xs-3 col-8 offset-2 col-md-4 offset-md-4 py-2 my-1 text-center bg-warning'> Route </div></div>";
     results_output += "<div class='row'>";
     for (var key in data){
@@ -20,24 +42,3 @@ fetch("/timetable_route").then(response => {
 }).catch(err => {
     document.getElementById("searchresults").innerHTML = "<h1>Error! The stations cannot be loaded at this time</h1>";
 })
-function filterSearch() {
-    var input, filter, list, ele, a, i, txtValue;
-    input = document.getElementById("userInput");
-    list = document.getElementById("resultslist");
-
-    //Search won't be case sensitive.
-    filter = input.value.toUpperCase();
-    ele = table.getElementsByClassName("routename");
-
-    //Anything not matching user query is hidden.
-    for (i = 0; i < th.length; i++) {
-        a = ele[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            ele[i].style.display = "";
-        } else {
-            ele[i].style.display = "none";
-        }
-    }
-
-}

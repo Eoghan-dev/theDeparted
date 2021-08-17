@@ -164,9 +164,8 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                      incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
-                }
-                else {
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
+                } else {
                     incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
                 }
             }
@@ -406,9 +405,19 @@ class AutocompleteDirectionsHandler {
                         let prediction_res = await fetch(`/get_direction_bus/${data_for_model}`);
                         console.log("raw result", prediction_res)
                         let prediction = await prediction_res.json();
-                        //console.log("result after .json()", prediction_json)
-                        //let prediction = JSON.parse(prediction_json)
                         console.log("result after json.parse", prediction)
+
+                        // fill in the departure times from trip_info using what was generated in our prediction
+                        // loop through trip info starting at the second item as we already have the initial departure time
+                        let transit_count = 0;
+                        for (let i = 1; i < trip_info.length; i++) {
+                            // If it's a walking step we can take the arrival time of the previous transit step as their departure time
+                            if (trip_info[i].step_type === "WALKING") {
+                                let departure_timestamp = prediction['arrival_time'][transit_count];
+                                let departure_string = getGmapsTimeFromTimestamp(departure_timestamp)
+                                trip_info[i].departure_time = departure_string;
+                            }
+                        }
                         // Get the html from this data that we want to show to the user and then display it to them
                         let prediction_html = getPredictionHTML(prediction, trip_info, gmaps_total_journey);
                         let results_container = document.getElementById('results_container');
@@ -487,6 +496,22 @@ class AutocompleteDirectionsHandler {
     }
 }
 
+function getGmapsTimeFromTimestamp(timestamp) {
+    // function that takes a timestamp and returns it as a formatted 24hr time in the same format as google maps
+
+    let departure_string = "";
+    let departure_Date = new Date(timestamp)
+    console.log({departure_Date})
+    let hour = departure_Date.getHours()
+    let minutes = departure_Date.getMinutes()
+    if (hour > 12) {
+        departure_string += hour - 12 + ":" + minutes + "pm";
+    } else {
+        departure_string += hour - 12 + ":" + minutes + "am";
+    }
+    return departure_string
+}
+
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     console.log("trip_info", trip_info)
     let first_walking_time;
@@ -504,8 +529,8 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
-            if (i == 0) {
+            prediction_html += trip_step.departure_time + ": " + trip_step.instructions + " ---- " + trip_step.duration;
+            if (i === 0) {
                 first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60
                 console.log(new Date(first_walking_time))
             }
@@ -571,6 +596,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     prediction_html += total_time_taken_str;
     return prediction_html
 }
+
 function determineSchoolRange(departure_time) {
     let valid = false;
     let departure_min;
@@ -580,11 +606,10 @@ function determineSchoolRange(departure_time) {
     // Parse the departure time minutes differently depending on if response includes pm/am
     if (departure_time.split(":")[1].includes("pm") || departure_time.split(":")[1].includes("am")) {
         departure_min = parseInt(departure_time.split(":")[1].substring(0, 2));
-        if (departure_time.split(":")[1].substring(2,4) === "pm") {
+        if (departure_time.split(":")[1].substring(2, 4) === "pm") {
             departure_hour += 12;
         }
-    }
-    else {
+    } else {
         departure_min = parseInt(departure_time.split(":")[1])
     }
 
@@ -598,14 +623,12 @@ function determineSchoolRange(departure_time) {
     // valid until 19:00 mon-fri and until 13:30 on saturday. Never valid on sunday
     if (weekday === 7) {
         // If it's before 1pm or after 1pm but before 1.30pm then it's valid
-        if ((date.getHours() < 13 ) || (date.getHours() < 14 && date.getHours() >= 13 && date.getMinutes() < 30)) {
+        if ((date.getHours() < 13) || (date.getHours() < 14 && date.getHours() >= 13 && date.getMinutes() < 30)) {
             valid = true;
         }
-    }
-    else if (weekday === 0) {
+    } else if (weekday === 0) {
         // Do nothing if it's sunday since it's never valid
-    }
-    else {
+    } else {
         // For mon-fri it's valid if it's before 19:00
         if (date.getHours() < 19) {
             console.log(date.getHours(), "is less than 19, valid")
@@ -758,9 +781,8 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
                     if (k === 0) {
-                        step_info["departure_time"] = current_leg.departure_time;
-                    }
-                    else {
+                        step_info["departure_time"] = current_leg.departure_time.text;
+                    } else {
                         step_info["departure_time"] = "n/a";
                     }
                     step_info["route_num"] = "n/a";
@@ -783,7 +805,7 @@ function fillSidebar(content, type) {
     if (type === "stops") {
 
         sidebar_content += "<h3 class='display-1' style='color:rgb(255,193,7)'>Favourite stops</h3>"
-    sidebar_content += "<div class='align-items-center'><ul class='list-group'>";
+        sidebar_content += "<div class='align-items-center'><ul class='list-group'>";
         let content_arr = content.split(",")
         for (let content of content_arr) {
             sidebar_content += `<a href='javascript:closeSidebar()'><li class="list-group-item fav_stops_button_sb" style="background-color:rgb(255,193,7)">${content}</li></a>`
@@ -810,7 +832,7 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     console.log("inside setup fav buttons")
     let fav_stops = document.querySelectorAll(".fav_stops_button_sb");
     console.log({fav_stops_buttons: fav_stops})
-    for (let i=0; i< fav_stops.length; i++) {
+    for (let i = 0; i < fav_stops.length; i++) {
         let current_stop = fav_stops[i];
 
         current_stop.addEventListener('click', () => {
@@ -820,21 +842,21 @@ function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     }
     let fav_routes = document.querySelectorAll(".fav_routes_button_sb");
     console.log({fav_routes_buttons: fav_routes})
-    for (let i=0; i< fav_routes.length; i++) {
+    for (let i = 0; i < fav_routes.length; i++) {
         let current_route = fav_routes[i];
-          current_route.addEventListener('click', () => {
-              console.log("in sidebar button event listener (route)")
-              displayRouteFromFavs(current_route.innerHTML)
-          });
+        current_route.addEventListener('click', () => {
+            console.log("in sidebar button event listener (route)")
+            displayRouteFromFavs(current_route.innerHTML)
+        });
     }
-    }
+}
 
-    function openSidebar() {
-  document.getElementById("sidebar").style.width = "100%";
+function openSidebar() {
+    document.getElementById("sidebar").style.width = "100%";
 }
 
 function closeSidebar() {
-  document.getElementById("sidebar").style.width = "0%";
+    document.getElementById("sidebar").style.width = "0%";
 
 }
 
@@ -844,10 +866,9 @@ function get_timetable_stops(result) {
     console.log("back again")
     var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
     for (let i = 0; i < result_1.length; i++) {
-        if (stop_list.includes(result_1[i]["stop"]))   {
+        if (stop_list.includes(result_1[i]["stop"])) {
 
-        }
-        else    {
+        } else {
 
             //stops += "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center \">"+result_1[i]["stop"]+"</div></span>"
             //var stop = result_1[i]["stop"];
@@ -863,10 +884,11 @@ function get_timetable_stops(result) {
     ordered_stop_list.sort((a, b) => a - b);
     for (let i = 0; i < ordered_stop_list.length; i++) {
         console.log("back again")
-        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable("+ ordered_stop_list[i] +")\"><div class=\"col-xs-12 col-md-12 text-center \">"+ordered_stop_list[i]+"</div></span>"
+        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
     }
     document.getElementById('stop_list').innerHTML = stops;
 }
+
 function get_timetable(stop) {
     var stop_time_list = parsedsched
     console.log(stop)
@@ -879,14 +901,12 @@ function get_timetable(stop) {
     let sat_content = "<div class=\"row\">";
     let sun_content = "<div class=\"row\">";
     for (let i = 0; i < stop_time_list.length; i++) {
-        if ((stop_time_list[i]["day"]=="mon")&&(stop_time_list[i]["stop"]==stop)   ) {
-            mon_fri_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning\">"+ stop_time_list[i]["stop_time"] +"</div>"
-        }
-        else if ((stop_time_list[i]["day"]=="sat")&&(stop_time_list[i]["stop"]==stop))    {
-            sat_content += "<div class=\"col-4 col-xs-3 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
-        }
-        else if ((stop_time_list[i]["day"]=="sun" )&&(stop_time_list[i]["stop"]==stop))    {
-            sun_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning \">"+ stop_time_list[i]["stop_time"] +"</div>"
+        if ((stop_time_list[i]["day"] == "mon") && (stop_time_list[i]["stop"] == stop)) {
+            mon_fri_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning\">" + stop_time_list[i]["stop_time"] + "</div>"
+        } else if ((stop_time_list[i]["day"] == "sat") && (stop_time_list[i]["stop"] == stop)) {
+            sat_content += "<div class=\"col-4 col-xs-3 col-2-md col-xl-2 text-center text-warning \">" + stop_time_list[i]["stop_time"] + "</div>"
+        } else if ((stop_time_list[i]["day"] == "sun") && (stop_time_list[i]["stop"] == stop)) {
+            sun_content += "<div class=\"col-xs-3 col-4 col-2-md col-xl-2 text-center text-warning \">" + stop_time_list[i]["stop_time"] + "</div>"
         }
     }
     mon_fri_content += "</div>"
@@ -921,18 +941,17 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
 
     //Data structure for costs as per Transport for Ireland website
     var costs = {
-        'adultleap': {'price1': 1.55, 'price2' : 2.25, 'price3': 2.50, 'price4': 3.00},
-        'adultcash': {'price1': 2.15, 'price2' : 3.00, 'price3': 3.30, 'price4': 3.80},
-        'childleap': {'price1': .80, 'price2' : 1.00, 'price3': 1.00, 'price4': 1.26},
-        'childcash': {'price1': 1.00, 'price2' : 1.30, 'price3': 1.30, 'price4': 1.60}
+        'adultleap': {'price1': 1.55, 'price2': 2.25, 'price3': 2.50, 'price4': 3.00},
+        'adultcash': {'price1': 2.15, 'price2': 3.00, 'price3': 3.30, 'price4': 3.80},
+        'childleap': {'price1': .80, 'price2': 1.00, 'price3': 1.00, 'price4': 1.26},
+        'childcash': {'price1': 1.00, 'price2': 1.30, 'price3': 1.30, 'price4': 1.60}
     };
 
     if (fareStatus === "adult") {
         if (xpresso === true) {
             cost = costs[package]['price4'];
             console.log("found fare, cost is", cost, "and package is", package)
-        }
-        else {
+        } else {
             if (stages >= 1 && stages <= 3) {
                 cost = costs[package]['price1'];
                 console.log("found fare, cost is", cost, "and package is", package)
@@ -944,16 +963,14 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
                 console.log("found fare, cost is", cost, "and package is", package)
             }
         }
-    }
-    else {
+    } else {
         if (schoolchild === true) {
             cost = costs[package]['price1'];
             console.log("found fare, cost is", cost, "and package is", package)
         } else if (xpresso === true) {
             cost = costs[package]['price4'];
             console.log("found fare, cost is", cost, "and package is", package)
-        }
-        else {
+        } else {
             if (stages >= 1 && stages <= 7) {
                 cost = costs[package]['price2'];
                 console.log("found fare, cost is", cost, "and package is", package)
@@ -965,93 +982,91 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     }
 
 
-
-
     //if else statements to return price based on dropdown selection
-  //   if(stages == 1 && package =='adultleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultleap'].price1);
-  //       var price = costs['adultleap'].price1;
-  //   }
-  //   else if(stages == 1 && package =='adultcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultcash'].price1);
-  //       var price = costs['adultcash'].price1;
-  //   }
-  //   else if(stages == 2 && package =='adultleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultleap'].price2);
-  //       var price = costs['adultleap'].price2;
-  //   }
-  //   else if(stages == 2 && package =='adultcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultcash'].price2);
-  //       var price = costs['adultcash'].price2;
-  //   }
-  //   else if(stages == 3 && package =='adultleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultleap'].price3);
-  //       var price = costs['adultleap'].price3;
-  //   }
-  //   else if(stages == 3 && package =='adultcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultcash'].price3);
-  //       var price = costs['adultcash'].price3;
-  //   }
-  //   else if(stages == 4 && package =='adultleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultleap'].price4);
-  //       var price = costs['adultleap'].price4;
-  //   }
-  //   else if(stages == 4 && package =='adultcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['adultcash'].price4);
-  //       var price = costs['adultcash'].price4;
-  //   }
-  //   else if(stages == 5 && package =='childleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childleap'].price1);
-  //       var price = costs['childleap'].price1;
-  //   }
-  //   else if(stages == 5 && package =='childcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childcash'].price1);
-  //       var price = costs['childcash'].price1;
-  //   }
-  //   else if(stages == 6 && package =='childleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childleap'].price2);
-  //       var price = costs['childleap'].price2;
-  //   }
-  //   else if(stages == 6 && package =='childcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childcash'].price2);
-  //       var price = costs['childcash'].price2;
-  //   }
-  //   else if(stages == 7 && package =='childleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childleap'].price3);
-  //       var price = costs['childleap'].price3;
-  //   }
-  //   else if(stages == 7 && package =='childcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childcash'].price3);
-  //       var price = costs['childleap'].price3;
-  //   }
-  //   else if(stages == 8 && package =='childleap') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childleap'].price4);
-  //       var price = costs['childleap'].price4;
-  //   }
-  //   else if(stages == 8 && package =='childcash') {
-  //       console.log('stage', stages);
-  //       console.log(costs['childcash'].price4);
-  //       var price = costs['childleap'].price4;
-  //   }
-  //   else {
-  //     var price = 'Invalid Selction';
-  //   }
-  //
-  // document.getElementById('price').innerHTML = price;
-        return cost;
+    //   if(stages == 1 && package =='adultleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultleap'].price1);
+    //       var price = costs['adultleap'].price1;
+    //   }
+    //   else if(stages == 1 && package =='adultcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultcash'].price1);
+    //       var price = costs['adultcash'].price1;
+    //   }
+    //   else if(stages == 2 && package =='adultleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultleap'].price2);
+    //       var price = costs['adultleap'].price2;
+    //   }
+    //   else if(stages == 2 && package =='adultcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultcash'].price2);
+    //       var price = costs['adultcash'].price2;
+    //   }
+    //   else if(stages == 3 && package =='adultleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultleap'].price3);
+    //       var price = costs['adultleap'].price3;
+    //   }
+    //   else if(stages == 3 && package =='adultcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultcash'].price3);
+    //       var price = costs['adultcash'].price3;
+    //   }
+    //   else if(stages == 4 && package =='adultleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultleap'].price4);
+    //       var price = costs['adultleap'].price4;
+    //   }
+    //   else if(stages == 4 && package =='adultcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['adultcash'].price4);
+    //       var price = costs['adultcash'].price4;
+    //   }
+    //   else if(stages == 5 && package =='childleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childleap'].price1);
+    //       var price = costs['childleap'].price1;
+    //   }
+    //   else if(stages == 5 && package =='childcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childcash'].price1);
+    //       var price = costs['childcash'].price1;
+    //   }
+    //   else if(stages == 6 && package =='childleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childleap'].price2);
+    //       var price = costs['childleap'].price2;
+    //   }
+    //   else if(stages == 6 && package =='childcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childcash'].price2);
+    //       var price = costs['childcash'].price2;
+    //   }
+    //   else if(stages == 7 && package =='childleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childleap'].price3);
+    //       var price = costs['childleap'].price3;
+    //   }
+    //   else if(stages == 7 && package =='childcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childcash'].price3);
+    //       var price = costs['childleap'].price3;
+    //   }
+    //   else if(stages == 8 && package =='childleap') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childleap'].price4);
+    //       var price = costs['childleap'].price4;
+    //   }
+    //   else if(stages == 8 && package =='childcash') {
+    //       console.log('stage', stages);
+    //       console.log(costs['childcash'].price4);
+    //       var price = costs['childleap'].price4;
+    //   }
+    //   else {
+    //     var price = 'Invalid Selction';
+    //   }
+    //
+    // document.getElementById('price').innerHTML = price;
+    return cost;
 }

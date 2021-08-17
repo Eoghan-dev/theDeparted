@@ -18,7 +18,55 @@ import time
 
 def index(request):
     """View to load the homepage of our application"""
-    return render(request, 'dublinBus/index.html')
+    cur_time = str(datetime.now().time())
+    cur_time_list = list(cur_time.split(":"))
+    cur_time = cur_time_list[0] + ":" + cur_time_list[1] + ":00"
+    result = CurrentBus.objects.filter(schedule="CANCELED", start_t__gt=cur_time).values()
+    print("result:",result)
+    weekday = int(datetime.now().weekday())
+    list_return = []
+    if weekday < 5:
+        day = "mon"
+    elif weekday == 5:
+        day = "sat"
+    elif weekday == 6:
+        day = "sun"
+    for i in result:
+        dict_return = {}
+        headsigns_li = []
+        route = i["route"]
+        start_t = i["start_t"]
+        direction = i["direction"]
+        file_path_routes = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
+                                       "routes.json")
+        f = open(file_path_routes, encoding="utf-8-sig")
+        routes_dict = json.load(f)
+        f.close()
+        for dir in routes_dict[route]["direction"]:
+            if dir[1] == direction:
+                headsigns_li.append(dir[0])
+        if len(headsigns_li) == 1:
+            dict_return["route"] = route
+            dict_return["headsign"] = headsigns_li[0]
+            dict_return["time"] = start_t
+        else:
+            file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files","bus_times", route + "_timetable.json")
+            if os.path.isfile(file_path_times) == True:
+                f = open(file_path_times, encoding="utf-8-sig")
+                times_dict = json.load(f)
+                f.close()
+                success = 0
+                for headsign in headsigns_li:
+                    for stop in times_dict[headsign][day]:
+                        for times in times_dict[headsign][day][stop]:
+                            if times[0] == start_t:
+                                dict_return["route"] = route
+                                dict_return["headsign"] = headsign
+                                dict_return["time"] = start_t
+                                break
+        list_return.append(dict_return)
+    list_return = json.dumps(list_return)
+    return render(request, 'dublinBus/index.html', {"result": list_return})
 
 
 def dbTwitter(request):
@@ -316,21 +364,11 @@ def get_direction_bus(request, data):
     data = json.loads(data)
     #Splits the route name as gives headsign with number--[number: headsign]
     data_return = {}
-    print("multiple buses")
-    print(data)
     data_return["route"] = []
     data_return["departure_time"] = []
     data_return["arrival_time"] = []
     for bus in range(0,len(data["departure_times"])):
-        print("**************")
-        print(data["departure_times"][bus])
-        print(data["departure_stops"][bus])
-        print(data["arrival_stops"][bus])
-        print(data["route_names"][bus])
-        print(data["date_time"])
-        print("**************")
         temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
-        print(temporary_dict)
         data_return["route"].append(temporary_dict["route"][0])
         if temporary_dict["departure_time"][0] == "gmaps":
             data_return["departure_time"].append(temporary_dict["departure_time"][0])
@@ -340,7 +378,6 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0])
         else:
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
-    print(data_return)
     return JsonResponse(data_return)
 
 def timetable_main(request):
@@ -365,7 +402,7 @@ def timetable(request, route):
     results = Current_timetable_all.objects
     result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
     result_list = json.dumps(result)
-    return render(request, 'dublinBus/timetables.html', {"result" : result_list})
+    return render(request, 'dublinBus/timetables.html', {"result": result_list})
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     # Splits the route name as gives headsign with number--[number: headsign]

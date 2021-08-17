@@ -73,6 +73,8 @@
             <div class="tab-pane" role="tabpanel" id="tab-2">
                 {# Everything under this div will be the main content of the page (not the sidebar) #}
                 <div class="container" id="route_input_container">
+                <div class="row">
+                <div class="col-md-4">
                     <div class="m-3 input-group">
                         <label for="routes_num"></label>
                         <input id="routes_num" list="routes" name="routes_num" class="form-control"
@@ -93,6 +95,27 @@
                     <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
                         route
                     </button>
+                </div>
+                <div class="col-md-4">
+                <h3 class="text-center">Cancelled Routes</h3>
+                    <table class="table table-striped table-dark">
+                    <thead>
+                        <tr class="orange-table">
+                            <th scope="col">Route Name</th>
+                            <th scope="col">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cancelled_route in result %}
+                        <tr class="orange-table">
+                            <td scope="row">{{ cancelled_route.route }}: {{ cancelled_route.headsign }}</td>
+                            <td scope="row">{{ cancelled_route.time }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
                 </div>
             </div>
 

@@ -78,3 +78,20 @@ border-right: 1px solid #eee;
   -ms-overflow-style: none;  /* IE and Edge - removes scrollbar timetable */
   scrollbar-width: none;  /* Firefox - removes scrollbar timetable */
 }
+
+/*.table {*/
+/*    margin: 1%;*/
+/*    border: 5px outset #021a40;*/
+/*    border-radius: 25px;*/
+/*    padding: 5px;*/
+/*}*/
+.orange-table {
+  color: rgb(255,193,7);
+  /*border: 5px outset rgb(255,193,7);*/
+  /*margin: 40px;*/
+  /*border-radius: 25px*/
+}
+
+.table-dark td {
+  color: rgb(255,193,7);
+}

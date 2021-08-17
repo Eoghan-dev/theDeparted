@@ -80,7 +80,6 @@ def index(request):
                                     dict_return["time"] = start_t
                                     break
         list_return.append(dict_return)
-    list_return = json.dumps(list_return)
     return render(request, 'dublinBus/index.html', {"result": list_return})
 
 

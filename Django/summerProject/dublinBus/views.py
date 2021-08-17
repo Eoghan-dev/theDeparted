@@ -32,6 +32,7 @@ def index(request):
     elif weekday == 6:
         day = "sun"
     for i in result:
+        print(i["route"])
         dict_return = {}
         headsigns_li = []
         route = i["route"]
@@ -45,6 +46,7 @@ def index(request):
         for dir in routes_dict[route]["direction"]:
             if dir[1] == direction:
                 headsigns_li.append(dir[0])
+        print(headsigns_li)
         if len(headsigns_li) == 1:
             dict_return["route"] = route
             dict_return["headsign"] = headsigns_li[0]
@@ -57,13 +59,14 @@ def index(request):
                 f.close()
                 success = 0
                 for headsign in headsigns_li:
-                    for stop in times_dict[headsign][day]:
-                        for times in times_dict[headsign][day][stop]:
-                            if times[0] == start_t:
-                                dict_return["route"] = route
-                                dict_return["headsign"] = headsign
-                                dict_return["time"] = start_t
-                                break
+                    if day in times_dict[headsign]:
+                        for stop in times_dict[headsign][day]:
+                            for times in times_dict[headsign][day][stop]:
+                                if times[0] == start_t:
+                                    dict_return["route"] = route
+                                    dict_return["headsign"] = headsign
+                                    dict_return["time"] = start_t
+                                    break
         list_return.append(dict_return)
     list_return = json.dumps(list_return)
     return render(request, 'dublinBus/index.html', {"result": list_return})

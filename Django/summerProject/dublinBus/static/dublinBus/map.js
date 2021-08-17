@@ -53,12 +53,15 @@ async function initMap() {
     }
 
     // Every time either the fav routes or fav stops button is clicked run this function to add event listeners to all the buttons
-    document.getElementById('fav_stops_btn').addEventListener('click', () => {
-        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
-    });
+    // Only do this if the user is logged in and the buttons are present
+    if (document.getElementById('fav_stops_btn')) {
+        document.getElementById('fav_stops_btn').addEventListener('click', () => {
+            setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+        });
         document.getElementById('fav_routes_btn').addEventListener('click', () => {
-        setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
-    })
+            setupFavButtons(displayStopFromFavs, displayRouteFromFavs)
+        })
+    }
 
 
     // Loop through our json object making a marker for each station and placing that marker on the map/saving it to an array
@@ -75,14 +78,12 @@ async function initMap() {
             station_routes.push(routes_string);
         })
         // Create content of window
-        let window_content = `<h1>Station Name: ${station.stop_name}</h1>` +
-            `<ul>` +
-            `<li>Station Number: ${station_number} </li>` +
-            `<li>Routes served by station:<ul>`;
+        let window_content = `<div class="infowindow"><h1> Stop ${station_number}: ${station.stop_name}</h1>` +
+            `Routes serving this station:<ul class="list-group">`;
         for (let route of station_routes) {
-            window_content += `<li>${route}</li>`;
+            window_content += `<li class="list-group-item">${route}</li>`;
         }
-        window_content += "</ul></ul>";
+        window_content += "</ul>";
         // Create info window object
         let current_info_window = new google.maps.InfoWindow({
             content: window_content,
@@ -118,19 +119,19 @@ async function initMap() {
             let info_window_text = previous_content;
 
             let incoming_buses_text = "<h3>Incoming Buses</h3>" +
-                "<ul>";
+                "<ul class='list-group'>";
             // Loop over the incoming bus data and each of them to the info window
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                    incoming_buses_text += `<li>${route_name} is currently less than a minute away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
                 }
                 else {
-                    incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
                 }
             }
-            incoming_buses_text += "</ul>";
+            incoming_buses_text += "</ul></div>";
             info_window_text += incoming_buses_text;
             current_info_window.setContent(info_window_text);
             current_info_window.open({

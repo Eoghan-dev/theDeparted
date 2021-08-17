@@ -159,18 +159,18 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             let previous_content = previous_info_window_text.split("<h3>")[0];
             let info_window_text = previous_content;
             // Loop over the incoming bus data and each of them to the info window
-            let incoming_buses_text = "<h3>Incoming Buses</h3>" + "<ul>";
+            let incoming_buses_text = "<h3>Incoming Buses</h3>" + "<ul class='list-group'>";
             for (let route of incoming_buses) {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                      incoming_buses_text += `<li>${route_name} is currently less than a minute away.</li>`;
+                      incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
                 }
                 else {
-                    incoming_buses_text += `<li>${route_name} is currently ${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
                 }
             }
-            incoming_buses_text += "</ul>";
+            incoming_buses_text += "</ul></div>";
             info_window_text += incoming_buses_text;
             current_info_window.setContent(info_window_text);
             // Make that marker visible
@@ -780,7 +780,7 @@ function fillSidebar(content, type) {
     sidebar_content += "<div class='align-items-center'><ul class='list-group'>";
         let content_arr = content.split(",")
         for (let content of content_arr) {
-            sidebar_content += `<a href='javascript:closeSidebar()'><li class="list-group-item fav_stops_button_sb"style="background-color:rgb(255,193,7)">${content}</li></a>`
+            sidebar_content += `<a href='javascript:closeSidebar()'><li class="list-group-item fav_stops_button_sb" style="background-color:rgb(255,193,7)">${content}</li></a>`
         }
 
     } else {

@@ -14,6 +14,7 @@ async function initMap() {
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 13,
         center: {lat: 53.349804, lng: -6.260310},
+        mapTypeControl: false,
     });
     var directionsService = new google.maps.DirectionsService();
     var directionsRenderer = new google.maps.DirectionsRenderer();

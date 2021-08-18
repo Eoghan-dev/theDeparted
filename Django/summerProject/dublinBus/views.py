@@ -112,6 +112,7 @@ def myAccount(request):
     # initialise fav routes and stops json before the if statement so that they can be passed to page even if empty
     fav_stops_list = []
     fav_routes_list = []
+    timetable_li = []
     if request.user.is_authenticated:
         user = request.user
         # Get users fav routes and stops, convert to array and then convert to json so it can be passed as a context
@@ -413,7 +414,7 @@ def timetable_route(request):
 def timetable(request, route):
     print(route)
     route_num = list(route.split(":"))[0]
-    headsign = list(route.split(":"))[1]
+    headsign = list(route.split(":"))[1].strip()
     results = Current_timetable_all.objects
     result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
     result_list = json.dumps(result)

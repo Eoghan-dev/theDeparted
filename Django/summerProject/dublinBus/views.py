@@ -619,6 +619,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     return data_return
 
 def get_next_four_bus(request, stop):
+    start_time = time.time()
     #Opens Path to stops.json / routes.json
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
     file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
@@ -669,16 +670,9 @@ def get_next_four_bus(request, stop):
                 headsign_list_2.append(routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"][direction][0])
     results = Current_timetable_all.objects
     real_time_bus = CurrentBus.objects
-    print("route", routes)
-    print("in_out", in_out)
-    print("distance",distance)
-    print("headsign",headsign_list)
-    print("headsign 2", headsign_list_2)
-    result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
-    print(future_time)
-    print(current_time)
-    print("result",result)
+    result = list(results.filter(stop_time__lt=future_time, stop_time__gte=current_time, stop=stop, day=Current_Day))
     for bus_stop_time in result:
+        route = bus_stop_time.route
         leave_time = bus_stop_time.leave_t
         leave_time_mins = list(leave_time.split(":"))
         leave_time_mins = (int(leave_time_mins[0]) * 60) + int(leave_time_mins[1])
@@ -712,11 +706,8 @@ def get_next_four_bus(request, stop):
             else:
                 predict_in_out = "O"
                 predict_in_out_num = 1
-
         real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
-        #print(real_time_check)
-        #print(bus_stop_time.headsign)
-        prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             if mins_till <0:
@@ -730,7 +721,8 @@ def get_next_four_bus(request, stop):
                 pass
             else:
                 buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
-    buses = sorted(buses, key=lambda x: x[0])
+    buses = sorted(buses, key=lambda x: x[1])[:4]
+    print("--- %s seconds last ---" % (time.time() - start_time))
     return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

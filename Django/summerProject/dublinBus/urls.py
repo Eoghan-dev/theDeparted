@@ -6,7 +6,6 @@ urlpatterns = [
     # ex: /
     path('', views.index, name='index'),
     path('home', views.index, name='index'),
-    path('get_cancellations', views.get_cancellations, name='get_cancellations'),
     path('update_user', views.updateUser, name='updateUser'),
     # ex: /add_user_routes
     path('add_user_route', views.addUserRoute, name='updateUserRoutes'),

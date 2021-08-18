@@ -9,6 +9,29 @@
         </div>
     </div>
 
+    <div id="cancellations_overlay" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeCancellationsOverlay()">&times;</a>
+        <div class="sidebar-content" id="cancellations_overlay_content">
+            <h3 class="text-center orange-table">Cancelled Routes</h3>
+            <table class="table table-dark">
+                <thead>
+                <tr class="orange-table">
+                    <th scope="col">Route Name</th>
+                    <th scope="col">Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cancelled_route in result %}
+                    <tr class="orange-table">
+                        <td scope="row">{{ cancelled_route.route }}: {{ cancelled_route.headsign }}</td>
+                        <td scope="row">{{ cancelled_route.time }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div id="content">
         <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
             <li class="nav-item" role="presentation"><a onclick="closeSidebar()" class="nav-link active" role="tab"
@@ -34,96 +57,86 @@
         <div class="tab-content">
             <div class="tab-pane active" role="tabpanel" id="tab-1" style="text-align: center;">
                 <div class="container" id="directions_input_container" style="padding: 5px">
-                    <div class ="row">
+                    <div class="row">
                         <div class="col-md-6 col-12">
-                    <div class="input-group mb-3">
-                        <input type="text" id="origin-input" class="form-control" placeholder="Enter origin location"
-                               aria-label="origin input" aria-describedby="origin input">
-                        <div class="input-group-append">
-                            <button id="dir_from_user_location" class="btn btn-outline-secondary" type="button">Use
-                                current
-                                location
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="input-group mb-3">
-                        <input type="text" id="destination-input" class="form-control"
-                               placeholder="Enter destination location"
-                               aria-label="destination input" aria-describedby="destination input">
-                    </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
-                        <div class ="row">
-                        <div class="col-md-3 col-6 mb-3">
-                        <input type="date" id="date_input">
-                        </div>
-                        <div class="col-md-3 col-6 mb-3">
-                        <input type="time" id="time_input">
-                        </div>
+                            <div class="input-group mb-3">
+                                <input type="text" id="origin-input" class="form-control"
+                                       placeholder="Enter origin location"
+                                       aria-label="origin input" aria-describedby="origin input">
+                                <div class="input-group-append">
+                                    <button id="dir_from_user_location" class="btn btn-outline-secondary" type="button">
+                                        Use
+                                        current
+                                        location
+                                    </button>
+                                </div>
                             </div>
-                    <div class="col-md-6 col-12">
-                        <button class="btn btn-outline-secondary" id="user_input_directions_btn">Get directions and
-                            predictions
-                        </button>
+
+                            <div class="input-group mb-3">
+                                <input type="text" id="destination-input" class="form-control"
+                                       placeholder="Enter destination location"
+                                       aria-label="destination input" aria-describedby="destination input">
+                            </div>
                         </div>
+
+                        <div class="col-md-6 col-12">
+                            <div class="row">
+                                <div class="col-md-3 col-6 mb-3">
+                                    <input type="date" id="date_input">
+                                </div>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <input type="time" id="time_input">
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <button class="btn btn-outline-secondary" id="user_input_directions_btn">Get directions
+                                    and
+                                    predictions
+                                </button>
+                            </div>
                         </div>
                         <div class="col-md-12 col-12">
-                    <div class="row" id="results_container" style="display: block">
+                            <div class="row" id="results_container" style="display: block">
 
-                    </div>
                             </div>
-                </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="tab-pane" role="tabpanel" id="tab-2">
                 {# Everything under this div will be the main content of the page (not the sidebar) #}
                 <div class="container" id="route_input_container">
-                <div class="row">
-                <div class="col-md-4">
-                    <div class="m-3 input-group">
-                        <label for="routes_num"></label>
-                        <input id="routes_num" list="routes" name="routes_num" class="form-control"
-                               placeholder="Please enter route number">
-                        {% if user.is_authenticated %}
-                        <div class="input-group-append">
-                            <button id="fav_routes_btn" class="btn btn-warning" type="button" data-toggle="canvas"
-                                    data-target="#bs-canvas-left"
-                                    aria-expanded="false" aria-controls="bs-canvas-left"
-                                    onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See favourite routes
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="m-3 input-group">
+                                <label for="routes_num"></label>
+                                <input id="routes_num" list="routes" name="routes_num" class="form-control"
+                                       placeholder="Please enter route number">
+                                {% if user.is_authenticated %}
+                                    <div class="input-group-append">
+                                        <button id="fav_routes_btn" class="btn btn-warning" type="button"
+                                                data-toggle="canvas"
+                                                data-target="#bs-canvas-left"
+                                                aria-expanded="false" aria-controls="bs-canvas-left"
+                                                onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See
+                                            favourite routes
+                                        </button>
+                                    </div>
+                                {% endif %}
+                                <datalist id="routes">
+                                </datalist>
+                            </div>
+
+                            <button class="btn btn-outline-secondary" id="get_directions"
+                                    onclick="displaySelectedRoute()">Give
+                                route
+                            </button>
+                            <button class="btn btn-outline-secondary" id="get_cancellations"
+                                    onclick="openCancellationsOverlay()"> Show Cancellations
                             </button>
                         </div>
-                        {% endif %}
-                        <datalist id="routes">
-                        </datalist>
                     </div>
-
-                    <button class="btn btn-outline-secondary" id="get_directions" onclick="displaySelectedRoute">Give
-                        route
-                    </button>
-                </div>
-                <div class="col-md-4">
-                <h3 class="text-center">Cancelled Routes</h3>
-                    <table class="table table-dark">
-                    <thead>
-                        <tr class="orange-table">
-                            <th scope="col">Route Name</th>
-                            <th scope="col">Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cancelled_route in result %}
-                        <tr class="orange-table">
-                            <td scope="row">{{ cancelled_route.route }}: {{ cancelled_route.headsign }}</td>
-                            <td scope="row">{{ cancelled_route.time }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    </table>
-                </div>
-                </div>
                 </div>
             </div>
 
@@ -135,13 +148,14 @@
                         <input id="stops_num" list="stops" name="stops_num" class="form-control"
                                placeholder="Please enter stop number">
                         {% if user.is_authenticated %}
-                        <div class="input-group-append">
-                            <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas"
-                                    data-target="#bs-canvas-left"
-                                    aria-expanded="false" aria-controls="bs-canvas-left"
-                                    onclick="fillSidebar( '{{ user.favourite_stops }}', 'stops')">See favourite stops
-                            </button>
-                        </div>
+                            <div class="input-group-append">
+                                <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas"
+                                        data-target="#bs-canvas-left"
+                                        aria-expanded="false" aria-controls="bs-canvas-left"
+                                        onclick="fillSidebar( '{{ user.favourite_stops }}', 'stops')">See favourite
+                                    stops
+                                </button>
+                            </div>
                         {% endif %}
                         <datalist id="stops">
                         </datalist>

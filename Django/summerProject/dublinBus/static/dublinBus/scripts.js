@@ -413,8 +413,18 @@ class AutocompleteDirectionsHandler {
                         for (let i = 1; i < trip_info.length; i++) {
                             // If it's a walking step we can take the arrival time of the previous transit step as their departure time
                             if (trip_info[i].step_type === "WALKING") {
-                                let departure_timestamp = prediction['arrival_time'][transit_count];
-                                let departure_string = getGmapsTimeFromTimestamp(departure_timestamp)
+                                let predicted_departure;
+                                let departure_string = "";
+                                if (prediction['arrival_time'][transit_count] === "gmaps") {
+                                    predicted_departure = trip_info.gmaps_prediction;
+
+                                    departure_string = predicted_departure;
+                                } else {
+                                    predicted_departure = prediction['arrival_time'][transit_count];
+                                    let departure_timestamp = predicted_departure;
+                                    departure_string = getGmapsTimeFromTimestamp(departure_timestamp)
+                                }
+
                                 trip_info[i].departure_time = departure_string;
                             }
                         }
@@ -471,6 +481,28 @@ class AutocompleteDirectionsHandler {
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
                                     let prediction_json = await prediction_res.json();
                                     let prediction = JSON.parse(prediction_json)
+
+                                    // fill in the departure times from trip_info using what was generated in our prediction
+                                    // loop through trip info starting at the second item as we already have the initial departure time
+                                    let transit_count = 0;
+                                    for (let i = 1; i < trip_info.length; i++) {
+                                        // If it's a walking step we can take the arrival time of the previous transit step as their departure time
+                                        if (trip_info[i].step_type === "WALKING") {
+                                            let predicted_departure;
+                                            let departure_string = "";
+                                            if (prediction['arrival_time'][transit_count] === "gmaps") {
+                                                predicted_departure = trip_info[i - 1]['departure_time']
+                                                departure_string = predicted_departure;
+                                            } else {
+                                                predicted_departure = prediction['arrival_time'][transit_count];
+                                                let departure_timestamp = predicted_departure;
+                                                departure_string = getGmapsTimeFromTimestamp(departure_timestamp)
+                                            }
+
+                                            trip_info[i].departure_time = departure_string;
+                                        }
+                                    }
+
                                     // Get the html from this data that we want to show to the user and then display it to them
                                     let prediction_html = getPredictionHTML(prediction, trip_info, gmaps_total_journey);
                                     let results_container = document.getElementById('results_container');
@@ -549,7 +581,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             } else {
                 // calculate total time taken by step
                 let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
-                step_time_date = new Date(step_time)
+                let step_time_date = new Date(step_time)
                 prediction_html += ((step_time / 1000) / 60) + " mins ";
             }
             // Get the total number of stops the bus passed for this stop
@@ -798,6 +830,14 @@ function getInfoFromDirections(response, selected_date_time) {
     return [data_for_model_json, trip_description, gmaps_total_journey_time];
 }
 
+function openCancellationsOverlay() {
+    document.getElementById("cancellations_overlay").style.width = "100%";
+}
+
+function closeCancellationsOverlay() {
+    document.getElementById("cancellations_overlay").style.width = "0%";
+}
+
 function fillSidebar(content, type) {
     // takes a parameter of user's fav routes/stops
     console.log("in fill sidebar")
@@ -940,7 +980,7 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     }
 
     //Data structure for costs as per Transport for Ireland website
-    var costs = {
+    let costs = {
         'adultleap': {'price1': 1.55, 'price2': 2.25, 'price3': 2.50, 'price4': 3.00},
         'adultcash': {'price1': 2.15, 'price2': 3.00, 'price3': 3.30, 'price4': 3.80},
         'childleap': {'price1': .80, 'price2': 1.00, 'price3': 1.00, 'price4': 1.26},
@@ -980,93 +1020,5 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
             }
         }
     }
-
-
-    //if else statements to return price based on dropdown selection
-    //   if(stages == 1 && package =='adultleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultleap'].price1);
-    //       var price = costs['adultleap'].price1;
-    //   }
-    //   else if(stages == 1 && package =='adultcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultcash'].price1);
-    //       var price = costs['adultcash'].price1;
-    //   }
-    //   else if(stages == 2 && package =='adultleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultleap'].price2);
-    //       var price = costs['adultleap'].price2;
-    //   }
-    //   else if(stages == 2 && package =='adultcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultcash'].price2);
-    //       var price = costs['adultcash'].price2;
-    //   }
-    //   else if(stages == 3 && package =='adultleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultleap'].price3);
-    //       var price = costs['adultleap'].price3;
-    //   }
-    //   else if(stages == 3 && package =='adultcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultcash'].price3);
-    //       var price = costs['adultcash'].price3;
-    //   }
-    //   else if(stages == 4 && package =='adultleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultleap'].price4);
-    //       var price = costs['adultleap'].price4;
-    //   }
-    //   else if(stages == 4 && package =='adultcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['adultcash'].price4);
-    //       var price = costs['adultcash'].price4;
-    //   }
-    //   else if(stages == 5 && package =='childleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childleap'].price1);
-    //       var price = costs['childleap'].price1;
-    //   }
-    //   else if(stages == 5 && package =='childcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childcash'].price1);
-    //       var price = costs['childcash'].price1;
-    //   }
-    //   else if(stages == 6 && package =='childleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childleap'].price2);
-    //       var price = costs['childleap'].price2;
-    //   }
-    //   else if(stages == 6 && package =='childcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childcash'].price2);
-    //       var price = costs['childcash'].price2;
-    //   }
-    //   else if(stages == 7 && package =='childleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childleap'].price3);
-    //       var price = costs['childleap'].price3;
-    //   }
-    //   else if(stages == 7 && package =='childcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childcash'].price3);
-    //       var price = costs['childleap'].price3;
-    //   }
-    //   else if(stages == 8 && package =='childleap') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childleap'].price4);
-    //       var price = costs['childleap'].price4;
-    //   }
-    //   else if(stages == 8 && package =='childcash') {
-    //       console.log('stage', stages);
-    //       console.log(costs['childcash'].price4);
-    //       var price = costs['childleap'].price4;
-    //   }
-    //   else {
-    //     var price = 'Invalid Selction';
-    //   }
-    //
-    // document.getElementById('price').innerHTML = price;
     return cost;
 }

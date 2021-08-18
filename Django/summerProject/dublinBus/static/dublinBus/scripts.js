@@ -146,6 +146,8 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
     showCertainMarkers(markersArray, []);
     // First we want to remove any directions from the directions api from the map
     directionsRenderer.set('directions', null);
+    // Show spinner
+    document.getElementById('stops_spinner').style.display = "block";
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
             console.log("Marker found", marker.number);
@@ -181,6 +183,7 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
             });
         }
     }
+    document.getElementById('stops_spinner').style.display = "none";
 }
 
 function loadStopsSearch(stopsData) {

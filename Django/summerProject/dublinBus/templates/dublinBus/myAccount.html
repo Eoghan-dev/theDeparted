@@ -6,14 +6,14 @@
     <div>
         {% if user.is_authenticated %}
             <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
-                <li class="nav-item" role="presentation" style="width: 50%;text-align: center;"><a class="nav-link"
+                <li class="nav-item" role="presentation" style="width: 50%;text-align: center;"><a class="nav-link active"
                                                                                                    role="tab"
                                                                                                    data-bs-toggle="tab"
                                                                                                    href="#tab-1"
                                                                                                    style="background: #819ca9;color: #ffffff;">User
                     Setting</a></li>
                 <li class="nav-item" role="presentation"
-                    style="background: #819ca9;color: #ffffff;width: 50%;text-align: center;"><a class="nav-link active"
+                    style="background: #819ca9;color: #ffffff;width: 50%;text-align: center;"><a class="nav-link"
                                                                                                  role="tab"
                                                                                                  data-bs-toggle="tab"
                                                                                                  href="#tab-3"
@@ -27,7 +27,7 @@
 
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 my-2">
                                 <div class="card">
                                     <div class="card-body" id="first_name">
                                         <h3 class="card-title">First Name</h3>
@@ -35,7 +35,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 my-2">
                                 <div class="card">
                                     <div class="card-body" id="last_name">
                                         <h3 class="card-title">Last Name</h3>
@@ -47,7 +47,7 @@
 
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 my-2">
                                 <div class="card">
                                     <div class="card-body" id="email">
                                         <h3 class="card-title">Email</h3>
@@ -56,7 +56,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-6 my-2">
                                 <div class="card">
                                     <div class="card-body" id="username">
                                         <h3 class="card-title">User Name</h3>
@@ -75,7 +75,7 @@
                         <form action="update_user" method="post">
                             {% csrf_token %}
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6 my-2">
                                     <div class="card">
                                         <div class="card-body" id="fare_status">
                                             {# For each of the radio buttons we need to check the fare_status of the current user and select that status if that's what they are#}
@@ -96,21 +96,6 @@
                                                 <label class="form-check-label"
                                                        for="child_radio">Child</label>
                                                 </div>
-                                                {#  Student radio  #}
-{#                                                {% if user.fare_status == 'student' %}#}
-{#                                                    <div class="form-check"><input class="form-check-input" type="radio"#}
-{#                                                                                   id="student_radio" checked="checked"#}
-{#                                                                                   name="fare_status_radios"#}
-{#                                                                                   value="student">#}
-{#                                                {% else %}#}
-{#                                                    <div class="form-check"><input class="form-check-input" type="radio"#}
-{#                                                                                   id="student_radio"#}
-{#                                                                                   name="fare_status_radios"#}
-{#                                                                                   value="student">#}
-{#                                                {% endif %}#}
-{#                                                <label class="form-check-label"#}
-{#                                                       for="student_radio">Student</label>#}
-{#                                                </div>#}
                                                 {#  Adult radio  #}
                                                 {% if user.fare_status == 'adult' %}
                                                     <div class="form-check"><input class="form-check-input" type="radio"
@@ -126,40 +111,12 @@
                                                 <label class="form-check-label"
                                                        for="adult_radio">Adult</label>
                                                 </div>
-                                                {#  Free travel radio  #}
-{#                                                {% if user.fare_status == 'free' %}#}
-{#                                                    <div class="form-check"><input class="form-check-input" type="radio"#}
-{#                                                                                   id="free_radio" checked="checked"#}
-{#                                                                                   name="fare_status_radios"#}
-{#                                                                                   value="fre">#}
-{#                                                {% else %}#}
-{#                                                    <div class="form-check"><input class="form-check-input" type="radio"#}
-{#                                                                                   id="free_radio"#}
-{#                                                                                   name="fare_status_radios"#}
-{#                                                                                   value="free">#}
-{#                                                {% endif %}#}
-{#                                                <label class="form-check-label"#}
-{#                                                       for="free_radio">65+ /#}
-{#                                                    Disability / Free Travel</label></div>#}
                                                 </div>
                                                 </div>
                                                 </div>
                                                 </div>
-
-
-
-
-
-                                    {#                    <div class="col-md-6">#}
-{#                        <div class="card">#}
-{#                            <div class="card-body" id="username">#}
-{#                                <h3 class="card-title">User Name</h3>#}
-{#                                <p class="card-text">{{ request.user.username }}</p>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
                                     {# Leap card section #}
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 my-2">
                                     <div class="card">
                                     <div class="card-body" id="leapcard">
                                         <h3 class="card-title">Do You Own a LeapCard?</h3>
@@ -234,7 +191,7 @@
                         <div class="container text-center">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h1>Routes</h1>
+                                    <h1 class="text-warning">Routes</h1>
                                     <div id="user_routes_container">
                                         <form method="post" action="add_user_route">
                                             {% csrf_token %}
@@ -244,7 +201,7 @@
                                                        placeholder="Add route to favourites" class="form-control">
                                                 <div class="input-group-append">
 
-                                                    <button class="btn btn-outline-secondary" type="submit">+</button>
+                                                    <button class="btn btn-warning" type="submit">+</button>
                                                 </div>
                                             </div>
                                             <datalist id="user_routes"></datalist>
@@ -252,9 +209,9 @@
                                         </form>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table" id="fav_routes_table">
+                                        <table class="table table-dark" id="fav_routes_table">
                                             <thead>
-                                            <tr>
+                                            <tr class="orange-table">
                                                 <th>Route</th>
                                                 <th>Timetable</th>
                                                 <th>Delete</th>
@@ -262,11 +219,11 @@
                                             </thead>
                                             <tbody>
                                             {% for fav_route in fav_routes %}
-                                                <tr>
+                                                <tr class="orange-table">
                                                     <td>{{ fav_route }}</td>
-                                                    <td><a href="timetable/{{ fav_route }}">timetable</a></td>
+                                                    <td><a href="timetable/{{ fav_route }}" class="text-decoration-none text-warning">timetable</a></td>
                                                     {# need to add actual timetable link here #}
-                                                    <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
+                                                    <td><a href="del_user_route/{{ fav_route }}" class="text-decoration-none text-warning">delete</a></td>
                                                 </tr>
                                             {% endfor %}
                                             </tbody>
@@ -274,7 +231,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h1>Stops</h1>
+                                    <h1 class="text-warning">Stops</h1>
                                     <div id="user_stops_container">
                                         <form method="post" action="add_user_stop">
                                             {% csrf_token %}
@@ -284,25 +241,25 @@
                                                    placeholder="Add stop to favourites" class="form-control">
                                                 <div class="input-group-append">
 
-                                                    <button class="btn btn-outline-secondary" type="submit">+</button>
+                                                    <button class="btn btn-warning" type="submit">+</button>
                                                 </div>
                                             </div>
                                             <datalist id="user_stops"></datalist>
                                         </form>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table" id="fav_stops_table">
+                                        <table class="table table-dark" id="fav_stops_table">
                                             <thead>
-                                            <tr>
+                                            <tr class="orange-table">
                                                 <th>Stop</th>
                                                 <th>Delete</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             {% for fav_stop in fav_stops %}
-                                                <tr>
+                                                <tr class="orange-table">
                                                     <td>{{ fav_stop }}</td>
-                                                    <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
+                                                    <td><a href="del_user_stop/{{ fav_stop }}" class="text-decoration-none text-warning">delete</a></td>
                                                 </tr>
                                             {% endfor %}
                                             </tbody>

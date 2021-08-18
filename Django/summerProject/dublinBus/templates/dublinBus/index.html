@@ -107,7 +107,7 @@
             <div class="tab-pane" role="tabpanel" id="tab-2">
                 {# Everything under this div will be the main content of the page (not the sidebar) #}
                 <div class="container" id="route_input_container">
-                    <div class="row">
+                    <div class="row justify-content-around">
                         <div class="col-md-6 col-12">
                             <div class="m-3 input-group">
                                 <label for="routes_num"></label>
@@ -123,19 +123,18 @@
                                     </div>
                             </div>
                             </div>
+                    </div>
+                    <div class="row justify-content-around">
                                 {% if user.is_authenticated %}
-                            <div class="col-md-3 col-6 m-3">
+                            <div class="col-6 text-center">
                                         <button id="fav_routes_btn" class="btn btn-warning" type="button"
-                                                data-toggle="canvas"
-                                                data-target="#bs-canvas-left"
-                                                aria-expanded="false" aria-controls="bs-canvas-left"
                                                 onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See
                                             favourite routes
                                         </button>
                             </div>
                                 {% endif %}
-                        <div class="col-md-3 col-6 m-3">
-                            <button class="btn btn-outline-secondary" id="get_cancellations"
+                        <div class="col-6 text-center">
+                            <button class="btn btn-danger" id="get_cancellations"
                                     onclick="openCancellationsOverlay()"> Show Cancellations
                             </button>
                             </div>

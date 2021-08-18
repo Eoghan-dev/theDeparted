@@ -81,10 +81,10 @@
 
                         <div class="col-md-6 col-12">
                             <div class="row">
-                                <div class="col-md-3 col-6 mb-3">
+                                <div class="col-md-3 col-6 mb-2">
                                     <input type="date" id="date_input">
                                 </div>
-                                <div class="col-md-3 col-6 mb-3">
+                                <div class="col-md-3 col-6 mb-2">
                                     <input type="time" id="time_input">
                                 </div>
                             </div>
@@ -95,7 +95,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-12 col-12">
+                        <div class="col-md-12 col-12 mt-1">
                             <div class="row" id="results_container" style="display: block">
 
                             </div>
@@ -108,13 +108,23 @@
                 {# Everything under this div will be the main content of the page (not the sidebar) #}
                 <div class="container" id="route_input_container">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6 col-12">
                             <div class="m-3 input-group">
                                 <label for="routes_num"></label>
+                                <datalist id="routes">
+                                </datalist>
                                 <input id="routes_num" list="routes" name="routes_num" class="form-control"
                                        placeholder="Please enter route number">
+                                <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" id="get_directions"
+                                    onclick="displaySelectedRoute()">Give
+                                route
+                            </button>
+                                    </div>
+                            </div>
+                            </div>
                                 {% if user.is_authenticated %}
-                                    <div class="input-group-append">
+                            <div class="col-md-3 col-6 m-3">
                                         <button id="fav_routes_btn" class="btn btn-warning" type="button"
                                                 data-toggle="canvas"
                                                 data-target="#bs-canvas-left"
@@ -122,20 +132,13 @@
                                                 onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See
                                             favourite routes
                                         </button>
-                                    </div>
-                                {% endif %}
-                                <datalist id="routes">
-                                </datalist>
                             </div>
-
-                            <button class="btn btn-outline-secondary" id="get_directions"
-                                    onclick="displaySelectedRoute()">Give
-                                route
-                            </button>
+                                {% endif %}
+                        <div class="col-md-3 col-6 m-3">
                             <button class="btn btn-outline-secondary" id="get_cancellations"
                                     onclick="openCancellationsOverlay()"> Show Cancellations
                             </button>
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -143,12 +146,18 @@
 
             <div class="tab-pane" role="tabpanel" id="tab-3">
                 <div class="container" id="stops_input_container">
+                    <div class="row">
                     <div class="m-3 input-group">
+                        <div class="col-md-5 col-8 text-center mb-2">
                         <label for="stops_num"></label>
                         <input id="stops_num" list="stops" name="stops_num" class="form-control"
                                placeholder="Please enter stop number">
+                            </div>
+                        <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id="get_stops">Give stops</button>
+                            </div>
                         {% if user.is_authenticated %}
-                            <div class="input-group-append">
+                        <div class="col-md-5 col-12 text-center">
                                 <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                         data-target="#bs-canvas-left"
                                         aria-expanded="false" aria-controls="bs-canvas-left"
@@ -160,8 +169,8 @@
                         <datalist id="stops">
                         </datalist>
                     </div>
-                    <button class="btn btn-outline-secondary" id="get_stops">Give stops</button>
                 </div>
+                    </div>
             </div>
 
 

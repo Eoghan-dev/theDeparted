@@ -20,7 +20,7 @@ def register(request):
                 # Correct password, and the user is marked "active"
                 login(request, user)
 
-            # Redirect back to homepage after user is created
+            # Redirect back to homepage after user is created & logged in
             return redirect("/")
     # If form was not posted then nothing was submitted by user so just load an empty form
     else:

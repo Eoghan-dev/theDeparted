@@ -152,7 +152,7 @@ async function initMap() {
 
     // Get user geolocation (adapted from https://developers.google.com/maps/documentation/javascript/examples/map-geolocation)
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
+        navigator.geolocation.watchPosition(
             (position) => {
                 const pos = {
                     lat: position.coords.latitude,

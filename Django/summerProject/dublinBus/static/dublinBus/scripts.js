@@ -166,9 +166,9 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is less than a min away.</li>`;
                 } else {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is ${minutes_away} mins away</li>`;
                 }
             }
             incoming_buses_text += "</ul></div>";

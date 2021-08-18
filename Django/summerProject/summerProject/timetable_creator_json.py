@@ -164,7 +164,7 @@ def get_timetable_all(index):
             trip_id = list(trip_id.strip().split("."))
             date = trip_id[1]
             #****************************** NB- Hard coded needs to be fixed *****************************
-            if date in ["y1003","y1004","y1005"]:
+            if date in ["y1007","y1008","y1009"]:
                 route = list(trip_id[2].strip().split("-"))
                 route = route[1]
                 direction = timetable[stop_time]["stop_headsign"]

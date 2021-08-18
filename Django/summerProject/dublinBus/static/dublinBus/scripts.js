@@ -563,8 +563,13 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         // Now loop through the keys from our data returned from backend and get the appropriate
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
+        // Add time to first item
+        if (i === 0) {
+            prediction_html += `<b>${trip_step.departure_time}: </b>`;
+        }
+
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.departure_time + ": " + trip_step.instructions + " ---- " + trip_step.duration;
+            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
             if (i === 0) {
                 first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60
                 console.log(new Date(first_walking_time))

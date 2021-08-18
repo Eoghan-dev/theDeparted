@@ -21,15 +21,13 @@ def index(request):
     Also loads all cancelled routes and times for display
     under routes tab
     """
-    return render(request, 'dublinBus/index.html')
-
-def get_cancellations(request):
+    #Gets current time and changes it to the desired format HH:MM:SS
     cur_time = str(datetime.now().time())
     cur_time_list = list(cur_time.split(":"))
     cur_time = cur_time_list[0] + ":" + cur_time_list[1] + ":00"
     result = CurrentBus.objects.filter(schedule="CANCELED", start_t__gt=cur_time).values()
-    print("result:", result)
-    # Gets weekdays and converts to an integer to match mon/sat/sun in json files
+    print("result:",result)
+    #Gets weekdays and converts to an integer to match mon/sat/sun in json files
     weekday = int(datetime.now().weekday())
     list_return = []
     if weekday < 5:
@@ -40,50 +38,49 @@ def get_cancellations(request):
         day = "sun"
     for i in result:
         print(i["route"])
-        # intialise lists and dictionaries that will be refreshed for each result
+        #intialise lists and dictionaries that will be refreshed for each result
         dict_return = {}
         headsigns_li = []
         route = i["route"]
         start_t = i["start_t"]
         direction = i["direction"]
-        # Opens routes.json file
+        #Opens routes.json file
         file_path_routes = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
-                                        "routes.json")
+                                       "routes.json")
         f = open(file_path_routes, encoding="utf-8-sig")
         routes_dict = json.load(f)
         f.close()
-        # Matches the directions/headsigns to that outputted from the database
+        #Matches the directions/headsigns to that outputted from the database
         for dir in routes_dict[route]["direction"]:
             if dir[1] == direction:
                 headsigns_li.append(dir[0])
         print(headsigns_li)
-        # If only one route for that direction must be this direction that is refrenced
+        #If only one route for that direction must be this direction that is refrenced
         if len(headsigns_li) == 1:
             dict_return["route"] = route
             dict_return["headsign"] = headsigns_li[0]
             dict_return["time"] = start_t
-        # Else we must check the timtable to tell which headsign is correct
+        #Else we must check the timtable to tell which headsign is correct
         else:
-            file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
-                                           "bus_times", route + "_timetable.json")
+            file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files","bus_times", route + "_timetable.json")
             if os.path.isfile(file_path_times) == True:
                 f = open(file_path_times, encoding="utf-8-sig")
                 times_dict = json.load(f)
                 f.close()
                 success = 0
-                # Iterates through the timetable until it finds a matching route
+                #Iterates through the timetable until it finds a matching route
                 for headsign in headsigns_li:
                     if day in times_dict[headsign]:
                         for stop in times_dict[headsign][day]:
                             for times in times_dict[headsign][day][stop]:
-                                # if start time from database is matched with the static json success and saves to returned dictionary
+                                #if start time from database is matched with the static json success and saves to returned dictionary
                                 if times[0] == start_t:
                                     dict_return["route"] = route
                                     dict_return["headsign"] = headsign
                                     dict_return["time"] = start_t
                                     break
         list_return.append(dict_return)
-    return JsonResponse(list_return)
+    return render(request, 'dublinBus/index.html', {"result": list_return})
 
 def dbTwitter(request):
     """View to load the Dublin bus twitter feed to our application"""

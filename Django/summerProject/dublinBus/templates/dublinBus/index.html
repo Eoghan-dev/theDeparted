@@ -64,7 +64,7 @@
                                        placeholder="Enter origin location"
                                        aria-label="origin input" aria-describedby="origin input">
                                 <div class="input-group-append">
-                                    <button id="dir_from_user_location" class="btn btn-outline-secondary" type="button">
+                                    <button id="dir_from_user_location" class="btn btn-primary" type="button">
                                         Use
                                         current
                                         location
@@ -81,22 +81,22 @@
 
                         <div class="col-md-6 col-12">
                             <div class="row">
-                                <div class="col-md-3 col-6 mb-2">
+                                <div class="col-md-3 offset-md-1 offset-1 col-5 my-2 text-center">
                                     <input type="date" id="date_input">
                                 </div>
-                                <div class="col-md-3 col-6 mb-2">
+                                <div class="col-md-3 col-6 my-2 text-center">
                                     <input type="time" id="time_input">
                                 </div>
-                            </div>
-                            <div class="col-md-6 col-12">
-                                <button class="btn btn-outline-secondary" id="user_input_directions_btn">Get directions
+
+
+                                <button class="btn btn-primary col-md-6 col-10 offset-md-1 offset-1 my-2 text-center" id="user_input_directions_btn">Get directions
                                     and
                                     predictions
                                 </button>
-                            </div>
+</div>
                         </div>
-                        <div class="col-md-12 col-12 mt-1">
-                            <div class="row" id="results_container" style="display: block">
+                        <div class="col-md-12 col-12 my-2">
+                            <div class="col-md-12 col-12 my-2" id="results_container" style="display: block">
 
                             </div>
                         </div>
@@ -116,7 +116,7 @@
                                 <input id="routes_num" list="routes" name="routes_num" class="form-control"
                                        placeholder="Please enter route number">
                                 <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" id="get_directions"
+                                <button class="btn btn-primary" id="get_directions"
                                     onclick="displaySelectedRoute()">Give
                                 route
                             </button>
@@ -126,16 +126,15 @@
                     </div>
                     <div class="row justify-content-around">
                                 {% if user.is_authenticated %}
-                            <div class="col-6 text-center">
+                            <div class="col-6 col-xl-3  col-xs-3 col-md-2 text-center">
                                         <button id="fav_routes_btn" class="btn btn-warning" type="button"
-                                                onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>See
-                                            favourite routes
+                                                onclick='fillSidebar( "{{ user.favourite_routes }}", "routes")'>Favourite routes
                                         </button>
                             </div>
                                 {% endif %}
-                        <div class="col-6 text-center">
-                            <button class="btn btn-danger" id="get_cancellations"
-                                    onclick="openCancellationsOverlay()"> Show Cancellations
+                        <div class="col-6 col-xl-3  col-xs-3 col-md-2 text-center">
+                            <button class="btn btn-danger " id="get_cancellations"
+                                    onclick="openCancellationsOverlay()">Cancellations
                             </button>
                             </div>
                     </div>
@@ -147,24 +146,24 @@
                 <div class="container" id="stops_input_container">
                     <div class="row">
                     <div class="m-3 input-group">
-                        <div class="col-md-5 col-8 text-center mb-2">
+                        <div class="col-md-6 offset-md-2 col-8 text-center mb-2">
                         <label for="stops_num"></label>
                         <input id="stops_num" list="stops" name="stops_num" class="form-control"
                                placeholder="Please enter stop number">
                             </div>
                         <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" id="get_stops">Give stops</button>
+                        <button class="btn btn-primary" id="get_stops">Give stops</button>
                             </div>
                         <datalist id="stops">
                         </datalist>
                     </div></div>
                     <div class="row" style="margin-bottom: 5px">
                         {% if user.is_authenticated %}
-                        <div class="col-md-5 col-12 text-center">
+                        <div class="col-md-6 offset-md-3 col-12 text-center">
                                 <button id="fav_stops_btn" class="btn btn-warning" type="button" data-toggle="canvas"
                                         data-target="#bs-canvas-left"
                                         aria-expanded="false" aria-controls="bs-canvas-left"
-                                        onclick="fillSidebar( '{{ user.favourite_stops }}', 'stops')">See favourite
+                                        onclick="fillSidebar( '{{ user.favourite_stops }}', 'stops')">Favourite
                                     stops
                                 </button>
                         </div>
@@ -180,6 +179,7 @@
 
         </div>
         <div id="map"></div>
+            </div>
     </div>
 {% endblock %}
 

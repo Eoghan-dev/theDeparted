@@ -263,7 +263,7 @@
                                             {% for fav_route in fav_routes %}
                                                 <tr>
                                                     <td>{{ fav_route }}</td>
-                                                    <td><a href="">timetable</a></td>
+                                                    <td><a href="timetable/{{ fav_route }}">timetable</a></td>
                                                     {# need to add actual timetable link here #}
                                                     <td><a href="del_user_route/{{ fav_route }}">delete</a></td>
                                                 </tr>
@@ -294,7 +294,6 @@
                                             <thead>
                                             <tr>
                                                 <th>Stop</th>
-                                                <th>Timetable</th>
                                                 <th>Delete</th>
                                             </tr>
                                             </thead>
@@ -302,8 +301,6 @@
                                             {% for fav_stop in fav_stops %}
                                                 <tr>
                                                     <td>{{ fav_stop }}</td>
-                                                    <td><a href="">timetable</a></td>
-                                                    {# need to add actual timetable link here #}
                                                     <td><a href="del_user_stop/{{ fav_stop }}">delete</a></td>
                                                 </tr>
                                             {% endfor %}

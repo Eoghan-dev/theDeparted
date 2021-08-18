@@ -453,7 +453,7 @@ class AutocompleteDirectionsHandler {
                 // Clear all (if any) markers from the map before continuing with drawing the directions
                 showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
                 console.log("attempting routing from user location")
-                navigator.geolocation.watchPosition(
+                navigator.geolocation.getCurrentPosition(
                     (position) => {
                         this.userLat = position.coords.latitude;
                         this.userLon = position.coords.longitude

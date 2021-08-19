@@ -613,11 +613,11 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
         last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60
     }
-    prediction_html += "</ul>";
+    //prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
-        total_time_taken_str = "Total journey should take " + gmaps_total_journey + "and should cost €" + total_cost.toFixed(2);
+        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + gmaps_total_journey + " and should cost €" + total_cost.toFixed(2)+"</li>";
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
@@ -625,10 +625,10 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2);
+        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2)+"</li>";
     }
 
-    prediction_html += total_time_taken_str;
+    prediction_html += total_time_taken_str + "</ul>";
     return prediction_html
 }
 

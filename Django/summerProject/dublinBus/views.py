@@ -9,6 +9,7 @@ import datetime
 from dateutil.relativedelta import *
 from datetime import timedelta, datetime
 base = settings.BASE_DIR
+from urllib.request import urlopen
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 import json
@@ -22,13 +23,20 @@ def index(request):
     under routes tab
     """
     #Gets current time and changes it to the desired format HH:MM:SS
-    cur_time = str(datetime.now().time())
+    start_time = time.time()
+    with urlopen("https://www.timeapi.io/api/Time/current/zone?timeZone=Europe/Dublin") as url:
+        s = url.read()
+        dub_t =json.loads(s)
+    print(dub_t["dateTime"])
+    dub_date_time = dub_t["dateTime"][:-1]
+    dub_date_time = datetime.strptime(dub_date_time.replace("T", " "), '%Y-%m-%d %H:%M:%S.%f')
+    print("--- %s seconds ---" % (time.time() - start_time))
+    cur_time = str(dub_date_time.time())
     cur_time_list = list(cur_time.split(":"))
     cur_time = cur_time_list[0] + ":" + cur_time_list[1] + ":00"
     result = CurrentBus.objects.filter(schedule="CANCELED", start_t__gt=cur_time).values()
-    print("result:",result)
     #Gets weekdays and converts to an integer to match mon/sat/sun in json files
-    weekday = int(datetime.now().weekday())
+    weekday = int(dub_date_time.weekday())
     list_return = []
     if weekday < 5:
         day = "mon"
@@ -37,7 +45,6 @@ def index(request):
     elif weekday == 6:
         day = "sun"
     for i in result:
-        print(i["route"])
         #intialise lists and dictionaries that will be refreshed for each result
         dict_return = {}
         headsigns_li = []
@@ -54,7 +61,6 @@ def index(request):
         for dir in routes_dict[route]["direction"]:
             if dir[1] == direction:
                 headsigns_li.append(dir[0])
-        print(headsigns_li)
         #If only one route for that direction must be this direction that is refrenced
         if len(headsigns_li) == 1:
             dict_return["route"] = route
@@ -266,7 +272,13 @@ def delUserStop(request, stop):
 
 def get_next_bus_time(request, route):
     """View to return the closest scheduled departure time for a certain bus route to the current time"""
-    current_date_time = datetime.now()
+    with urlopen("https://www.timeapi.io/api/Time/current/zone?timeZone=Europe/Dublin") as url:
+        s = url.read()
+        dub_t =json.loads(s)
+    print(dub_t["dateTime"])
+    dub_date_time = dub_t["dateTime"][:-1]
+    dub_date_time = datetime.strptime(dub_date_time.replace("T", " "), '%Y-%m-%d %H:%M:%S.%f')
+    current_date_time = dub_date_time
     current_24hr_time = current_date_time.strftime("%H:%M:%S")
     # Open the json file of all route timetables as a dictionary
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "bus_times.json")
@@ -322,7 +334,7 @@ def get_next_bus_time(request, route):
     # Make an array with all the times converted to a datetime object (hours and minutes only)
     converted_times = list(map(lambda x: datetime.strptime(x, "%H:%M:%S"), times))
     # Get current time as datetime object also with only hours and minutes
-    now = datetime.now().strftime("%H:%M:%S")
+    now = dub_date_time.strftime("%H:%M:%S")
     now_dt = datetime.strptime(now, "%H:%M:%S")
     # Remove all items from the timetable list that are before the current time as they're useless in this context
     filtered_times = list(filter(lambda x: x >= now_dt, converted_times))
@@ -634,10 +646,15 @@ def get_next_four_bus(request, stop):
     f.close()
 
     #Gets current month/date in integer value and current time in HH:MM:SS and mins format for querying and feeding to prediction
-    print("datetime-now",datetime.now())
-    current_month=datetime.now()
+    with urlopen("https://www.timeapi.io/api/Time/current/zone?timeZone=Europe/Dublin") as url:
+        s = url.read()
+        dub_t = json.loads(s)
+    print(dub_t["dateTime"])
+    dub_date_time = dub_t["dateTime"][:-1]
+    dub_date_time = datetime.strptime(dub_date_time.replace("T", " "), '%Y-%m-%d %H:%M:%S.%f')
+    current_month=dub_date_time
     current_month =int(current_month.strftime("%m"))
-    current = datetime.now().time()
+    current = dub_date_time.time()
     current_time = current.strftime("%H:%M:%S")
     current_time_mins = list(current_time.split(":"))
     current_time_mins = (int(current_time_mins[0])*60) +int(current_time_mins[1])
@@ -649,7 +666,7 @@ def get_next_four_bus(request, stop):
     else:
         future_time = "0" + str(int(future_time[0]) +1) + ":" + future_time[1] + ":00"
 
-    Current_Day = datetime.now().strftime("%A")
+    Current_Day = dub_date_time.strftime("%A")
     if Current_Day == "Saturday":
         Current_Day = "sat"
     elif Current_Day == "Sunday":
@@ -712,11 +729,11 @@ def get_next_four_bus(request, stop):
                 predict_in_out_num = 1
         #real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
         if not weather_results:
-            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=dub_date_time.day)
         else:
             temp = weather_results["main_temp"] - 273.15
             weather_id = weather_results["weather_id"]
-            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=dub_date_time.day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             if mins_till <0:
@@ -741,7 +758,13 @@ def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp
     #if weather not in weather_dict.keys():
     #    weather = "Rain"
     if month == -1:
-        month = int(datetime.datetime.now().strftime("%m")) - 1
+        with urlopen("https://www.timeapi.io/api/Time/current/zone?timeZone=Europe/Dublin") as url:
+            s = url.read()
+            dub_t = json.loads(s)
+        print(dub_t["dateTime"])
+        dub_date_time = dub_t["dateTime"][:-1]
+        dub_date_time = datetime.strptime(dub_date_time.replace("T", " "), '%Y-%m-%d %H:%M:%S.%f')
+        month = int(dub_date_time.strftime("%m")) - 1
     # If actual departure time not available sets to planned departure time
     if actual_dep == -1:
         actual_dep = dep
@@ -752,7 +775,7 @@ def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp
         temp = temp_list[month]
 
     if date == -1:
-        date = datetime.datetime.today().weekday()
+        date = datetime.today().weekday()
     data = {
         'PLANNEDTIME_ARR': [arriv],  # float in minutes
         'PLANNEDTIME_DEP': [dep],  # float in minutes

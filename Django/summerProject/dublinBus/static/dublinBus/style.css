@@ -89,3 +89,10 @@ border-right: 1px solid #eee;
     margin-top: 20px;
     /* background-color: orange; */
 }
+
+.user-pages {
+  color: white;
+}
+.user-pages li {
+  color: white;
+}

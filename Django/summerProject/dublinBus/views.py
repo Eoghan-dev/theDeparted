@@ -720,8 +720,8 @@ def get_next_four_bus(request, stop):
         if not weather_results:
             prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         else:
-            temp = weather_results[0]["main_temp"] - 273.15
-            weather_id = weather_results[0]["weather_id"]
+            temp = weather_results["main_temp"] - 273.15
+            weather_id = weather_results["weather_id"]
             prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins

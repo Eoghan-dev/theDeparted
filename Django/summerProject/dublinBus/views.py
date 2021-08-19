@@ -377,6 +377,7 @@ def get_direction_bus(request, data):
     #Loads json data passed from the request - obtained from google maps api
     data = json.loads(data)
     #Splits the route name as gives headsign with number--[number: headsign]
+    print("original-data",data)
     data_return = {}
     data_return["route"] = []
     data_return["departure_time"] = []
@@ -392,7 +393,7 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0])
         else:
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
-    print(data_return)
+    print("data_returned",data_return)
     return JsonResponse(data_return)
 
 def timetable_main(request):
@@ -503,7 +504,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         distance_depart = 0
         dep_stop_list = []
         depart_stop = None
-        print("else")
         for i in stop_dict:
             # Checks for stop when stop name == departure name
             if stop_dict[i]["stop_name"] == dep_stop or stop_dict[i]["stop_name"] in dep_stop:
@@ -520,7 +520,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 pass
     #Catch for if the Name check couldn't find the correct stop departure and arrival
     if depart_stop == None or last_stop ==None:
-        print("depart stop or last stop broke")
         data_return["route"] = ["gmaps"]
         data_return["departure_time"] = ["gmaps"]
         data_return["arrival_time"] = ["gmaps"]
@@ -534,8 +533,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     else:
         for i in stop_dict:
             if stop_dict[i]["stop_name"] == arr_stop or stop_dict[i]["stop_name"] == list(arr_stop.split(","))[-1].strip(" "):
-                print(arr_stop)
-                print(stop_dict[i]["stop_name"])
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
                     if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1]:
                         arr_stop = i
@@ -588,15 +585,11 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
     timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
     timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
-    print("timestamp_cur_bef",timestamp_cur_bef)
-    print("timestamp_cur_aft",timestamp_cur_aft)
-    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,
-                                             timestamp__gt=timestamp_cur_bef).values()
+    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
     if not results:
         prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
                              date=date)
     else:
-        print(results)
         # change temp to celcius
         temp = results[0]["main_temp"] - 273.15
         weather_id = results[0]["weather_id"]
@@ -640,6 +633,7 @@ def get_next_four_bus(request, stop):
     f.close()
 
     #Gets current month/date in integer value and current time in HH:MM:SS and mins format for querying and feeding to prediction
+    print("datetime-now",datetime.now())
     current_month=datetime.now()
     current_month =int(current_month.strftime("%m"))
     current = datetime.now().time()
@@ -715,8 +709,7 @@ def get_next_four_bus(request, stop):
             else:
                 predict_in_out = "O"
                 predict_in_out_num = 1
-        real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
-        print(real_time_check)
+        #real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
         if not weather_results:
             prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         else:

@@ -61,6 +61,7 @@ def write_weather_forecast(weather_json):
     """
     # Make an instance of the model for each 3 hourly forecast for the next 5 days
     # Store all these to a list and then bulk add all from the list to the db
+    models.WeatherForecast.objects.all().delete()
     entries = []
     for forecast in weather_json['list']:
         latestUpdate = models.WeatherForecast(

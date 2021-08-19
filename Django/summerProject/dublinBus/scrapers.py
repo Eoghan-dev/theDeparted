@@ -285,4 +285,8 @@ def get_bus_timetable_all():
                             end_t=first_last[timetable[routes][directions][day][stop][time][0]]
                         )
                         entries.append(latestUpdate)
+                        if len(entries)==1000:
+                            models.Current_timetable_all.objects.bulk_create(entries)
+                            entries = []
+                            print("successful_entry")
     models.Current_timetable_all.objects.bulk_create(entries)

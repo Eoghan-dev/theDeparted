@@ -1,9 +1,8 @@
 /* Set the size of the div element that contains the map */
 /*Css for map adapted from google maps tutorial  https://developers.google.com/maps/documentation/javascript/examples/directions-panel#maps_directions_panel-html*/
 #map {
-  height: 100%;
+    height: 100%;
 }
-
 .sidebar {
   height: 100%;
   width: 0;
@@ -84,4 +83,9 @@ border-right: 1px solid #eee;
   /*border: 5px outset rgb(255,193,7);*/
   /*margin: 40px;*/
   /*border-radius: 25px*/
+}
+
+#teamBacking {
+    margin-top: 20px;
+    /* background-color: orange; */
 }

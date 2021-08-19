@@ -1,51 +1,83 @@
 {% extends "dublinBus/base.html" %}
-{% block title %}Test twitter page{% endblock %}
+{% block title %}The team{% endblock %}
 {% load static %}
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Eoghan</h3>
-                    <p class="card-text">Code Lead</p>
-                </div>
-            </div>
+<div class="container" id="teamBacking">
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      <div class="col">
+        <div class="card">
+          <img src="..." class="card-img-top" alt="Picture of team member">
+          <div class="card-body">
+              <h5 class="card-title">Eoghan</h5>
+              <p class="card-text">Code Lead and all around legend</p>
+              <div class="row justify-content-around">
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="github"></i></a>
+                  </div>
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="linkedin"></i></a>
+                  </div>
+              </div>
+          </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Shane</h3>
-                    <p class="card-text">Maintenance lead</p>
-                </div>
-            </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="..." class="card-img-top" alt="Picture of team member">
+          <div class="card-body">
+              <h5 class="card-title">Shane</h5>
+              <p class="card-text">Maintenance Lead and always the last awake at sleepovers</p>
+              <div class="row justify-content-around">
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="github"></i></a>
+                  </div>
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="linkedin"></i></a>
+                  </div>
+              </div>
+          </div>
         </div>
-    </div>
-
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Finnian</h3>
-                    <p class="card-text">Coordination lead</p>
-                </div>
-            </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="..." class="card-img-top" alt="Picture of team member">
+          <div class="card-body">
+              <h5 class="card-title">Finnian</h5>
+              <p class="card-text">Coordination lead and lovable country boy</p>
+              <div class="row justify-content-around">
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="github"></i></a>
+                  </div>
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="linkedin"></i></a>
+                  </div>
+              </div>
+          </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Ross</h3>
-                    <p class="card-text">Customer lead</p>
-                </div>
-            </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="..." class="card-img-top" alt="Picture of team member">
+          <div class="card-body">
+              <h5 class="card-title">Ross</h5>
+              <p class="card-text">Customer lead and part-time model</p>
+              <div class="row justify-content-around">
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="github"></i></a>
+                  </div>
+                  <div class="col text-center">
+                      <a href="#"><i data-feather="linkedin"></i></a>
+                  </div>
+              </div>
+          </div>
         </div>
-    </div>
-    <div class="row justify-content-md-center">
-        <p>link to github as image</p>
+      </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script>
+      feather.replace()
+</script>
 {% endblock %}

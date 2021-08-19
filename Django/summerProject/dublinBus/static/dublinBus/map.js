@@ -79,12 +79,13 @@ async function initMap() {
             station_routes.push(routes_string);
         })
         // Create content of window
-        let window_content = `<div class="infowindow"><h1> Stop ${station_number}: ${station.stop_name}</h1>` +
-            `Routes serving this station:<ul class="list-group">`;
+        let window_content = `<div class="infowindow"><h2> Stop ${station_number}: ${station.stop_name}</h2>` +
+            `Routes serving this station:`;
+        window_content +="<br><a>";
         for (let route of station_routes) {
-            window_content += `<li class="list-group-item">${route}</li>`;
+            window_content += `${route}<br>`;
         }
-        window_content += "</ul>";
+        window_content +="</a>";
         // Create info window object
         let current_info_window = new google.maps.InfoWindow({
             content: window_content,
@@ -98,6 +99,7 @@ async function initMap() {
             name: station.stop_name,
             number: station_number,
             infowindow: current_info_window,
+            label: station_number,
             // Icon taken from http://kml4earth.appspot.com/icons.html
             // icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png", this is the hideous icon
             routes: station_routes,
@@ -126,10 +128,10 @@ async function initMap() {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is less than a minute away.</li>`;
                 }
                 else {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} +${minutes_away} minutes away.</li>`;
                 }
             }
             incoming_buses_text += "</ul></div>";

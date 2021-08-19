@@ -200,7 +200,7 @@ def addUserRoute(request):
                         user.save()
                         return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite route was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def addUserStop(request):
     """View to update users favourite stops from favourites tab in my account page"""
@@ -235,7 +235,7 @@ def addUserStop(request):
             user.save()
             return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite stop was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def delUserRoute(request, route):
     """View to delete a particular route chosen by the user"""
@@ -392,6 +392,7 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0])
         else:
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
+    print(data_return)
     return JsonResponse(data_return)
 
 def timetable_main(request):
@@ -477,7 +478,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     if (list(dep_stop.split(" "))[-1]).isnumeric() == True:
         depart_stop = list(dep_stop.split(" "))[-1]
         for bus_route_stops in range(0, len(stop_dict[depart_stop]["routes"])):
-            if route[1].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][1]:
+            if route[1].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][1] and route[0].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][0]:
                 # gets distance along route and last stop
                 distance_depart = stop_dict[depart_stop]["routes"][bus_route_stops][3]
                 last_stop = stop_dict[depart_stop]["routes"][bus_route_stops][5]
@@ -492,7 +493,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                         # Acquires the distance percent and last stop when found
                         dep_stop_list.append(i)
                         for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                            if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <= stop_dict[i]["routes"][bus_route_stops][3]:
+                            if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <= stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                                 depart_stop = i
                                 distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                                 last_stop = stop_dict[i]["routes"][bus_route_stops][5]
@@ -509,7 +510,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 # Acquires the distance percent and last stop when found
                 dep_stop_list.append(i)
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                    if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3]:
+                    print(route[1],"test",stop_dict[i]["routes"][bus_route_stops][1])
+                    if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                         depart_stop = i
                         distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                         last_stop = stop_dict[i]["routes"][bus_route_stops][5]
@@ -564,6 +566,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             else:
                 direction = 1
     entry = 0
+    if last_stop not in times_dict[route[1].strip(" ")][predict_day]:
+        print("ni hao")
     while times_dict[route[1].strip(" ")][predict_day][last_stop][entry][0] != next_bus:
         entry += 1
     last_stop_time = times_dict[route[1].strip(" ")][predict_day][last_stop][entry][1]
@@ -584,16 +588,21 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
     timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
     timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
+    print("timestamp_cur_bef",timestamp_cur_bef)
+    print("timestamp_cur_aft",timestamp_cur_aft)
     results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,
                                              timestamp__gt=timestamp_cur_bef).values()
-    # change temp to celcius
-    temp = results[0]["main_temp"] - 273.15
-    weather_id = results[0]["weather_id"]
-    start_time = time.time()
-    print(date)
-    prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
-                         date=date, temp=temp, weather=weather_id)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    if not results:
+        prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
+                             date=date)
+    else:
+        print(results)
+        # change temp to celcius
+        temp = results[0]["main_temp"] - 273.15
+        weather_id = results[0]["weather_id"]
+        print(date)
+        prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
+                             date=date, temp=temp, weather=weather_id)
     print(prediction)
     if prediction == False:
         print("prediction failed")
@@ -670,6 +679,8 @@ def get_next_four_bus(request, stop):
     results = Current_timetable_all.objects
     real_time_bus = CurrentBus.objects
     result = list(results.filter(stop_time__lt=future_time, stop_time__gte=current_time, stop=stop, day=Current_Day))
+    weather_results = WeatherForecast.objects.all().values()[0]
+    print(weather_results)
     for bus_stop_time in result:
         route = bus_stop_time.route
         leave_time = bus_stop_time.leave_t
@@ -681,7 +692,6 @@ def get_next_four_bus(request, stop):
         stop_time = bus_stop_time.stop_time
         stop_time_mins = list(stop_time.split(":"))
         stop_time_mins = (int(stop_time_mins[0]) * 60) + int(stop_time_mins[1])
-        real_time_check = real_time_bus.filter(route=bus_stop_time.route,start_t= leave_time)
         count=0
         count_2=0
         while (routes[count] !=bus_stop_time.route and headsign_list[count] != bus_stop_time.headsign):
@@ -706,7 +716,13 @@ def get_next_four_bus(request, stop):
                 predict_in_out = "O"
                 predict_in_out_num = 1
         real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
-        prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        print(real_time_check)
+        if not weather_results:
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        else:
+            temp = weather_results[0]["main_temp"] - 273.15
+            weather_id = weather_results[0]["weather_id"]
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             if mins_till <0:

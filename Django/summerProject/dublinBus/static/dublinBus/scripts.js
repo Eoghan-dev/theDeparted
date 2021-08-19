@@ -166,9 +166,9 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
                 let route_name = route[0];
                 let minutes_away = route[1];
                 if (minutes_away == 0) {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently less than a minute away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is less than a min away.</li>`;
                 } else {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} is currently ${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} is ${minutes_away} mins away</li>`;
                 }
             }
             incoming_buses_text += "</ul></div>";
@@ -625,11 +625,11 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
         last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60
     }
-    prediction_html += "</ul>";
+    //prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
-        total_time_taken_str = "Total journey should take " + gmaps_total_journey + "and should cost €" + total_cost.toFixed(2);
+        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + gmaps_total_journey + " and should cost €" + total_cost.toFixed(2)+"</li>";
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
@@ -637,10 +637,10 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2);
+        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2)+"</li>";
     }
 
-    prediction_html += total_time_taken_str;
+    prediction_html += total_time_taken_str + "</ul>";
     return prediction_html
 }
 
@@ -918,30 +918,42 @@ function closeSidebar() {
 function get_timetable_stops(result) {
     var result_1 = JSON.parse(result);
     var stop_list = [];
-    console.log("back again")
     var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
     for (let i = 0; i < result_1.length; i++) {
         if (stop_list.includes(result_1[i]["stop"])) {
 
         } else {
-
-            //stops += "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center \">"+result_1[i]["stop"]+"</div></span>"
-            //var stop = result_1[i]["stop"];
-            //var entry = document.createElement('li');
-            //entry.hre
-            //entry.classList.add("list-group-item");
-            //entry.appendChild(document.createTextNode(stop));
-            //list.appendChild(entry);
             stop_list.push(result_1[i]["stop"])
         }
     }
-    var ordered_stop_list = stop_list.map((i) => Number(i));
-    ordered_stop_list.sort((a, b) => a - b);
-    for (let i = 0; i < ordered_stop_list.length; i++) {
-        console.log("back again")
-        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+    if (stop_list.length == 0) {
+        let url = window.location.href
+        url = url.replace("%20", " ");
+        url = url.replace("%20", " ");
+        url = url.replace("%27", "'");
+        const myArr = url.split("/");
+        document.getElementById('Title').innerHTML = myArr[myArr.length - 1]
+        document.getElementById("head_mon_fri").style.display = "none";
+        document.getElementById("head_sat").style.display = "none";
+        document.getElementById("head_sun").style.display = "none";
+        document.getElementById('unavailable').innerHTML = "There doesn't Appear to be any information on this bus Route, Sorry for any inconvenience caused";
+        document.getElementById('unavailable').style.display = "visible";
     }
-    document.getElementById('stop_list').innerHTML = stops;
+    else {
+        document.getElementById('unavailable').style.display = "none";
+        var ordered_stop_list = stop_list.map((i) => Number(i));
+        ordered_stop_list.sort((a, b) => a - b);
+        for (let i = 0; i < ordered_stop_list.length; i++) {
+            if (i==0)   {
+                get_timetable(ordered_stop_list[i]);
+                stops += "<span class=\"border border-dark bg-warning border-2 active\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+            }
+            else {
+                stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+            }
+            }
+        document.getElementById('stop_list').innerHTML = stops;
+    }
 }
 
 function get_timetable(stop) {

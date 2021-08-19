@@ -906,30 +906,42 @@ function closeSidebar() {
 function get_timetable_stops(result) {
     var result_1 = JSON.parse(result);
     var stop_list = [];
-    console.log("back again")
     var stops = "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center fw-bolder\">Stops</div></span>";
     for (let i = 0; i < result_1.length; i++) {
         if (stop_list.includes(result_1[i]["stop"])) {
 
         } else {
-
-            //stops += "<span class=\"border border-dark bg-warning border-2\"><div class=\"col-xs-12 col-md-12 text-center \">"+result_1[i]["stop"]+"</div></span>"
-            //var stop = result_1[i]["stop"];
-            //var entry = document.createElement('li');
-            //entry.hre
-            //entry.classList.add("list-group-item");
-            //entry.appendChild(document.createTextNode(stop));
-            //list.appendChild(entry);
             stop_list.push(result_1[i]["stop"])
         }
     }
-    var ordered_stop_list = stop_list.map((i) => Number(i));
-    ordered_stop_list.sort((a, b) => a - b);
-    for (let i = 0; i < ordered_stop_list.length; i++) {
-        console.log("back again")
-        stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+    if (stop_list.length == 0) {
+        let url = window.location.href
+        url = url.replace("%20", " ");
+        url = url.replace("%20", " ");
+        url = url.replace("%27", "'");
+        const myArr = url.split("/");
+        document.getElementById('Title').innerHTML = myArr[myArr.length - 1]
+        document.getElementById("head_mon_fri").style.display = "none";
+        document.getElementById("head_sat").style.display = "none";
+        document.getElementById("head_sun").style.display = "none";
+        document.getElementById('unavailable').innerHTML = "There doesn't Appear to be any information on this bus Route, Sorry for any inconvenience caused";
+        document.getElementById('unavailable').style.display = "visible";
     }
-    document.getElementById('stop_list').innerHTML = stops;
+    else {
+        document.getElementById('unavailable').style.display = "none";
+        var ordered_stop_list = stop_list.map((i) => Number(i));
+        ordered_stop_list.sort((a, b) => a - b);
+        for (let i = 0; i < ordered_stop_list.length; i++) {
+            if (i==0)   {
+                get_timetable(ordered_stop_list[i]);
+                stops += "<span class=\"border border-dark bg-warning border-2 active\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+            }
+            else {
+                stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
+            }
+            }
+        document.getElementById('stop_list').innerHTML = stops;
+    }
 }
 
 function get_timetable(stop) {

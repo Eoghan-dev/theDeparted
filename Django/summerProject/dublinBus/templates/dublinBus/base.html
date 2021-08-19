@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 <head>
     <title>{% block title %}Dublin Bus Project{% endblock %}</title>
 
@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <link rel="stylesheet" href='{% static "dublinBus/assets/bootstrap/css/bootstrap.min.css" %}'>
     <script src='{% static "dublinBus/assets/bootstrap/js/bootstrap.min.js" %}'></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
     {#  Load our own local javascript/css files  #}
     <script type="text/javascript" src="{% static 'dublinBus/scripts.js' %}"></script>
@@ -28,7 +29,7 @@
     <meta name="theme-color" content="#ffffff">
 </head>
 
-<body>
+<body style="background-color:#29434e">
 {#HTML for side bar adapted from https://bootstrapious.com/p/bootstrap-sidebar#}
 <!-- Sidebar -->
 
@@ -37,6 +38,7 @@
         <div class="container-fluid"><a class="navbar-brand" href="/" style="color: #f1f2f6;">The Departed</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1" style="border-color: #f1f2f6;border-top-color: rgba(0,;border-right-color: 0,;border-bottom-color: 0,;border-left-color: 0.55);"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav">
+                    <li class="nav-item" style="color: #f1f2f6;"><a class="nav-link" href={% url 'index' %} style="color: #f1f2f6;">Home</a></li>
                         {% if user.is_authenticated %}
         <li class="nav-item"><a class="nav-link active" href={% url 'myAccount' %} style="color: #f1f2f6;">{{ user.username }}</a></li>
                             <li class="nav-item"><a class="nav-link active" href={% url 'logout' %} style="color: #f1f2f6;">Logout</a></li>

@@ -61,6 +61,7 @@ def write_weather_forecast(weather_json):
     """
     # Make an instance of the model for each 3 hourly forecast for the next 5 days
     # Store all these to a list and then bulk add all from the list to the db
+    models.WeatherForecast.objects.all().delete()
     entries = []
     for forecast in weather_json['list']:
         latestUpdate = models.WeatherForecast(
@@ -284,4 +285,8 @@ def get_bus_timetable_all():
                             end_t=first_last[timetable[routes][directions][day][stop][time][0]]
                         )
                         entries.append(latestUpdate)
+                        if len(entries)==1000:
+                            models.Current_timetable_all.objects.bulk_create(entries)
+                            entries = []
+                            print("successful_entry")
     models.Current_timetable_all.objects.bulk_create(entries)

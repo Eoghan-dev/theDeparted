@@ -17,9 +17,70 @@ import gzip
 import time
 
 def index(request):
-    """View to load the homepage of our application"""
-    return render(request, 'dublinBus/index.html')
-
+    """View to load the homepage of our application
+    Also loads all cancelled routes and times for display
+    under routes tab
+    """
+    #Gets current time and changes it to the desired format HH:MM:SS
+    cur_time = str(datetime.now().time())
+    cur_time_list = list(cur_time.split(":"))
+    cur_time = cur_time_list[0] + ":" + cur_time_list[1] + ":00"
+    result = CurrentBus.objects.filter(schedule="CANCELED", start_t__gt=cur_time).values()
+    print("result:",result)
+    #Gets weekdays and converts to an integer to match mon/sat/sun in json files
+    weekday = int(datetime.now().weekday())
+    list_return = []
+    if weekday < 5:
+        day = "mon"
+    elif weekday == 5:
+        day = "sat"
+    elif weekday == 6:
+        day = "sun"
+    for i in result:
+        print(i["route"])
+        #intialise lists and dictionaries that will be refreshed for each result
+        dict_return = {}
+        headsigns_li = []
+        route = i["route"]
+        start_t = i["start_t"]
+        direction = i["direction"]
+        #Opens routes.json file
+        file_path_routes = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files",
+                                       "routes.json")
+        f = open(file_path_routes, encoding="utf-8-sig")
+        routes_dict = json.load(f)
+        f.close()
+        #Matches the directions/headsigns to that outputted from the database
+        for dir in routes_dict[route]["direction"]:
+            if dir[1] == direction:
+                headsigns_li.append(dir[0])
+        print(headsigns_li)
+        #If only one route for that direction must be this direction that is refrenced
+        if len(headsigns_li) == 1:
+            dict_return["route"] = route
+            dict_return["headsign"] = headsigns_li[0]
+            dict_return["time"] = start_t
+        #Else we must check the timtable to tell which headsign is correct
+        else:
+            file_path_times = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files","bus_times", route + "_timetable.json")
+            if os.path.isfile(file_path_times) == True:
+                f = open(file_path_times, encoding="utf-8-sig")
+                times_dict = json.load(f)
+                f.close()
+                success = 0
+                #Iterates through the timetable until it finds a matching route
+                for headsign in headsigns_li:
+                    if day in times_dict[headsign]:
+                        for stop in times_dict[headsign][day]:
+                            for times in times_dict[headsign][day][stop]:
+                                #if start time from database is matched with the static json success and saves to returned dictionary
+                                if times[0] == start_t:
+                                    dict_return["route"] = route
+                                    dict_return["headsign"] = headsign
+                                    dict_return["time"] = start_t
+                                    break
+        list_return.append(dict_return)
+    return render(request, 'dublinBus/index.html', {"result": list_return})
 
 def dbTwitter(request):
     """View to load the Dublin bus twitter feed to our application"""
@@ -49,6 +110,7 @@ def myAccount(request):
     # initialise fav routes and stops json before the if statement so that they can be passed to page even if empty
     fav_stops_list = []
     fav_routes_list = []
+    timetable_li = []
     if request.user.is_authenticated:
         user = request.user
         # Get users fav routes and stops, convert to array and then convert to json so it can be passed as a context
@@ -138,7 +200,7 @@ def addUserRoute(request):
                         user.save()
                         return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite route was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def addUserStop(request):
     """View to update users favourite stops from favourites tab in my account page"""
@@ -173,7 +235,7 @@ def addUserStop(request):
             user.save()
             return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite stop was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def delUserRoute(request, route):
     """View to delete a particular route chosen by the user"""
@@ -315,22 +377,13 @@ def get_direction_bus(request, data):
     #Loads json data passed from the request - obtained from google maps api
     data = json.loads(data)
     #Splits the route name as gives headsign with number--[number: headsign]
+    print("original-data",data)
     data_return = {}
-    print("multiple buses")
-    print(data)
     data_return["route"] = []
     data_return["departure_time"] = []
     data_return["arrival_time"] = []
     for bus in range(0,len(data["departure_times"])):
-        print("**************")
-        print(data["departure_times"][bus])
-        print(data["departure_stops"][bus])
-        print(data["arrival_stops"][bus])
-        print(data["route_names"][bus])
-        print(data["date_time"])
-        print("**************")
         temporary_dict = setting_data(data["departure_times"][bus],data["departure_stops"][bus],data["arrival_stops"][bus],data["route_names"][bus], data["date_time"])
-        print(temporary_dict)
         data_return["route"].append(temporary_dict["route"][0])
         if temporary_dict["departure_time"][0] == "gmaps":
             data_return["departure_time"].append(temporary_dict["departure_time"][0])
@@ -340,7 +393,7 @@ def get_direction_bus(request, data):
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0])
         else:
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
-    print(data_return)
+    print("data_returned",data_return)
     return JsonResponse(data_return)
 
 def timetable_main(request):
@@ -361,11 +414,11 @@ def timetable_route(request):
 def timetable(request, route):
     print(route)
     route_num = list(route.split(":"))[0]
-    headsign = list(route.split(":"))[1]
+    headsign = list(route.split(":"))[1].strip()
     results = Current_timetable_all.objects
     result = list(results.filter(route=route_num, headsign=headsign).order_by("day","stop","stop_time").values("stop","stop_time","day"))
     result_list = json.dumps(result)
-    return render(request, 'dublinBus/timetables.html', {"result" : result_list})
+    return render(request, 'dublinBus/timetables.html', {"result": result_list})
 
 def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     # Splits the route name as gives headsign with number--[number: headsign]
@@ -426,7 +479,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     if (list(dep_stop.split(" "))[-1]).isnumeric() == True:
         depart_stop = list(dep_stop.split(" "))[-1]
         for bus_route_stops in range(0, len(stop_dict[depart_stop]["routes"])):
-            if route[1].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][1]:
+            if route[1].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][1] and route[0].strip(" ") == stop_dict[depart_stop]["routes"][bus_route_stops][0]:
                 # gets distance along route and last stop
                 distance_depart = stop_dict[depart_stop]["routes"][bus_route_stops][3]
                 last_stop = stop_dict[depart_stop]["routes"][bus_route_stops][5]
@@ -441,7 +494,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                         # Acquires the distance percent and last stop when found
                         dep_stop_list.append(i)
                         for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                            if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <= stop_dict[i]["routes"][bus_route_stops][3]:
+                            if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <= stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                                 depart_stop = i
                                 distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                                 last_stop = stop_dict[i]["routes"][bus_route_stops][5]
@@ -451,14 +504,14 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         distance_depart = 0
         dep_stop_list = []
         depart_stop = None
-        print("else")
         for i in stop_dict:
             # Checks for stop when stop name == departure name
             if stop_dict[i]["stop_name"] == dep_stop or stop_dict[i]["stop_name"] in dep_stop:
                 # Acquires the distance percent and last stop when found
                 dep_stop_list.append(i)
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                    if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3]:
+                    print(route[1],"test",stop_dict[i]["routes"][bus_route_stops][1])
+                    if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                         depart_stop = i
                         distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                         last_stop = stop_dict[i]["routes"][bus_route_stops][5]
@@ -467,7 +520,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 pass
     #Catch for if the Name check couldn't find the correct stop departure and arrival
     if depart_stop == None or last_stop ==None:
-        print("depart stop or last stop broke")
         data_return["route"] = ["gmaps"]
         data_return["departure_time"] = ["gmaps"]
         data_return["arrival_time"] = ["gmaps"]
@@ -481,8 +533,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     else:
         for i in stop_dict:
             if stop_dict[i]["stop_name"] == arr_stop or stop_dict[i]["stop_name"] == list(arr_stop.split(","))[-1].strip(" "):
-                print(arr_stop)
-                print(stop_dict[i]["stop_name"])
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
                     if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1]:
                         arr_stop = i
@@ -513,6 +563,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             else:
                 direction = 1
     entry = 0
+    if last_stop not in times_dict[route[1].strip(" ")][predict_day]:
+        print("ni hao")
     while times_dict[route[1].strip(" ")][predict_day][last_stop][entry][0] != next_bus:
         entry += 1
     last_stop_time = times_dict[route[1].strip(" ")][predict_day][last_stop][entry][1]
@@ -533,16 +585,17 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
     timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
     timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
-    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,
-                                             timestamp__gt=timestamp_cur_bef).values()
-    # change temp to celcius
-    temp = results[0]["main_temp"] - 273.15
-    weather_id = results[0]["weather_id"]
-    start_time = time.time()
-    print(date)
-    prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
-                         date=date, temp=temp, weather=weather_id)
-    print("--- %s seconds ---" % (time.time() - start_time))
+    results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
+    if not results:
+        prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
+                             date=date)
+    else:
+        # change temp to celcius
+        temp = results[0]["main_temp"] - 273.15
+        weather_id = results[0]["weather_id"]
+        print(date)
+        prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
+                             date=date, temp=temp, weather=weather_id)
     print(prediction)
     if prediction == False:
         print("prediction failed")
@@ -557,8 +610,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         predict_dep_arr = full_time * (distance_arr)
         predict_dep_arr = int(predict_dep_arr + next_bus_min)
         # +1 month for javascript datetime, change min format to hours and min
-        timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0) + relativedelta(months=1)
-        timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0) + relativedelta(months=1)
+        timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0)
+        timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0)
         print(timestamp_return_dep)
         print(timestamp_return_arr)
         data_return["route"] = [route[0]]
@@ -567,6 +620,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     return data_return
 
 def get_next_four_bus(request, stop):
+    start_time = time.time()
     #Opens Path to stops.json / routes.json
     file_path = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
     file_path_route = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")
@@ -579,6 +633,7 @@ def get_next_four_bus(request, stop):
     f.close()
 
     #Gets current month/date in integer value and current time in HH:MM:SS and mins format for querying and feeding to prediction
+    print("datetime-now",datetime.now())
     current_month=datetime.now()
     current_month =int(current_month.strftime("%m"))
     current = datetime.now().time()
@@ -617,16 +672,11 @@ def get_next_four_bus(request, stop):
                 headsign_list_2.append(routejson_dict[stop_dict[stop]["routes"][bus_route][0]]["direction"][direction][0])
     results = Current_timetable_all.objects
     real_time_bus = CurrentBus.objects
-    print("route", routes)
-    print("in_out", in_out)
-    print("distance",distance)
-    print("headsign",headsign_list)
-    print("headsign 2", headsign_list_2)
-    result = results.filter(stop_time__lt=future_time, stop_time__gte=current_time, route__in=routes, stop=stop, day=Current_Day).order_by('stop_time')[:4]
-    print(future_time)
-    print(current_time)
-    print("result",result)
+    result = list(results.filter(stop_time__lt=future_time, stop_time__gte=current_time, stop=stop, day=Current_Day))
+    weather_results = WeatherForecast.objects.all().values()[0]
+    print(weather_results)
     for bus_stop_time in result:
+        route = bus_stop_time.route
         leave_time = bus_stop_time.leave_t
         leave_time_mins = list(leave_time.split(":"))
         leave_time_mins = (int(leave_time_mins[0]) * 60) + int(leave_time_mins[1])
@@ -636,7 +686,6 @@ def get_next_four_bus(request, stop):
         stop_time = bus_stop_time.stop_time
         stop_time_mins = list(stop_time.split(":"))
         stop_time_mins = (int(stop_time_mins[0]) * 60) + int(stop_time_mins[1])
-        real_time_check = real_time_bus.filter(route=bus_stop_time.route,start_t= leave_time)
         count=0
         count_2=0
         while (routes[count] !=bus_stop_time.route and headsign_list[count] != bus_stop_time.headsign):
@@ -660,11 +709,13 @@ def get_next_four_bus(request, stop):
             else:
                 predict_in_out = "O"
                 predict_in_out_num = 1
-
-        real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
-        #print(real_time_check)
-        #print(bus_stop_time.headsign)
-        prediction = predict(bus_stop_time.route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        #real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
+        if not weather_results:
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        else:
+            temp = weather_results["main_temp"] - 273.15
+            weather_id = weather_results["weather_id"]
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             if mins_till <0:
@@ -678,7 +729,8 @@ def get_next_four_bus(request, stop):
                 pass
             else:
                 buses.append([str(bus_stop_time.route + ": " + bus_stop_time.headsign), mins_till])
-    buses = sorted(buses, key=lambda x: x[0])
+    buses = sorted(buses, key=lambda x: x[1])[:4]
+    print("--- %s seconds last ---" % (time.time() - start_time))
     return JsonResponse(buses, safe=False)
 
 def predict(route, direction, arriv, dep, actual_dep=-1, month=-1, date=-1, temp=-273, weather=500):

@@ -5,7 +5,7 @@ from . import models
 import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
-from django.utils import timezone
+from urllib.request import urlopen
 from summerProject import logins
 
 def get_current_weather():
@@ -113,7 +113,13 @@ def write_current_bus(transport_data):
 
     # Timestamp is the same for all items in the json object so we can create this and dt outside the loop
     timestamp = transport_data['header']['timestamp']
-    dt = datetime.now(tz=timezone.utc)
+    with urlopen("https://www.timeapi.io/api/Time/current/zone?timeZone=Europe/Dublin") as url:
+        s = url.read()
+        dub_t = json.loads(s)
+    print(dub_t["dateTime"])
+    dub_date_time = dub_t["dateTime"][:-1]
+    dub_date_time = datetime.strptime(dub_date_time.replace("T", " "), '%Y-%m-%d %H:%M:%S.%f')
+    dt = dub_date_time
 
     base = settings.BASE_DIR
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "routes.json")

@@ -679,6 +679,8 @@ def get_next_four_bus(request, stop):
     results = Current_timetable_all.objects
     real_time_bus = CurrentBus.objects
     result = list(results.filter(stop_time__lt=future_time, stop_time__gte=current_time, stop=stop, day=Current_Day))
+    weather_results = WeatherForecast.objects.all().values()[0]
+    print(weather_results)
     for bus_stop_time in result:
         route = bus_stop_time.route
         leave_time = bus_stop_time.leave_t
@@ -690,7 +692,6 @@ def get_next_four_bus(request, stop):
         stop_time = bus_stop_time.stop_time
         stop_time_mins = list(stop_time.split(":"))
         stop_time_mins = (int(stop_time_mins[0]) * 60) + int(stop_time_mins[1])
-        real_time_check = real_time_bus.filter(route=bus_stop_time.route,start_t= leave_time)
         count=0
         count_2=0
         while (routes[count] !=bus_stop_time.route and headsign_list[count] != bus_stop_time.headsign):
@@ -715,7 +716,13 @@ def get_next_four_bus(request, stop):
                 predict_in_out = "O"
                 predict_in_out_num = 1
         real_time_check = real_time_bus.filter(route=bus_stop_time.route, start_t=leave_time, direction=predict_in_out)
-        prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        print(real_time_check)
+        if not weather_results:
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
+        else:
+            temp = weather_results[0]["main_temp"] - 273.15
+            weather_id = weather_results[0]["weather_id"]
+            prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins
             if mins_till <0:

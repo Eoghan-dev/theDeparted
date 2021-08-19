@@ -556,8 +556,8 @@ function getGmapsTimeFromTimestamp(timestamp) {
 
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     console.log("trip_info", trip_info)
-    let first_walking_time;
-    let last_walking_time
+    let initial_departure_time;
+    let final_arrival_time
     let total_cost = 0.0;
     // first get the number of bus trips that we have in total as we have a prediction for each
     let num_trips = trip_info.length;
@@ -571,18 +571,32 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         // index from each of their respective arrays (the value to the key).
         let trip_step = trip_info[i];
         // Add time to first item
-        if (i === 0) {
-            prediction_html += `<b>${trip_step.departure_time}: </b>`;
-        }
+
 
         if (trip_step.step_type === "WALKING") {
-            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
+
+            // First step of journey if walking
             if (i === 0) {
-                first_walking_time = parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60
-                console.log(new Date(first_walking_time))
+                // prediction_html += `<b>${trip_step.departure_time}:</b> `;
+                initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60);
+                console.log("initial departure time (walking)", new Date(initial_departure_time))
             }
+            prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
 
         } else {
+            // First step of journey if bus
+            if (i === 0) {
+                initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]));
+                console.log("initial departure time (transit)", new Date(initial_departure_time));
+            }
+            if (prediction["departure_time"][transit_count] === "gmaps") {
+                prediction_html += `<b>${trip_step.departure_time}: </b>`;
+            } else {
+                let formatted_date = new Date(prediction["departure_time"][transit_count]);
+                formatted_date = formatted_date.getHours() + ":" + formatted_date.getMinutes();
+                prediction_html += `<b>${formatted_date}: </b>`;
+            }
+
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
             console.log({prediction})
@@ -595,8 +609,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 gmaps_journey = true;
             } else {
                 // calculate total time taken by step
-                let step_time = prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count];
-                let step_time_date = new Date(step_time)
+                let step_time = Math.abs(prediction["arrival_time"][transit_count] - prediction.departure_time[transit_count]);
                 prediction_html += ((step_time / 1000) / 60) + " mins ";
             }
             // Get the total number of stops the bus passed for this stop
@@ -616,20 +629,39 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             console.log({trip_step})
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
             let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
-            prediction_html += " ---- €" + fare.toFixed(2);
-            total_cost += fare;
+            console.log(trip_info[i], "LOOK HERE")
+            if (trip_info[i]['agency'] === "Dublin Bus") {
+                prediction_html += " ---- €" + fare.toFixed(2);
+                total_cost += fare;
+            }
             transit_count += 1;
         }
         prediction_html += "</li>";
     }
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
-        last_walking_time = parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60
+        final_arrival_time = Math.abs(parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60);
+        console.log("final arrival time (walking)", new Date(final_arrival_time))
+    } else {
+        final_arrival_time = Math.abs(parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]));
+        console.log("final arrival time (transit)", new Date(final_arrival_time))
     }
-    //prediction_html += "</ul>";
     // Get total time of journey
     let total_time_taken_str = "";
     if (gmaps_journey) {
-        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + gmaps_total_journey + " and should cost €" + total_cost.toFixed(2)+"</li>";
+        // If bus is dublin bus add price, don't otherwise
+
+        // Boolean for whether or not the journey consisted of only dublin bus trips and we should use the fare calculator
+        let fareJourney = true;
+        trip_info.forEach( trip => {
+            if (trip['agency'] != "Dublin Bus") {
+                fareJourney = false;
+            }
+        })
+        if (fareJourney) {
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + gmaps_total_journey + " and should cost €" + total_cost.toFixed(2) + "</li>";
+        } else {
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + gmaps_total_journey + "</li>";
+        }
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
         console.log(prediction["departure_time"][0])
@@ -637,8 +669,25 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
-        total_time_taken_str = "<li class='list-group-item'>Total journey should take " + ((last_walking_time - first_walking_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2)+"</li>";
-    }
+
+        // Boolean for whether or not the journey consisted of only dublin bus trips and we should use the fare calculator
+        let fareJourney = true;
+        console.log("Look here 2", trip_info)
+        trip_info.forEach( trip => {
+            if (trip['step_type'] === "TRANSIT") {
+                if (trip['agency'] != "Dublin Bus") {
+                    fareJourney = false;
+                }
+            }
+        });
+        console.log({fareJourney})
+        if (fareJourney) {
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + ((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2) + "</li>";
+        }
+        else {
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + ((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes</li>";
+        }
+        }
 
     prediction_html += total_time_taken_str + "</ul>";
     return prediction_html
@@ -819,6 +868,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["departure_time"] = departure_time;
                     step_info["route_num"] = current_step.transit.line.short_name;
                     step_info["num_stops"] = current_step.transit.num_stops;
+                    step_info["agency"] = current_step['transit']['line']['agencies'][0]['name'];
                 } else {
                     console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
@@ -834,6 +884,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     }
                     step_info["route_num"] = "n/a";
                     step_info["num_stops"] = "n/a";
+                    step_info["agency"] = "n/a";
                 }
                 trip_description.push(step_info);
             }
@@ -938,20 +989,18 @@ function get_timetable_stops(result) {
         document.getElementById("head_sun").style.display = "none";
         document.getElementById('unavailable').innerHTML = "There doesn't Appear to be any information on this bus Route, Sorry for any inconvenience caused";
         document.getElementById('unavailable').style.display = "visible";
-    }
-    else {
+    } else {
         document.getElementById('unavailable').style.display = "none";
         var ordered_stop_list = stop_list.map((i) => Number(i));
         ordered_stop_list.sort((a, b) => a - b);
         for (let i = 0; i < ordered_stop_list.length; i++) {
-            if (i==0)   {
+            if (i == 0) {
                 get_timetable(ordered_stop_list[i]);
                 stops += "<span class=\"border border-dark bg-warning border-2 active\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
-            }
-            else {
+            } else {
                 stops += "<span class=\"border border-dark bg-warning border-2\" onclick=\"get_timetable(" + ordered_stop_list[i] + ")\"><div class=\"col-xs-12 col-md-12 text-center \">" + ordered_stop_list[i] + "</div></span>"
             }
-            }
+        }
         document.getElementById('stop_list').innerHTML = stops;
     }
 }

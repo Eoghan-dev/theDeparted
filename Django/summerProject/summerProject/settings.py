@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = logins.django_key["new"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['137.43.49.56', 'localhost', '127.0.0.1','www.thedeparted.games', 'thedeparted.games']

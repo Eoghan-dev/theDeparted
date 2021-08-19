@@ -70,15 +70,16 @@ def index(request):
                 success = 0
                 #Iterates through the timetable until it finds a matching route
                 for headsign in headsigns_li:
-                    if day in times_dict[headsign]:
-                        for stop in times_dict[headsign][day]:
-                            for times in times_dict[headsign][day][stop]:
-                                #if start time from database is matched with the static json success and saves to returned dictionary
-                                if times[0] == start_t:
-                                    dict_return["route"] = route
-                                    dict_return["headsign"] = headsign
-                                    dict_return["time"] = start_t
-                                    break
+                    if headsign in times_dict:
+                        if day in times_dict[headsign]:
+                            for stop in times_dict[headsign][day]:
+                                for times in times_dict[headsign][day][stop]:
+                                    #if start time from database is matched with the static json success and saves to returned dictionary
+                                    if times[0] == start_t:
+                                        dict_return["route"] = route
+                                        dict_return["headsign"] = headsign
+                                        dict_return["time"] = start_t
+                                        break
         list_return.append(dict_return)
     return render(request, 'dublinBus/index.html', {"result": list_return})
 

@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
 from urllib.request import urlopen
-from summerProject import logins
+from ..summerProject import logins
 
 def get_current_weather():
     """

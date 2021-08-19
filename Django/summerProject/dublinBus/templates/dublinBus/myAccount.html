@@ -6,22 +6,22 @@
     <div>
         {% if user.is_authenticated %}
             <ul class="nav nav-tabs nav-fill fixed-bottom" role="tablist">
-                <li class="nav-item" role="presentation" style="width: 50%;text-align: center;"><a class="nav-link active"
-                                                                                                   role="tab"
-                                                                                                   data-bs-toggle="tab"
-                                                                                                   href="#tab-1"
-                                                                                                   style="background: #819ca9;color: #ffffff;">User
-                    Setting</a></li>
                 <li class="nav-item" role="presentation"
-                    style="background: #819ca9;color: #ffffff;width: 50%;text-align: center;"><a class="nav-link"
+                    style="background: #819ca9;color: #ffffff;width: 50%;text-align: center;"><a class="nav-link  active"
                                                                                                  role="tab"
                                                                                                  data-bs-toggle="tab"
                                                                                                  href="#tab-3"
                                                                                                  style="background: #819ca9;color: #ffffff;">Favourites</a>
                 </li>
+                <li class="nav-item" role="presentation" style="width: 50%;text-align: center;"><a class="nav-link"
+                                                                                                   role="tab"
+                                                                                                   data-bs-toggle="tab"
+                                                                                                   href="#tab-1"
+                                                                                                   style="background: #819ca9;color: #ffffff;">User
+                    Setting</a></li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane active" role="tabpanel" id="tab-1">
+                <div class="tab-pane" role="tabpanel" id="tab-1">
                     <div></div>
                     <div class="container">
 
@@ -186,7 +186,7 @@
 
                 </div>
                 {#  Tab 2 starts from here  #}
-                <div class="tab-pane" role="tabpanel" id="tab-3">
+                <div class="tab-pane active" role="tabpanel" id="tab-3">
                     <div>
                         <div class="container text-center">
                             <div class="row">

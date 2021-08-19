@@ -200,7 +200,7 @@ def addUserRoute(request):
                         user.save()
                         return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite route was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def addUserStop(request):
     """View to update users favourite stops from favourites tab in my account page"""
@@ -235,7 +235,7 @@ def addUserStop(request):
             user.save()
             return redirect('myAccount')
     # If the route entered by the user wasn't found return an error
-    return HttpResponse("Error, your inputted favourite stop was not valid, please try again and make sure you select the full suggested route name")
+    return redirect('myAccount')
 
 def delUserRoute(request, route):
     """View to delete a particular route chosen by the user"""

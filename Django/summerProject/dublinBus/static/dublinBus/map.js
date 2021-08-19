@@ -99,7 +99,7 @@ async function initMap() {
             name: station.stop_name,
             number: station_number,
             infowindow: current_info_window,
-            label: station_number,
+            //label: station_number,
             // Icon taken from http://kml4earth.appspot.com/icons.html
             // icon: "http://maps.google.com/mapfiles/kml/shapes/bus.png", this is the hideous icon
             routes: station_routes,

@@ -354,10 +354,7 @@ class AutocompleteDirectionsHandler {
 
         let selectedDateTime = new Date();
         let currentTimestamp = selectedDateTime.getTime();
-        let hours = time.split(":")[0];
-        let minutes = time.split(":")[1];
-        selectedDateTime.setHours(hours);
-        selectedDateTime.setMinutes(minutes);
+
 
         let year = date.split("-")[0];
         let month = date.split("-")[1];
@@ -366,11 +363,21 @@ class AutocompleteDirectionsHandler {
         selectedDateTime.setMonth(month);
         selectedDateTime.setDate(day);
 
+        let hours = time.split(":")[0];
+        let minutes = time.split(":")[1];
+        selectedDateTime.setHours(hours);
+        selectedDateTime.setMinutes(minutes);
+
+        console.log("date time before conversion", selectedDateTime)
+        console.log(selectedDateTime.getTime())
         // CHeck if the user entered date time is older than the current datetime as we don't want to get predictions
         // from the past (can happen if tab was left open)
         if (selectedDateTime.getTime() < currentTimestamp) {
             selectedDateTime = new Date(currentTimestamp);
         }
+        console.log("date time after conversion", selectedDateTime)
+        console.log("TEST")
+        console.log(currentTimestamp)
         // Return early if the relevant fields haven't been filled out yet
         if (this.usingUserInput === false) {
             if (!this.originPlaceId || !this.destinationPlaceId) {

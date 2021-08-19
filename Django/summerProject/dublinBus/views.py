@@ -617,8 +617,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         predict_dep_arr = full_time * (distance_arr)
         predict_dep_arr = int(predict_dep_arr + next_bus_min)
         # +1 month for javascript datetime, change min format to hours and min
-        timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0) + relativedelta(months=1)
-        timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0) + relativedelta(months=1)
+        timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0)
+        timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0)
         print(timestamp_return_dep)
         print(timestamp_return_arr)
         data_return["route"] = [route[0]]
@@ -720,8 +720,8 @@ def get_next_four_bus(request, stop):
         if not weather_results:
             prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month, date=datetime.now().day)
         else:
-            temp = weather_results[0]["main_temp"] - 273.15
-            weather_id = weather_results[0]["weather_id"]
+            temp = weather_results["main_temp"] - 273.15
+            weather_id = weather_results["weather_id"]
             prediction = predict(route, predict_in_out_num, arr_time_mins, leave_time_mins, month=current_month,date=datetime.now().day, temp=temp, weather=weather_id)
         if prediction == False:
             mins_till = stop_time_mins - current_time_mins

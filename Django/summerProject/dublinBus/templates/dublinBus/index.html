@@ -144,18 +144,19 @@
 
             <div class="tab-pane" role="tabpanel" id="tab-3">
                 <div class="container" id="stops_input_container">
-                    <div class="row">
+                    <div class="row justify-content-around">
+                        <div class="col-md-6 col-12">
                     <div class="m-3 input-group">
-                        <div class="col-md-6 offset-md-2 col-8 text-center mb-2">
                         <label for="stops_num"></label>
+                        <datalist id="stops">
+                        </datalist>
                         <input id="stops_num" list="stops" name="stops_num" class="form-control"
                                placeholder="Please enter stop number">
-                            </div>
+
                         <div class="input-group-append">
                         <button class="btn btn-primary" id="get_stops">Give stops</button>
                             </div>
-                        <datalist id="stops">
-                        </datalist>
+                            </div>
                     </div></div>
                     <div class="row" style="margin-bottom: 5px">
                         {% if user.is_authenticated %}

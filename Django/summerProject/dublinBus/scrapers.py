@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 import urllib.request, urllib.parse, urllib.error, json
 from urllib.request import urlopen
-from ..summerProject import logins
+from summerProject import logins
 
 def get_current_weather():
     """
@@ -14,7 +14,7 @@ def get_current_weather():
     """
     latitude = '53.349805'
     longitude = '-6.26031'
-    weather_key = logins.apis['OpenWeather']
+    weather_key = "a50cf221b9fb108b0ae5f652642a0b11"
     weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/weather'
     r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
     weather_json = r.json()
@@ -48,7 +48,7 @@ def get_weather_forecast():
     """
     latitude = '53.349805'
     longitude = '-6.26031'
-    weather_key = logins.apis['OpenWeather']
+    weather_key = "a50cf221b9fb108b0ae5f652642a0b11"
     weather_by_coordinates = 'http://api.openweathermap.org/data/2.5/forecast'
     r = requests.get(weather_by_coordinates, params={"APPID": weather_key, "lat": latitude, "lon": longitude})
     weather_json = r.json()

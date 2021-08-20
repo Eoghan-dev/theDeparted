@@ -491,6 +491,7 @@ class AutocompleteDirectionsHandler {
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
                                     let prediction = await prediction_res.json();
 
+
                                     // fill in the departure times from trip_info using what was generated in our prediction
                                     // loop through trip info starting at the second item as we already have the initial departure time
                                     let transit_count = 0;
@@ -565,6 +566,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     let gmaps_journey = false; //boolean for whether we're using gmaps predictions or our own
     let transit_count = 0; //counter to differentiate number of transit steps from walking/transit (i)
     for (let i = 0; i < num_trips; i++) {
+        var index = i;
         prediction_html += "<li class='list-group-item'>";
         // Now loop through the keys from our data returned from backend and get the appropriate
         // index from each of their respective arrays (the value to the key).
@@ -576,8 +578,14 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 
             // First step of journey if walking
             if (i === 0) {
+                if (prediction.departure_time[0] === "gmaps") {
+                    let gmaps_str = trip_step["departure_time"];
+                    initial_departure_time = gmaps_to_timestamp(gmaps_str);
+                }
+                else {
+                    initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60);
+                }
                 // prediction_html += `<b>${trip_step.departure_time}:</b> `;
-                initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60);
                 console.log("initial departure time (walking)", new Date(initial_departure_time))
             }
             prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
@@ -585,7 +593,13 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         } else {
             // First step of journey if bus
             if (i === 0) {
-                initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]));
+                if (prediction.departure_time[0] === "gmaps") {
+                    let gmaps_str = trip_step["departure_time"];
+                    initial_departure_time = gmaps_to_timestamp(gmaps_str);
+                }
+                else {
+                    initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]));
+                }
                 console.log("initial departure time (transit)", new Date(initial_departure_time));
             }
             if (prediction["departure_time"][transit_count] === "gmaps") {
@@ -643,10 +657,25 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         prediction_html += "</li>";
     }
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
-        final_arrival_time = Math.abs(parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]) + parseInt(trip_info[trip_info.length - 1].duration.split(" ")[0]) * 1000 * 60);
+        if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
+                    let gmaps_str = trip_info[trip_info.length-2]["arrival_time"];
+                    console.log("gmaps_str", gmaps_str)
+                    final_arrival_time = gmaps_to_timestamp(gmaps_str);
+                    final_arrival_time += (parseInt(trip_info[trip_info.length-1].duration.split(" ")[0]) * 1000 * 60)
+                }
+        else {
+            final_arrival_time = Math.abs(parseInt(prediction.arrival_time[prediction.arrival_time.length - 1]));
+            final_arrival_time += (parseInt(trip_info[trip_info.length-1].duration.split(" ")[0]) * 1000 * 60)
+        }
         console.log("final arrival time (walking)", new Date(final_arrival_time))
     } else {
-        final_arrival_time = Math.abs(parseInt(prediction["arrival_time"][prediction["arrival_time"].length - 1]));
+        if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
+                    let gmaps_str = trip_info[trip_info.length-1]["arrival_time"];
+                    final_arrival_time = gmaps_to_timestamp(gmaps_str);
+                }
+        else {
+            final_arrival_time = Math.abs(parseInt(prediction.arrival_time[prediction.arrival_time.length - 1]));
+        }
         console.log("final arrival time (transit)", new Date(final_arrival_time))
     }
     // Get total time of journey
@@ -662,9 +691,9 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             }
         })
         if (fareJourney) {
-            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + gmaps_total_journey + " and should cost €" + total_cost.toFixed(2) + "</li>";
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + parseInt((final_arrival_time - initial_departure_time) / 1000 / 60) + " mins and should cost €" + total_cost.toFixed(2) + "</li>";
         } else {
-            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + gmaps_total_journey + "</li>";
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + parseInt((final_arrival_time - initial_departure_time) / 1000 / 60) + " mins</li>";
         }
     } else {
         console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
@@ -686,15 +715,45 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         });
         console.log({fareJourney})
         if (fareJourney) {
-            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + ((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2) + "</li>";
+            console.log("final_arrival_time",final_arrival_time)
+            console.log("initial_departure_time",initial_departure_time)
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + parseInt((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes and should cost €" + total_cost.toFixed(2) + "</li>";
         }
         else {
-            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + ((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes</li>";
+            console.log("final_arrival_time",final_arrival_time)
+            console.log("initial_departure_time",initial_departure_time)
+            total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + parseInt((final_arrival_time - initial_departure_time) / 1000 / 60) + " minutes</li>";
         }
+        console.log("**********************************************")
         }
 
     prediction_html += total_time_taken_str + "</ul>";
     return prediction_html
+}
+
+function gmaps_to_timestamp(gmaps_str) {
+    let date_temp = new Date();
+    let converted_time;
+    gmaps_str = gmaps_str.split(":");
+    if ((gmaps_str[1].includes("am")) ||(gmaps_str[1].includes("AM"))) {
+        date_temp.setHours(parseInt(gmaps_str[0]));
+        date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
+    else if ((gmaps_str[1].includes("pm")) ||(gmaps_str[1].includes("PM"))) {
+        date_temp.setHours(parseInt(gmaps_str[0])+12);
+        date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
+    else {
+        date_temp.setHours(parseInt(gmaps_str[0]));
+        date_temp.setMinutes(parseInt(gmaps_str[1]))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
+    return converted_time
 }
 
 function determineSchoolRange(departure_time) {
@@ -869,6 +928,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
+                    step_info["arrival_time"] = current_step.transit.arrival_time.text;
                     step_info["departure_time"] = departure_time;
                     step_info["route_num"] = current_step.transit.line.short_name;
                     step_info["num_stops"] = current_step.transit.num_stops;
@@ -881,6 +941,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
+                    step_info["arrival_time"] = "n/a";
                     if (k === 0) {
                         step_info["departure_time"] = current_leg.departure_time.text;
                     } else {

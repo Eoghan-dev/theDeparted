@@ -489,8 +489,7 @@ class AutocompleteDirectionsHandler {
                                     // Send the relevant data to our backend so it can get model predictions
                                     console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
-                                    let prediction_json = await prediction_res.json();
-                                    let prediction = JSON.parse(prediction_json)
+                                    let prediction = await prediction_res.json();
 
                                     // fill in the departure times from trip_info using what was generated in our prediction
                                     // loop through trip info starting at the second item as we already have the initial departure time

@@ -490,7 +490,6 @@ class AutocompleteDirectionsHandler {
                                     console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
                                     let prediction_json = await prediction_res.json();
-                                    let prediction = JSON.parse(prediction_json)
 
                                     // fill in the departure times from trip_info using what was generated in our prediction
                                     // loop through trip info starting at the second item as we already have the initial departure time
@@ -566,6 +565,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     let gmaps_journey = false; //boolean for whether we're using gmaps predictions or our own
     let transit_count = 0; //counter to differentiate number of transit steps from walking/transit (i)
     for (let i = 0; i < num_trips; i++) {
+        var index = i;
         prediction_html += "<li class='list-group-item'>";
         // Now loop through the keys from our data returned from backend and get the appropriate
         // index from each of their respective arrays (the value to the key).
@@ -653,6 +653,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
         if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
                     let gmaps_str = trip_info[trip_info.length-2]["arrival_time"];
+                    console.log("gmaps_str", gmaps_str)
                     final_arrival_time = gmaps_to_timestamp(gmaps_str);
                     final_arrival_time += (parseInt(trip_info[trip_info.length-1].duration.split(" ")[0]) * 1000 * 60)
                 }
@@ -663,7 +664,7 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         console.log("final arrival time (walking)", new Date(final_arrival_time))
     } else {
         if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
-                    let gmaps_str = trip_info[trip_info.length-2]["arrival_time"];
+                    let gmaps_str = trip_info[trip_info.length-1]["arrival_time"];
                     final_arrival_time = gmaps_to_timestamp(gmaps_str);
                 }
         else {
@@ -726,11 +727,26 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 
 function gmaps_to_timestamp(gmaps_str) {
     let date_temp = new Date();
+    let converted_time;
     gmaps_str = gmaps_str.split(":");
-    date_temp.setHours(parseInt(gmaps_str[0]));
-    date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
-    converted_time = date_temp.getTime();
-    console.log({converted_time})
+    if ((gmaps_str[1].includes("am")) ||(gmaps_str[1].includes("AM"))) {
+        date_temp.setHours(parseInt(gmaps_str[0]));
+        date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
+    else if ((gmaps_str[1].includes("pm")) ||(gmaps_str[1].includes("PM"))) {
+        date_temp.setHours(parseInt(gmaps_str[0])+12);
+        date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
+    else {
+        date_temp.setHours(parseInt(gmaps_str[0]));
+        date_temp.setMinutes(parseInt(gmaps_str[1]))
+        converted_time = date_temp.getTime();
+        console.log({converted_time})
+    }
     return converted_time
 }
 
@@ -906,6 +922,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = current_step.transit.arrival_time.value;
+                    step_info["arrival_time"] = current_step.transit.arrival_time.text;
                     step_info["departure_time"] = departure_time;
                     step_info["route_num"] = current_step.transit.line.short_name;
                     step_info["num_stops"] = current_step.transit.num_stops;
@@ -918,6 +935,7 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["instructions"] = current_step.instructions;
                     step_info["duration"] = current_step.duration.text;
                     step_info["gmaps_prediction"] = "n/a";
+                    step_info["arrival_time"] = "n/a";
                     if (k === 0) {
                         step_info["departure_time"] = current_leg.departure_time.text;
                     } else {

@@ -523,7 +523,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 # Acquires the distance percent and last stop when found
                 dep_stop_list.append(i)
                 for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                    print(route[1],"test",stop_dict[i]["routes"][bus_route_stops][1])
                     if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                         depart_stop = i
                         distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
@@ -560,6 +559,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             for timetable_time in range(0, len(times_dict[route[1].strip(" ")][predict_day][depart_stop])):
                 if time_dir < times_dict[route[1].strip(" ")][predict_day][depart_stop][timetable_time][1]:
                     next_bus = times_dict[route[1].strip(" ")][predict_day][depart_stop][timetable_time][0]
+                    print(time_dir)
                     break
     else:
         for headsign_timetable in times_dict:
@@ -598,7 +598,11 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
     timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
     timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
+    print("timestampt before:",timestamp_cur_bef)
     results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
+    print("last stop min", last_stop_min)
+    print("next bus min", next_bus_min)
+    print("date",date)
     if not results:
         prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
                              date=date)
@@ -617,11 +621,15 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         data_return["arrival_time"] = ["gmaps"]
 
     else:
+        print("prediction",prediction)
+        print("next bus min",next_bus_min)
         full_time = prediction - next_bus_min
         predict_dep_mins = full_time * distance_depart
         predict_dep_mins = int(predict_dep_mins + next_bus_min)
         predict_dep_arr = full_time * (distance_arr)
         predict_dep_arr = int(predict_dep_arr + next_bus_min)
+        print("predict_dep_mins",predict_dep_mins)
+        print("predict_dep_arr",predict_dep_arr)
         # +1 month for javascript datetime, change min format to hours and min
         timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0)
         timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0)

@@ -513,6 +513,7 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                                     distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                                     last_stop = stop_dict[i]["routes"][bus_route_stops][5]
 
+
         else:
             # If no stop number was available for departure checks by name
             distance_depart = 0

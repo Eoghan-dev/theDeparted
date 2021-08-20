@@ -347,7 +347,7 @@ class AutocompleteDirectionsHandler {
     route() {
         // user_start is a boolean to indicate whether the start point was a user location(true) or place id
         const me = this;
-
+        console.log("CURRENT DATE TIME IS",new Date());
         // Get the time selected by the user/automatically generated as current time from the date/time input
         let date = document.getElementById('date_input').value;
         let time = document.getElementById('time_input').value;
@@ -489,7 +489,8 @@ class AutocompleteDirectionsHandler {
                                     // Send the relevant data to our backend so it can get model predictions
                                     console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
-                                    let prediction_json = await prediction_res.json();
+                                    let prediction = await prediction_res.json();
+
 
                                     // fill in the departure times from trip_info using what was generated in our prediction
                                     // loop through trip info starting at the second item as we already have the initial departure time
@@ -605,7 +606,12 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 prediction_html += `<b>${trip_step.departure_time}: </b>`;
             } else {
                 let formatted_date = new Date(prediction["departure_time"][transit_count]);
-                formatted_date = formatted_date.getHours() + ":" + formatted_date.getMinutes();
+                if (formatted_date.getMinutes() < 10) {
+                      formatted_date = formatted_date.getHours() + ":0" +formatted_date.getMinutes();
+                }
+                else {
+                      formatted_date = formatted_date.getHours() + ":" + formatted_date.getMinutes();
+                }
                 prediction_html += `<b>${formatted_date}: </b>`;
             }
 

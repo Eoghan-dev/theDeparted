@@ -1,6 +1,6 @@
 import json
 import os
-from . import DublinBus_current_info
+import DublinBus_current_info
 from operator import itemgetter
 from django.conf import settings
 base = settings.BASE_DIR
@@ -97,19 +97,33 @@ def get_timetable(index):
                     time = timetable[stop_time]["departure_time"]
                     check_time = list(time.split(":"))
                     if int(check_time[0]) >= 24:
-                        time = str(int(check_time[0]) - 24) +":"+ str(check_time[1]) + ":"+ str(check_time[2])
+                        time = "0" + str(int(check_time[0]) - 24) +":"+ str(check_time[1]) + ":"+ str(check_time[2])
+                        print(time)
                     stop = stops_dict[timetable[stop_time]["stop_id"]]
                     date = index[date]["Days"]
                     if route in bus_times:
-                        success_dir = 0
+                        if int(check_time[0]) >= 24:
+                            print("holo5")
                         if direction in bus_times[route]:
+                            if int(check_time[0]) >= 24:
+                                print("holo4")
                             if date[0] in bus_times[route][direction]:
+                                if int(check_time[0]) >= 24:
+                                    print("holo3")
                                 if stop in bus_times[route][direction][date[0]]:
+                                    if int(check_time[0]) >= 24:
+                                        print("holo2")
                                     if time in bus_times[route][direction][date[0]][stop]:
+                                        if int(check_time[0]) >= 24:
+                                            print("holo")
                                         pass
                                     else:
                                         bus_times[route][direction][date[0]][stop].append(time)
+                                        if int(check_time[0]) >= 24:
+                                            print("holohh",bus_times[route][direction][date[0]][stop])
                                         bus_times[route][direction][date[0]][stop] = sorted(bus_times[route][direction][date[0]][stop])
+                                        if int(check_time[0]) >= 24:
+                                            print("hologg",bus_times[route][direction][date[0]][stop])
                                 else:
                                     bus_times[route][direction][date[0]][stop] = [time]
                             else:
@@ -159,7 +173,7 @@ def get_timetable_all(index):
                 first_stop =  timetable[stop_time]["arrival_time"]
                 check_first_time = list(first_stop.split(":"))
                 if int(check_first_time[0]) >= 24:
-                    first_stop = str(int(check_first_time[0]) - 24) + ":" + str(check_first_time[1]) + ":" + str(check_first_time[2])
+                    first_stop = "0" + str(int(check_first_time[0]) - 24) + ":" + str(check_first_time[1]) + ":" + str(check_first_time[2])
             trip_id = timetable[stop_time]["trip_id"]
             trip_id = list(trip_id.strip().split("."))
             date = trip_id[1]
@@ -171,7 +185,7 @@ def get_timetable_all(index):
                 time = timetable[stop_time]["departure_time"]
                 check_time = list(time.split(":"))
                 if int(check_time[0]) >= 24:
-                    time = str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
+                    time = "0" + str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
                 stop = stops_dict[timetable[stop_time]["stop_id"]]
                 date = index[date]["Days"]
                 if route in bus_times:

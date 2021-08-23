@@ -21,8 +21,6 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
 
     // Some logic will be needed here to determine the start and end point co-ordinates of the passed route
     // but for the purposes of the presentation I'm going to hardcode the co-ordinates for route 56A
-    console.log("In displayRoute function")
-    console.log("Selected route passed through:", routeNumberAndDir)
 
     // Get the map as it's own variable by accessing it through the first marker in markersArray
     let map = markersArray[0].getMap();
@@ -55,14 +53,12 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
         // Pull the departure time and coordinates for start and end stops on the route from the response
         let departure_time = data['time'];
         let route_start_end_coords = data['coords'];
-        console.log("unformatted departure time:", departure_time);
         // Convert the time from 24hr to a Date object
         let dep_time_hrs = parseInt(departure_time.split(":")[0]);
         let dep_time_mins = parseInt(departure_time.split(":")[1]);
         let date_obj = new Date();
         date_obj.setHours(dep_time_hrs);
         date_obj.setMinutes(dep_time_mins - 5);
-        console.log("formatted departure time:", date_obj);
 
         // Extract the start and end coords
         let start_coords = route_start_end_coords[0];
@@ -87,7 +83,6 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
             provideRouteAlternatives: true,
         };
         directionsService.route(request, function (response, status) {
-            console.log(response);
             if (status == 'OK') {
                 // Loop through all of the possible route directions given back by the api
                 for (let i = 0; i < response.routes.length; i++) {
@@ -103,11 +98,9 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
                             console.group("current_step is:", current_step)
                             // Check if this step is using public transport and if so check if it's using the correct route
                             if (current_step.travel_mode === "TRANSIT") {
-                                console.log("step is in transit")
                                 // Check if the bus route is 56A, if it is we know that this route uses 56A at at least some point throughout the route
                                 // so we can select the route to be used as the current one in the for loop
                                 if (current_step.transit.line.short_name === routeNumberAndDir.split(":")[0]) {
-                                    console.log("56A found")
                                     directionsRenderer.setDirections(response);
                                     directionsRenderer.setRouteIndex(i);
                                     // Hide all markers except those in our new array which are on our route
@@ -117,13 +110,11 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
                                     return
                                 }
                             } else {
-                                console.log("step is not transit")
                             }
                         }
                     }
                 }
                 // Here we'll just set the default route given by google maps as we could not find a match for the entered route
-                console.log("Match could not be found with 56A");
                 //directionsRenderer.setDirections(response);
             } else {
                 alert("Error with response from google directions API")
@@ -132,15 +123,12 @@ async function displayRoute(directionsService, directionsRenderer, markersArray,
     } catch (err) {
         // If we couldn't display the route and markers then just display the markers
         showCertainMarkers(markersArray, markersOnRoute);
-        console.log("Error displaying route for this map from directions api. Err code:", err)
 
     }
 
 }
 
 async function displayStop(markersArray, stopNumber, directionsRenderer) {
-    console.log("In displayStop, stopNumber is", stopNumber)
-    console.log("In displayStop, markers array is", markersArray)
     let map = markersArray[0].getMap();
     // Close all info windows and hide markers
     showCertainMarkers(markersArray, []);
@@ -150,12 +138,10 @@ async function displayStop(markersArray, stopNumber, directionsRenderer) {
     document.getElementById('stops_spinner').style.display = "block";
     for (let marker of markersArray) {
         if (marker.number == stopNumber) {
-            console.log("Marker found", marker.number);
             let current_info_window = marker.infowindow;
             // Make a request to our backend to get the next several buses coming to this stop at time of click
             let incoming_buses_res = await fetch(`get_next_four_bus/${stopNumber}`);
             let incoming_buses = await incoming_buses_res.json();
-            console.log(incoming_buses)            // Parse the buses into a string and add this to our info window
             let previous_info_window_text = current_info_window.getContent();
             // Get the static part of the info window before overwriting it
             let previous_content = previous_info_window_text.split("<h3>")[0];
@@ -210,10 +196,8 @@ function loadRoutesSearch(routesJson) {
     // If the user is looking at the my account page load that datalist, if not load the one on the homepage
     let routes_selector;
     if (document.URL.includes('myAccount')) {
-        console.log("in load routes search in my account page")
         routes_selector = document.getElementById("user_routes");
     } else {
-        console.log("in load routes search not in my account page")
         routes_selector = document.getElementById("routes");
     }
     // First we need to remove all entries in the json file where there is a duplicate route number (route_short_name)
@@ -347,7 +331,6 @@ class AutocompleteDirectionsHandler {
     route() {
         // user_start is a boolean to indicate whether the start point was a user location(true) or place id
         const me = this;
-        console.log("CURRENT DATE TIME IS",new Date());
         // Get the time selected by the user/automatically generated as current time from the date/time input
         let date = document.getElementById('date_input').value;
         let time = document.getElementById('time_input').value;
@@ -368,16 +351,11 @@ class AutocompleteDirectionsHandler {
         selectedDateTime.setHours(hours);
         selectedDateTime.setMinutes(minutes);
 
-        console.log("date time before conversion", selectedDateTime)
-        console.log(selectedDateTime.getTime())
         // CHeck if the user entered date time is older than the current datetime as we don't want to get predictions
         // from the past (can happen if tab was left open)
         if (selectedDateTime.getTime() < currentTimestamp) {
             selectedDateTime = new Date(currentTimestamp);
         }
-        console.log("date time after conversion", selectedDateTime)
-        console.log("TEST")
-        console.log(currentTimestamp)
         // Return early if the relevant fields haven't been filled out yet
         if (this.usingUserInput === false) {
             if (!this.originPlaceId || !this.destinationPlaceId) {
@@ -402,7 +380,6 @@ class AutocompleteDirectionsHandler {
                 },
                 async (response, status) => {
                     if (status === "OK") {
-                        console.log("RESPONSE LOOK HERE:::", response)
                         // Set the directions on the map
                         me.directionsRenderer.setDirections(response);
                         // Get the info we need for our model from the directions response
@@ -411,11 +388,8 @@ class AutocompleteDirectionsHandler {
                         let trip_info = dir_info[1];
                         let gmaps_total_journey = dir_info[2];
                         // Send the relevant data to our backend so it can get model predictions
-                        console.log(data_for_model)
                         let prediction_res = await fetch(`/get_direction_bus/${data_for_model}`);
-                        console.log("raw result", prediction_res)
                         let prediction = await prediction_res.json();
-                        console.log("result after json.parse", prediction)
 
                         // fill in the departure times from trip_info using what was generated in our prediction
                         // loop through trip info starting at the second item as we already have the initial departure time
@@ -449,7 +423,6 @@ class AutocompleteDirectionsHandler {
                 }
             );
         } else if (this.usingUserInput === true) {
-            console.log("user location button clicked")
             if (navigator.geolocation) {
                 if (!this.destinationPlaceId) {
                     // return if they haven't entered a destination yet
@@ -462,7 +435,6 @@ class AutocompleteDirectionsHandler {
                 }
                 // Clear all (if any) markers from the map before continuing with drawing the directions
                 showCertainMarkers(this.markersArray, []); // we don't want to show any markers so pass an empty array
-                console.log("attempting routing from user location")
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         this.userLat = position.coords.latitude;
@@ -479,7 +451,6 @@ class AutocompleteDirectionsHandler {
                             },
                             async (response, status) => {
                                 if (status === "OK") {
-                                    console.log("RESPONSE LOOK HERE:::", response)
                                     // Set the directions on the map
                                     me.directionsRenderer.setDirections(response);
                                     let dir_info = getInfoFromDirections(response, selectedDateTime);
@@ -487,7 +458,6 @@ class AutocompleteDirectionsHandler {
                                     let trip_info = dir_info[1];
                                     let gmaps_total_journey = dir_info[2];
                                     // Send the relevant data to our backend so it can get model predictions
-                                    console.log(data_for_model)
                                     let prediction_res = await fetch(`get_direction_bus/${data_for_model}`);
                                     let prediction = await prediction_res.json();
 
@@ -565,7 +535,6 @@ function getGmapsTimeFromTimestamp(timestamp) {
 
     let departure_string = "";
     let departure_Date = new Date(timestamp)
-    console.log({departure_Date})
     let hour = departure_Date.getHours()
     let minutes = departure_Date.getMinutes()
     if (hour > 12) {
@@ -581,7 +550,6 @@ function getGmapsTimeFromTimestamp(timestamp) {
 }
 
 function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
-    console.log("trip_info", trip_info)
     let initial_departure_time;
     let final_arrival_time
     let total_cost = 0.0;
@@ -611,7 +579,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 else {
                     initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]) - parseInt(trip_step.duration.split(" ")[0]) * 1000 * 60);
                 }
-                console.log("initial departure time (walking)", new Date(initial_departure_time))
             }
             prediction_html += trip_step.instructions + " ---- " + trip_step.duration;
 
@@ -625,7 +592,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 else {
                     initial_departure_time = Math.abs(parseInt(prediction.departure_time[0]));
                 }
-                console.log("initial departure time (transit)", new Date(initial_departure_time));
             }
             if (prediction["departure_time"][transit_count] === "gmaps") {
                 prediction_html += `<i data-feather="chrome"></i><b>${trip_step.departure_time}: </b>`;
@@ -659,7 +625,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
 
             let instructions_string_arr = trip_step.instructions.split(" ");
             // remove first element from array and convert back to string
-            console.log({prediction})
             instructions_string_arr = instructions_string_arr.slice(1);
             let instructions_string = instructions_string_arr.join(" ");
             prediction_html += "Get route " + trip_step.route_num + " " + instructions_string + " ---- ";
@@ -680,16 +645,13 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 fare_status = "adult";
             }
             let leap_card = window.leap_card
-            console.log("num stops is " + stops_passed + " and fare status is " + fare_status + " and leap card is " + leap_card)
 
             // calculate cost of bus by first calculating whether the current departure time falls within a schooltime range
             let departure_time = trip_info[i].departure_time;
             let schooltime = determineSchoolRange(departure_time);
             // check if route is xpresso (has an x in the route number)
-            console.log({trip_step})
             let xpresso = (trip_step.route_num.includes("x") || trip_step.route_num.includes("X"));
             let fare = calculatePrice(stops_passed, fare_status, leap_card, schooltime, xpresso);
-            console.log(trip_info[i], "LOOK HERE")
             if (trip_info[i]['agency'] === "Dublin Bus") {
                 prediction_html += " ---- €" + fare.toFixed(2);
                 total_cost += fare;
@@ -701,7 +663,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
     if (trip_info[trip_info.length - 1].step_type === "WALKING") {
         if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
                     let gmaps_str = trip_info[trip_info.length-2]["arrival_time"];
-                    console.log("gmaps_str", gmaps_str)
                     final_arrival_time = gmaps_to_timestamp(gmaps_str);
                     final_arrival_time += (parseInt(trip_info[trip_info.length-1].duration.split(" ")[0]) * 1000 * 60)
                 }
@@ -709,7 +670,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
             final_arrival_time = Math.abs(parseInt(prediction.arrival_time[prediction.arrival_time.length - 1]));
             final_arrival_time += (parseInt(trip_info[trip_info.length-1].duration.split(" ")[0]) * 1000 * 60)
         }
-        console.log("final arrival time (walking)", new Date(final_arrival_time))
     } else {
         if (prediction.arrival_time[prediction.arrival_time.length - 1] === "gmaps") {
                     let gmaps_str = trip_info[trip_info.length-1]["arrival_time"];
@@ -718,7 +678,6 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         else {
             final_arrival_time = Math.abs(parseInt(prediction.arrival_time[prediction.arrival_time.length - 1]));
         }
-        console.log("final arrival time (transit)", new Date(final_arrival_time))
     }
     // Get total time of journey
     let total_time_taken_str = "";
@@ -734,29 +693,23 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
         })
         let total;
         if (fareJourney) {
-            console.log("hola")
             total = parseInt(total_journey_time(parseInt(initial_departure_time),parseInt(final_arrival_time)))
             let total_str = "";
             (Math.floor(total/60) === 0) ? total_str = ((total%60) + "mins") : total_str = (Math.floor(total/60) + " hours " + (total%60) + " mins ");
             total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + total_str + " and should cost €" + total_cost.toFixed(2) + "</li>";
         } else {
-            console.log("hola")
             total = parseInt(total_journey_time(parseInt(initial_departure_time),parseInt(final_arrival_time)))
             let total_str = "";
             (Math.floor(total/60) === 0) ? total_str = ((total%60) + "mins") : total_str = (Math.floor(total/60) + " hours " + (total%60) + " mins ");
             total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + total_str + "</li>";
         }
     } else {
-        console.log("prediction.arrival_time[num_trips - 1]", prediction.arrival_time[num_trips - 1])
-        console.log(prediction["departure_time"][0])
         let time_taken_timestamp = Math.abs(prediction.arrival_time[num_trips - 1] - prediction.departure_time[0]);
-        console.log("time_taken_timestamp", time_taken_timestamp)
         let hours_taken = (time_taken_timestamp / 1000) / 3600;
         let minutes_taken = (time_taken_timestamp / 1000) / 60;
 
         // Boolean for whether or not the journey consisted of only dublin bus trips and we should use the fare calculator
         let fareJourney = true;
-        console.log("Look here 2", trip_info)
         trip_info.forEach( trip => {
             if (trip['step_type'] === "TRANSIT") {
                 if (trip['agency'] != "Dublin Bus") {
@@ -764,24 +717,18 @@ function getPredictionHTML(prediction, trip_info, gmaps_total_journey) {
                 }
             }
         });
-        console.log({fareJourney})
         if (fareJourney) {
-            console.log("final_arrival_time",final_arrival_time)
-            console.log("initial_departure_time",initial_departure_time)
             total = parseInt((final_arrival_time - initial_departure_time) / 1000 / 60);
             let total_str = "";
             (Math.floor(total/60) === 0) ? total_str = ((total%60) + "mins") : total_str = (Math.floor(total/60) + " hours " + (total%60) + " mins ");
             total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + total_str +" and should cost €" + total_cost.toFixed(2) + "</li>";
         }
         else {
-            console.log("final_arrival_time",final_arrival_time)
-            console.log("initial_departure_time",initial_departure_time)
             total = parseInt((final_arrival_time - initial_departure_time) / 1000 / 60);
             let total_str = "";
             (Math.floor(total/60) === 0) ? total_str = ((total%60) + " mins ") : total_str = (Math.floor(total/60) + " hours " + (total%60) + " mins ");
             total_time_taken_str = "<li class='list-group-item list-group-item-primary'>Total journey should take " + total_str + "</li>";
         }
-        console.log("**********************************************")
         }
 
     prediction_html += total_time_taken_str + "</ul>";
@@ -796,7 +743,6 @@ function total_journey_time(initial,final) {
 }
 function gmaps_to_timestamp(gmaps_str) {
     let date_temp = getDateFromInput();
-    console.log("****************",date_temp)
     //let day = sel_date_time.getDate();
     //let month = sel_date_time.getMonth();
     //let year = sel_date_time.getYear();
@@ -812,19 +758,16 @@ function gmaps_to_timestamp(gmaps_str) {
         date_temp.setHours(parseInt(gmaps_str[0]));
         date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
         converted_time = date_temp.getTime();
-        console.log({converted_time})
     }
     else if ((gmaps_str[1].includes("pm")) ||(gmaps_str[1].includes("PM"))) {
         date_temp.setHours(parseInt(gmaps_str[0])+12);
         date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
         converted_time = date_temp.getTime();
-        console.log({converted_time})
     }
     else {
         date_temp.setHours(parseInt(gmaps_str[0]));
         date_temp.setMinutes(parseInt(gmaps_str[1]))
         converted_time = date_temp.getTime();
-        console.log({converted_time})
     }
     return converted_time
 }
@@ -833,7 +776,6 @@ function determineSchoolRange(departure_time) {
     let valid = false;
     let departure_min;
     // Function to determine if a bus departure time falls within a school range for our fare calculator
-    console.log("departure time", departure_time)
     let departure_hour = parseInt(departure_time.split(":")[0]);
     // Parse the departure time minutes differently depending on if response includes pm/am
     if (departure_time.split(":")[1].includes("pm") || departure_time.split(":")[1].includes("am")) {
@@ -847,7 +789,6 @@ function determineSchoolRange(departure_time) {
 
     let date = new Date();
     // set the departure time to our date object
-    console.log(departure_min)
     date.setHours(departure_hour);
     date.setMinutes(departure_min);
     // get the day of the week (sunday is 0)
@@ -863,7 +804,6 @@ function determineSchoolRange(departure_time) {
     } else {
         // For mon-fri it's valid if it's before 19:00
         if (date.getHours() < 19) {
-            console.log(date.getHours(), "is less than 19, valid")
             valid = true;
         }
     }
@@ -874,7 +814,6 @@ async function loadRoutes() {
     let routes = await fetch('/get_routes').then(res => {
         return res.json()
     }).then(data => {
-        console.log("all routes:", data)
         return data
     });
     return routes
@@ -884,7 +823,6 @@ async function loadStops() {
     let bus_stop_data = await fetch('/get_bus_stops').then(res => {
         return res.json()
     }).then(data => {
-        console.log("bus stop data:", data)
         return data
     });
     return bus_stop_data
@@ -905,7 +843,6 @@ function loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displayS
 }
 
 async function loadDataListsUser() {
-    console.log("in load data lists user")
     // Function to load datalists for user page. Currently calling server for bus and stop data again even though
     // we've already loaded them in the homepage which is fairly wasteful and pointless but can't think of another way atm
     let routes = await loadRoutes();
@@ -921,7 +858,6 @@ function loadDirUserInput() {
     // Set min and max values for date and time inputs
     // get current date and set as min
     let now = new Date();
-    console.log({now})
     let current_date = now.toISOString().split("T")[0]; // https://stackoverflow.com/a/49916376
     date_input.setAttribute("min", current_date);
     date_input.setAttribute("value", current_date);
@@ -931,11 +867,8 @@ function loadDirUserInput() {
     let future_day = current_day + 5;
 
     max_date.setDate(future_day)
-    console.log({max_date})
     let max_date_formatted = max_date.toISOString().split("T")[0];
     date_input.setAttribute("max", max_date_formatted);
-    console.log(current_date)
-    console.log(max_date)
     let hour = now.getHours();
     if (hour < 10) {
         hour = "0" + hour;
@@ -945,7 +878,6 @@ function loadDirUserInput() {
         minutes = "0" + minutes;
     }
     let current_time = hour + ":" + minutes;
-    console.log(current_time)
     time_input.setAttribute("min", current_time);
     time_input.setAttribute("value", current_time);
 }
@@ -972,7 +904,6 @@ function getInfoFromDirections(response, selected_date_time) {
         // Loop through all the legs of the current route
         for (let j = 0; j < current_route.legs.length; j++) {
             let current_leg = current_route.legs[j];
-            console.log("GMAPS TOTAL JOURNEY TIME:", current_leg.duration.text)
             gmaps_total_journey_time = current_leg.duration.text;
             console.group("current_leg is:", current_leg)
             // Loop through each step in this leg of the route
@@ -982,7 +913,6 @@ function getInfoFromDirections(response, selected_date_time) {
                 // Check if this step is using public transport and if so check if it's using the correct route
                 let step_info = {}
                 if (current_step.travel_mode === "TRANSIT") {
-                    console.log("step is in transit")
                     let departure_time = current_step.transit.departure_time.text;
                     let route_num = current_step.transit.line.short_name;
                     let route_headsign = current_step.transit.headsign;
@@ -1007,7 +937,6 @@ function getInfoFromDirections(response, selected_date_time) {
                     step_info["num_stops"] = current_step.transit.num_stops;
                     step_info["agency"] = current_step['transit']['line']['agencies'][0]['name'];
                 } else {
-                    console.log("step is not transit")
                     // save step info with no detail for gmaps prediction as this is only needed for bus times
                     step_info["step_type"] = current_step.travel_mode;
                     step_info["distance"] = current_step.distance;
@@ -1028,7 +957,6 @@ function getInfoFromDirections(response, selected_date_time) {
             }
         }
     }
-    console.log(data_for_model);
     // Return our objects
     let data_for_model_json = JSON.stringify(data_for_model);
     return [data_for_model_json, trip_description, gmaps_total_journey_time];
@@ -1044,7 +972,6 @@ function closeCancellationsOverlay() {
 
 function fillSidebar(content, type) {
     // takes a parameter of user's fav routes/stops
-    console.log("in fill sidebar")
     let sidebar_content = "";
     if (type === "stops") {
 
@@ -1073,23 +1000,18 @@ function fillSidebar(content, type) {
 function setupFavButtons(displayStopFromFavs, displayRouteFromFavs) {
     // Function to get all buttons from the sidebar and add an event listener that will call
     // a function which will then call either displayStops or displayRoutes depending on which is needed
-    console.log("inside setup fav buttons")
     let fav_stops = document.querySelectorAll(".fav_stops_button_sb");
-    console.log({fav_stops_buttons: fav_stops})
     for (let i = 0; i < fav_stops.length; i++) {
         let current_stop = fav_stops[i];
 
         current_stop.addEventListener('click', () => {
-            console.log("in sidebar button event listener (stop)")
             displayStopFromFavs(current_stop.innerHTML)
         });
     }
     let fav_routes = document.querySelectorAll(".fav_routes_button_sb");
-    console.log({fav_routes_buttons: fav_routes})
     for (let i = 0; i < fav_routes.length; i++) {
         let current_route = fav_routes[i];
         current_route.addEventListener('click', () => {
-            console.log("in sidebar button event listener (route)")
             displayRouteFromFavs(current_route.innerHTML)
         });
     }
@@ -1145,7 +1067,6 @@ function get_timetable_stops(result) {
 
 function get_timetable(stop) {
     var stop_time_list = parsedsched
-    console.log(stop)
     let url = window.location.href
     url = url.replace("%20", " ");
     url = url.replace("%27", "'");
@@ -1178,7 +1099,6 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     let package;
     let cost;
     // First determine package (leap card and fare status combo)
-    console.log("fare status of user is", fareStatus)
     if (fareStatus === "adult") {
         if (leapcard === true) {
             package = "adultleap";
@@ -1204,33 +1124,25 @@ function calculatePrice(stages, fareStatus, leapcard, schoolchild, xpresso) {
     if (fareStatus === "adult") {
         if (xpresso === true) {
             cost = costs[package]['price4'];
-            console.log("found fare, cost is", cost, "and package is", package)
         } else {
             if (stages >= 1 && stages <= 3) {
                 cost = costs[package]['price1'];
-                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 3 && stages <= 13) {
                 cost = costs[package]['price2'];
-                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 13) {
                 cost = costs[package]['price3'];
-                console.log("found fare, cost is", cost, "and package is", package)
             }
         }
     } else {
         if (schoolchild === true) {
             cost = costs[package]['price1'];
-            console.log("found fare, cost is", cost, "and package is", package)
         } else if (xpresso === true) {
             cost = costs[package]['price4'];
-            console.log("found fare, cost is", cost, "and package is", package)
         } else {
             if (stages >= 1 && stages <= 7) {
                 cost = costs[package]['price2'];
-                console.log("found fare, cost is", cost, "and package is", package)
             } else if (stages > 7) {
                 cost = costs[package]['price3'];
-                console.log("found fare, cost is", cost, "and package is", package)
             }
         }
     }

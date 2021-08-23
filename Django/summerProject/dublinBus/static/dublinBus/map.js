@@ -131,7 +131,7 @@ async function initMap() {
                     incoming_buses_text += `<li class="list-group-item">${route_name} is less than a minute away.</li>`;
                 }
                 else {
-                    incoming_buses_text += `<li class="list-group-item">${route_name} +${minutes_away} minutes away.</li>`;
+                    incoming_buses_text += `<li class="list-group-item">${route_name} ${minutes_away} minutes away.</li>`;
                 }
             }
             incoming_buses_text += "</ul></div>";

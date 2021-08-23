@@ -407,6 +407,14 @@ def get_direction_bus(request, data):
         else:
             data_return["arrival_time"].append(temporary_dict["arrival_time"][0] * 1000)
     print("data_returned",data_return)
+    #Catch if departure time before arrival time of previous bus
+    if len(data_return["departure_time"]) >1:
+        for departure_time in range(1,len(data_return["departure_time"])):
+            if data_return["departure_time"][departure_time] != "gmaps" and data_return["arrival_time"][departure_time-1] != "gmaps" and int(data_return["departure_time"][departure_time]) <int(data_return["arrival_time"][departure_time-1]):
+                for depBefArr in range(0,len(data_return["departure_time"])):
+                    data_return["departure_time"][depBefArr] = "gmaps"
+                    data_return["arrival_time"][depBefArr] = "gmaps"
+                print("bad times")
     return JsonResponse(data_return)
 
 def timetable_main(request):
@@ -460,7 +468,9 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     stop_dict = json.load(f)
     f.close()
     depart_time = list(dep_time.split(":"))
+    print(depart_time)
     date = datetime.fromtimestamp(int(date_time)) - relativedelta(months=1)
+    print(date)
     month = date.month
     year = date.year
     hour = date.hour
@@ -474,17 +484,20 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
     elif weekday ==6:
         predict_day = "sun"
     # time is given in form of HH:MM am/pm checks if am or pm
-    if depart_time[-1][-2:] == "pm" or int(depart_time[0])>=12:
+    if depart_time[-1][-2:] == "pm" or (int(depart_time[0])>=12 and "am" not in depart_time[-1]):
+        print("bad code")
         # Changes pm to HH:MM:SS format matches that in timetable
         if int(depart_time[0]) >= 12:
             time_dir = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
         else:
             hh = 12 + int(depart_time[0])
             time_dir =str(hh) + ":" + depart_time[1][:2] + ":00"
-    elif depart_time[-1][-2:] == "am" or int(depart_time[0])<12:
+    elif depart_time[-1][-2:] == "am" or (int(depart_time[0])<=12):
         hh =int(depart_time[0])
         if hh < 10:
             time_dir = "0" + str(hh) + ":" + depart_time[1][:2] + ":00"
+        elif hh == 12:
+            time_dir = "0" + str(hh - 12) + ":" + depart_time[1][:2] + ":00"
         else:
             time_dir =str(hh) + ":" + depart_time[1][:2] + ":00"
     # Gets the stop number if available for departure and arrival if none available compares to stops.json
@@ -525,7 +538,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                     # Acquires the distance percent and last stop when found
                     dep_stop_list.append(i)
                     for bus_route_stops in range(0, len(stop_dict[i]["routes"])):
-                        print(route[1],"test",stop_dict[i]["routes"][bus_route_stops][1])
                         if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1] and distance_depart <=stop_dict[i]["routes"][bus_route_stops][3] and route[0].strip(" ") == stop_dict[i]["routes"][bus_route_stops][0]:
                             depart_stop = i
                             distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
@@ -598,10 +610,16 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             timestamp_cur_aft = datetime(year, month, date + 1, hour - 22, min, 0)
         else:
             timestamp_cur_aft = datetime(year, month, date, hour + 2, min, 0)
+        print(timestamp_cur_bef)
+        print(timestamp_cur_aft)
         timestamp_cur_bef = datetime.timestamp(timestamp_cur_bef)
         timestamp_cur_aft = datetime.timestamp(timestamp_cur_aft)
-        results = WeatherForecast.objects.filter(timestamp__lt=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
+        print(timestamp_cur_bef)
+        print(timestamp_cur_aft)
+
+        results = WeatherForecast.objects.filter(timestamp__lte=timestamp_cur_aft,timestamp__gt=timestamp_cur_bef).values()
         if not results:
+            print("no weather")
             prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
                                  date=date)
         else:
@@ -609,10 +627,11 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             temp = results[0]["main_temp"] - 273.15
             weather_id = results[0]["weather_id"]
             print(date)
+            print(route[0], direction, last_stop_min, next_bus_min, month, date)
             prediction = predict(route[0], direction, last_stop_min, next_bus_min, actual_dep=next_bus_min, month=month,
                                  date=date, temp=temp, weather=weather_id)
         print(prediction)
-        if prediction == False:
+        if prediction == False or prediction < next_bus_min:
             print("prediction failed")
             data_return["route"] = ["gmaps"]
             data_return["departure_time"] = ["gmaps"]
@@ -620,6 +639,8 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
 
         else:
             full_time = prediction - next_bus_min
+            print("distance_depart", distance_depart)
+            print("distance_arr",distance_arr)
             predict_dep_mins = full_time * distance_depart
             predict_dep_mins = int(predict_dep_mins + next_bus_min)
             predict_dep_arr = full_time * (distance_arr)

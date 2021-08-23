@@ -32,24 +32,20 @@ async function initMap() {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected route by the user
         let selectedRoute = document.getElementsByName('routes_num')[0];
         let routeNumberAndDir = selectedRoute.value;
-        console.log("Selected route was: ", routeNumberAndDir)
         displayRoute(directionsService, directionsRenderer, markers_array, routeNumberAndDir)
     };
     const displaySelectedStop = function () {
         // The first index of the array returned by getElementsByName for our datalist with always be the selected stop by the user
         let selectedStop = document.getElementsByName('stops_num')[0];
         let stopNum = selectedStop.value;
-        console.log("Selected stop was: ", stopNum)
         displayStop(markers_array, stopNum, directionsRenderer)
     };
     loadDataListsHome(bus_stop_data, routes, displaySelectedRoute, displaySelectedStop);
 
     const displayStopFromFavs = function(stopNum) {
-        console.log("Inside displayStopFromFavs")
         displayStop(markers_array, stopNum, directionsRenderer);
     }
     const displayRouteFromFavs = function(route) {
-        console.log("Inside displayRouteFromFavs")
         displayRoute(directionsService, directionsRenderer, markers_array, route);
     }
 
@@ -107,7 +103,6 @@ async function initMap() {
         // Add an on-click event for each marker to open the associated info window
         current_marker.addListener("click", async () => {
             // document.getElementById('map').classList.toggle("spinner-border")
-            console.log("IN marker listener function")
             // before opening the window for this marker close any other open markers
             markers_array.forEach(current_marker => {
                 current_marker.infowindow.close(map, current_marker)
@@ -177,6 +172,5 @@ async function initMap() {
         handleLocationError(false, map);
     }
 
-    console.log("Markers array:", markers_array)
 }
 

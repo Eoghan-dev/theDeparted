@@ -417,6 +417,7 @@ class AutocompleteDirectionsHandler {
                         let results_container = document.getElementById('results_container');
                         results_container.innerHTML = prediction_html;
                         results_container.style.display = "block";
+                        feather.replace()
                     } else {
                         alert("Directions request failed due to " + status);
                     }
@@ -488,6 +489,7 @@ class AutocompleteDirectionsHandler {
                                     let results_container = document.getElementById('results_container');
                                     results_container.innerHTML = prediction_html;
                                     results_container.style.display = "block";
+                                    feather.replace()
 
                                 } else {
                                     window.alert("Directions request failed due to " + status);

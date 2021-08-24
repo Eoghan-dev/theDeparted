@@ -745,12 +745,6 @@ function total_journey_time(initial,final) {
 }
 function gmaps_to_timestamp(gmaps_str) {
     let date_temp = getDateFromInput();
-    //let day = sel_date_time.getDate();
-    //let month = sel_date_time.getMonth();
-    //let year = sel_date_time.getYear();
-    //date_temp.setDate(day)
-    //date_temp.setMonth(month);
-    //date_temp.setYear(year);
     let converted_time;
     gmaps_str = gmaps_str.split(":");
     if ((gmaps_str[1].includes("am")) ||(gmaps_str[1].includes("AM"))) {
@@ -762,7 +756,12 @@ function gmaps_to_timestamp(gmaps_str) {
         converted_time = date_temp.getTime();
     }
     else if ((gmaps_str[1].includes("pm")) ||(gmaps_str[1].includes("PM"))) {
-        date_temp.setHours(parseInt(gmaps_str[0])+12);
+        if (gmaps_str[0] === "12") {
+            date_temp.setHours(parseInt(gmaps_str[0]));
+        }
+        else    {
+            date_temp.setHours(parseInt(gmaps_str[0])+12);
+        }
         date_temp.setMinutes(parseInt(gmaps_str[1].slice(0,2)))
         converted_time = date_temp.getTime();
     }

@@ -59,82 +59,81 @@ def get_index():
                         else:
                             count +=1
                     time_dict[description[0]] = dates_dict
-        print(time_dict)
         return time_dict
 
 def get_timetable(index):
-    #Opens paths to json files
+    """Creates timetable for first and last stop only"""
+    # Opens paths to json files
     file_location = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stop_times.json")
     stops_id = os.path.join(base, "dublinBus", "static", "dublinBus", "Dublin_bus_info", "json_files", "stops.json")
-    #Initialises dictionaries and counter
+    # Initialises dictionaries and counter
     bus_times = {}
     stops_dict = {}
     count = 0
-    #Checks if stop_times.json exists
+    # Checks if stop_times.json exists
     if os.path.exists(file_location)==False:
         return False
     else:
+        # Opens stops.json file
         with open(stops_id, encoding="utf-8-sig") as out_file:
             stop_id = json.loads(out_file.read())
+        # Iterates through it to create a dictionary for stop id to stop
         for id in stop_id:
             stops_dict[stop_id[id]["stop_id"]] = id
+        # Opens stops_times.json
         with open(file_location, encoding="utf-8-sig") as out_file:
             timetable = json.loads(out_file.read())
         for stop_time in timetable:
             date_dict = {}
             stop_dict_create = {}
             dir_dict = {}
-            #If stop sequence is 1
+            # If stop sequence is 1
             if timetable[stop_time]["stop_sequence"] == "1":
                 trip_id = timetable[stop_time]["trip_id"]
                 trip_id = list(trip_id.strip().split("."))
                 date = trip_id[1]
-                #****************************** NB- Hard coded needs to be fixed *****************************
+                # Works for dates until October more information is needed how these change in time periods to automate
                 if date in ["y1007","y1008","y1009"]:
                     route = list(trip_id[2].strip().split("-"))
                     route = route[1]
                     direction = timetable[stop_time]["stop_headsign"]
                     time = timetable[stop_time]["departure_time"]
+                    # Splits time into a list with hour, min and sec each being an element
                     check_time = list(time.split(":"))
+                    # If time is greater then 24 takes 24 from hours
                     if int(check_time[0]) >= 24:
                         time = "0" + str(int(check_time[0]) - 24) +":"+ str(check_time[1]) + ":"+ str(check_time[2])
                         print(time)
                     stop = stops_dict[timetable[stop_time]["stop_id"]]
                     date = index[date]["Days"]
+                    # if a route already exists in dictionary
                     if route in bus_times:
-                        if int(check_time[0]) >= 24:
-                            print("holo5")
+                        # If the direction for that route exists in the route
                         if direction in bus_times[route]:
-                            if int(check_time[0]) >= 24:
-                                print("holo4")
+                            # If the date exists within that direction
                             if date[0] in bus_times[route][direction]:
-                                if int(check_time[0]) >= 24:
-                                    print("holo3")
+                                # If the stop exists in that date
                                 if stop in bus_times[route][direction][date[0]]:
-                                    if int(check_time[0]) >= 24:
-                                        print("holo2")
+                                    # If the time already exists in that stop ignore
                                     if time in bus_times[route][direction][date[0]][stop]:
-                                        if int(check_time[0]) >= 24:
-                                            print("holo")
                                         pass
+                                    # Else appends that time along the tree checked by the if statement
                                     else:
                                         bus_times[route][direction][date[0]][stop].append(time)
-                                        if int(check_time[0]) >= 24:
-                                            print("holohh",bus_times[route][direction][date[0]][stop])
                                         bus_times[route][direction][date[0]][stop] = sorted(bus_times[route][direction][date[0]][stop])
-                                        if int(check_time[0]) >= 24:
-                                            print("hologg",bus_times[route][direction][date[0]][stop])
+                                # Creates stop and time list in the dictionary
                                 else:
                                     bus_times[route][direction][date[0]][stop] = [time]
+                            # Creates stop and time list in separate dictionary then creates a new date key for the path with the stop dictionary
                             else:
                                 stop_dict_create[stop] = [time]
-                                #date_dict[date[0]] = stop_dict_create
                                 bus_times[route][direction][date[0]] = stop_dict_create
+                        # New stop dictionary saved to new date dictionary saved to main dictionary with new direction
                         else:
                             stop_dict_create[stop] = [time]
                             date_dict[date[0]] = stop_dict_create
-                            #dir_dict[direction] = date_dict
                             bus_times[route][direction] = date_dict
+                    # Creates a new entry in the main dictionary
                     else:
                         count = count + 1
                         stop_dict_create[stop] = [time]
@@ -159,58 +158,69 @@ def get_timetable_all(index):
     if os.path.exists(file_location)==False:
         return False
     else:
+        #Opens stops.json
         with open(stops_id, encoding="utf-8-sig") as out_file:
             stop_id = json.loads(out_file.read())
+        #Iterates through the id's in stops.json
         for id in stop_id:
             stops_dict[stop_id[id]["stop_id"]] = id
+        #Opens stop_times.json
         with open(file_location, encoding="utf-8-sig") as out_file:
             timetable = json.loads(out_file.read())
         for stop_time in timetable:
             date_dict = {}
             stop_dict_create = {}
             dir_dict = {}
+            # Saves first stop time as first_stop
             if timetable[stop_time]["stop_sequence"] == "1":
                 first_stop =  timetable[stop_time]["arrival_time"]
                 check_first_time = list(first_stop.split(":"))
+                # If first_stop time is greater then 24 takes 24 from hours
                 if int(check_first_time[0]) >= 24:
                     first_stop = "0" + str(int(check_first_time[0]) - 24) + ":" + str(check_first_time[1]) + ":" + str(check_first_time[2])
             trip_id = timetable[stop_time]["trip_id"]
             trip_id = list(trip_id.strip().split("."))
             date = trip_id[1]
-            #****************************** NB- Hard coded needs to be fixed *****************************
+            # Works for dates until October more information is needed how these change in time periods to automate
             if date in ["y1007","y1008","y1009"]:
                 route = list(trip_id[2].strip().split("-"))
                 route = route[1]
                 direction = timetable[stop_time]["stop_headsign"]
                 time = timetable[stop_time]["departure_time"]
                 check_time = list(time.split(":"))
+                # If time is greater then 24 takes 24 from hours
                 if int(check_time[0]) >= 24:
                     time = "0" + str(int(check_time[0]) - 24) + ":" + str(check_time[1]) + ":" + str(check_time[2])
                 stop = stops_dict[timetable[stop_time]["stop_id"]]
                 date = index[date]["Days"]
+                # if a route already exists in dictionary
                 if route in bus_times:
-                    success_dir = 0
+                    # If the direction for that route exists in the route
                     if direction in bus_times[route]:
+                        # If the date exists within that direction
                         if date[0] in bus_times[route][direction]:
+                            # If the stop exists in that date
                             if stop in bus_times[route][direction][date[0]]:
+                                # If the time already exists in that stop ignore
                                 if [first_stop, time] in bus_times[route][direction][date[0]][stop]:
                                     pass
+                                # Else appends that first stop time,time along the tree checked by the if statement
                                 else:
                                     bus_times[route][direction][date[0]][stop].append([first_stop, time])
                                     bus_times[route][direction][date[0]][stop] = (sorted(bus_times[route][direction][date[0]][stop], key=itemgetter(0)))
+                            # Creates times for a new stop
                             else:
                                 bus_times[route][direction][date[0]][stop] = [[first_stop, time]]
+                        # Creates times for new stop and date
                         else:
-                            if time > "24:00:00":
-                                print(time)
                             stop_dict_create[stop] = [[first_stop, time]]
-                            #date_dict[date[0]] = stop_dict_create
                             bus_times[route][direction][date[0]] = stop_dict_create
+                    # Creates times for new stop, date and direction
                     else:
                         stop_dict_create[stop] = [[first_stop, time]]
                         date_dict[date[0]] = stop_dict_create
-                        #dir_dict[direction] = date_dict
                         bus_times[route][direction] = date_dict
+                # Creates times for new stop, date, direction and route
                 else:
                     count = count + 1
                     stop_dict_create[stop] = [[first_stop, time]]

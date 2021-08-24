@@ -485,7 +485,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
         predict_day = "sun"
     # time is given in form of HH:MM am/pm checks if am or pm
     if depart_time[-1][-2:] == "pm" or (int(depart_time[0])>=12 and "am" not in depart_time[-1]):
-        print("bad code")
         # Changes pm to HH:MM:SS format matches that in timetable
         if int(depart_time[0]) >= 12:
             time_dir = str(depart_time[0]) + ":" + depart_time[1][:2] + ":00"
@@ -525,8 +524,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                                     depart_stop = i
                                     distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                                     last_stop = stop_dict[i]["routes"][bus_route_stops][5]
-
-
         else:
             # If no stop number was available for departure checks by name
             distance_depart = 0
@@ -542,9 +539,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                             depart_stop = i
                             distance_depart = stop_dict[i]["routes"][bus_route_stops][3]
                             last_stop = stop_dict[i]["routes"][bus_route_stops][5]
-
-                else:
-                    pass
         #Catch for if the Name check couldn't find the correct stop departure and arrival
         if depart_stop == None or last_stop ==None:
             data_return["route"] = ["gmaps"]
@@ -564,9 +558,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                         if route[1].strip(" ") == stop_dict[i]["routes"][bus_route_stops][1]:
                             arr_stop = i
                             distance_arr = stop_dict[i]["routes"][bus_route_stops][3]
-
-                else:
-                    pass
         # if departure stop in timetable for route given
         if route[1].strip(" ") in times_dict:
             if depart_stop in times_dict[route[1].strip(" ")][predict_day]:
@@ -575,11 +566,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                     if time_dir < times_dict[route[1].strip(" ")][predict_day][depart_stop][timetable_time][1]:
                         next_bus = times_dict[route[1].strip(" ")][predict_day][depart_stop][timetable_time][0]
                         break
-        else:
-            for headsign_timetable in times_dict:
-                #Checks if headsign is abbreviated
-                if list((route[1].strip(" ")).split(" "))[0] in headsign_timetable:
-                    print("ahoy")
         # Finds the headsign for bus route to check if inbound or outbound
         for headsign in range(0, len(routes_dict[route[0]]["direction"])):
             if routes_dict[route[0]]["direction"][headsign][0] == route[1].strip(" "):
@@ -590,8 +576,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
                 else:
                     direction = 1
         entry = 0
-        if last_stop not in times_dict[route[1].strip(" ")][predict_day]:
-            print("ni hao")
         while times_dict[route[1].strip(" ")][predict_day][last_stop][entry][0] != next_bus:
             entry += 1
         last_stop_time = times_dict[route[1].strip(" ")][predict_day][last_stop][entry][1]
@@ -639,8 +623,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
 
         else:
             full_time = prediction - next_bus_min
-            print("distance_depart", distance_depart)
-            print("distance_arr",distance_arr)
             predict_dep_mins = full_time * distance_depart
             predict_dep_mins = int(predict_dep_mins + next_bus_min)
             predict_dep_arr = full_time * (distance_arr)
@@ -648,8 +630,6 @@ def setting_data(dep_time,dep_stop,arr_stop,route_name,date_time):
             # +1 month for javascript datetime, change min format to hours and min
             timestamp_return_dep = datetime(year, month, date, math.floor(predict_dep_mins / 60), predict_dep_mins % 60,0)
             timestamp_return_arr = datetime(year, month, date, math.floor(predict_dep_arr / 60), predict_dep_arr % 60,0)
-            print(timestamp_return_dep)
-            print(timestamp_return_arr)
             data_return["route"] = [route[0]]
             data_return["departure_time"] = [datetime.timestamp(timestamp_return_dep)]
             data_return["arrival_time"] = [datetime.timestamp(timestamp_return_arr)]
